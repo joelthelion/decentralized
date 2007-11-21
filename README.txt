@@ -1,11 +1,14 @@
 Presentation
 ------------
 
-KolmoGNUS is a simple yet powerful program which recommends links to the user based on his tastes. Links are taken from selected del.icio.us feeds, and user tastes are learned with a bayesian inference technique. The program comes with a simple TK interface for easy opening and rating of the links.
+KolmoGNUS is a simple yet powerful program which recommends links to the user based on his tastes.
+Links are taken from selected del.icio.us feeds, and user tastes are learned with a bayesian inference technique.
+The program comes with a simple TK interface for easy opening and rating of the links.
 
-This simple concept allows to chose links based both on content and collaborative filtering. It quickly gives very good, personalized recommendations.
+This simple concept allows to chose links based both on content and collaborative filtering. 
+It quickly gives very good, personalized recommendations.
 
-Slashdot allowed users to comment, Reddit added the right to submit. KolmoGNUS gives you complete freedom of content! 
+Slashdot allowed users to comment, Reddit added the right to submit. KolmoGNUS gives you complete freedom of content!
 
 Installation
 ------------
