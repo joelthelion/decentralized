@@ -1,3 +1,12 @@
+License and Authors
+-------------------
+
+This software is licensed under the GPL, a copy of which can be found with the
+distribution. It was written by Joel Schaerer (see project website
+http://kolmognus.berlios.de/ for contact information)
+
+Copyright 2007 Joel Schaerer.
+
 Presentation
 ------------
 
