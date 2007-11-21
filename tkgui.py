@@ -8,7 +8,7 @@ import utils
 class App:
     def __init__(self,root):
         self.root=root  #GUI Initialization
-        self.root.title("Bogocious intelligent feed reader")
+        self.root.title("KolmoGNUS intelligent feed reader")
         frame = Tkinter.Frame(root)
         frame.pack()
         self.root.protocol("WM_DELETE_WINDOW", self.quit)
