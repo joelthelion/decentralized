@@ -22,11 +22,12 @@ class Story:
         return a.encode("utf8")
     def bogorepresentation(self):
         """Returns a representation suitable for a classifier"""
-        tokens=["\n\n"] #\ns are to avoid head:token bogofilter problems
+        tokens=[]
         tokens.append(self.url)
         tokens.extend(["liked_by_%s" % user for user in self.liked])
         tokens.extend(["disliked_by_%s" % user for user in self.disliked])
         tokens.extend([description for description in self.descriptions.values()])
+        tokens.append("special_always_there") #this is used to measure the overall probability that a story is spam
         return " ".join(tokens).encode("ascii","replace")
     def update_score(self):
         from story_filter import filter_text
