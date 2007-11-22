@@ -84,7 +84,6 @@ def main():
         print i,filter_text(i)
     hapaxes=[]
     for k in sfilter.corpus.keys():
-        if sfilter.corpus[k] < 3 : continue #ignore keys with low occurence
         guess=sfilter.guess(k)
         if len(guess) > 0:
             pool,prob=max(guess,key=lambda x:x[1])
