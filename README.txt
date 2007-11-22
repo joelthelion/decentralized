@@ -33,7 +33,8 @@ Simply run the tkgui.py program. On the first run, the program will ask to defin
 This is a very important step, but you will have the occasion to add some keywords later through the "train
 filter manually" option.
 
-Keyboard shortcuts are extremely important : "l" for liked, "d" for disliked, "enter" to open link in browser.
+Keyboard shortcuts are extremely important : "l" for liked, "d" for disliked, "enter" to open link in browser, and "r"
+to refresh the list of URLs.
 
 Contact
 -------
