@@ -40,6 +40,7 @@ class App:
         self.root.bind("d",lambda e:dislike.invoke())
         self.root.bind("r",lambda e:refr.invoke())
         self.root.bind("q",lambda e:self.quit())
+        self.root.bind("<FocusIn>", lambda e : self.lb.select_set(self.get_cursor_pos()))
 
         #Menu
         menu=Tkinter.Menu(root)

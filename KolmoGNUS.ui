@@ -1,0 +1,196 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>KolmoGNUS - intelligent feed reader</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <widget class="QToolButton" name="GoodBtn" >
+    <property name="geometry" >
+     <rect>
+      <x>100</x>
+      <y>10</y>
+      <width>100</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Good !</string>
+    </property>
+    <property name="shortcut" >
+     <string>Ctrl+L, Ctrl+S</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="BadBtn" >
+    <property name="geometry" >
+     <rect>
+      <x>210</x>
+      <y>10</y>
+      <width>100</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Bad !</string>
+    </property>
+    <property name="shortcut" >
+     <string>Ctrl+D</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefreshBtn" >
+    <property name="geometry" >
+     <rect>
+      <x>320</x>
+      <y>10</y>
+      <width>100</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Refresh !</string>
+    </property>
+    <property name="shortcut" >
+     <string>F5</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="RedditBtn" >
+    <property name="geometry" >
+     <rect>
+      <x>430</x>
+      <y>10</y>
+      <width>125</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Discuss on reddit</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="QuitBtn" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>80</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Quit</string>
+    </property>
+    <property name="shortcut" >
+     <string>Ctrl+Q</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="FeedList" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>781</width>
+      <height>501</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>File</string>
+    </property>
+    <addaction name="actionQuit" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>Tools</string>
+    </property>
+    <addaction name="actionManually_train_filter" />
+    <addaction name="actionShow_filter_info" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout" />
+   </widget>
+   <addaction name="menuFile" />
+   <addaction name="menuTools" />
+   <addaction name="menuHelp" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <action name="actionAbout" >
+   <property name="text" >
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionQuit" >
+   <property name="text" >
+    <string>Quit</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionManually_train_filter" >
+   <property name="text" >
+    <string>Manually train filter</string>
+   </property>
+  </action>
+  <action name="actionShow_filter_info" >
+   <property name="text" >
+    <string>Show filter info</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>QuitBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>49</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
