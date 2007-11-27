@@ -16,4 +16,5 @@ datadir="data/"
 common_words = set(['with', 'is', 'and', 'the', 'of', 'to', 'in', \
     'index', 'http', 'html', 'com', 'has', 'le', 'quot',\
     'a', 'un', 'les', 'on', 'by','www','http','com','org'\
-    ,'as','net','for','la','et','htm','par'] + [repr(n) for n in range(100)])
+    ,'as','net','for','la','et','htm','par','sur']\
+    + [repr(n) for n in range(100)])
