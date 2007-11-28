@@ -78,7 +78,7 @@ def readdeliciousfeed(feedurl,storydict={}):
     print len(f.entries)
     output=[] #optional debug output
     for i in f.entries:
-        if not is_old(i.id):
+        if not is_old(i.id): #i.id is simply the story URL
             output.append("+")
             if not storydict.has_key(i.id):
                 storydict[i.id]=item_description.DeliciousStory(i.id)
@@ -100,7 +100,7 @@ def clean_stories(stories):
         #if the story is older than twelve hours, and wasn't rated by me, remove it
         #We keep stories I rated to avoid dupes
         age = (current_time - s.creation_time) / 3600 #story age in hours
-        if age > 6:
+        if age > 24:
             stories.pop(s.url)
             print s.url
     print "Done!"
@@ -178,6 +178,14 @@ def train_filter(story,pool):
     story.get_additional_info()
     story_filter.train_filter(story.bogorepresentation(),pool)
     add_old(story)
+
+def manual_train_filter_no_func(ham, spam=False):
+    """Trains the filter with words given in function parameters"""
+    import story_filter
+    weight = 6
+    story_filter.train_filter((" "+ham+" ")*weight,"ham",removeDuplicates=False)
+    if spam:
+        story_filter.train_filter((" "+spam+" ")*weight,"spam",removeDuplicates=False)
 
 def manual_train_filter(trainforspam=False,inputfunc=raw_input):
     """Ask the user for a few words for filter initialization"""
