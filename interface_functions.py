@@ -190,11 +190,16 @@ def manual_train_filter_no_func(ham, spam=False):
 def manual_train_filter(trainforspam=False,inputfunc=raw_input):
     """Ask the user for a few words for filter initialization"""
     import story_filter
+    import types
     weight=6
-    ham=inputfunc("Enter a few space separated words describing topics you like: ")
+    while True:
+        ham=inputfunc("Enter a few space separated words describing topics you like: ")
+        if type(ham) == types.StringType and ham != "" : break
     story_filter.train_filter((" "+ham+" ")*weight,"ham",removeDuplicates=False)
     if trainforspam:
-        spam=inputfunc("Enter a few space separated words describing topics you DON'T like: ")
+        while True:
+            spam=inputfunc("Enter a few space separated words describing topics you DON'T like: ")
+            if type(spam) == types.StringType and spam != "" : break
         story_filter.train_filter((" "+spam+" ")*weight,"spam",removeDuplicates=False)
 
 def get_filter_stats():
