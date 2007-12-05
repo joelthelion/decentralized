@@ -161,6 +161,7 @@ def reevaluate_all(stories,update_function):
     return stories
 
 def get_feeds():
+    # Feed format is list of tuples of form (feed_name, feed_url, refresh_time)
     import story_filter
     feeds=[("delicious_current","http://del.icio.us/rss/recent?min=1",1)] #feed_name,feed url,refresh time. This is the delicious recent feed and should be included all the time
     feed_keys=story_filter.get_pool_keys(number=10)['ham']
@@ -195,11 +196,20 @@ def manual_train_filter(trainforspam=False,inputfunc=raw_input):
     while True:
         ham=inputfunc("Enter a few space separated words describing topics you like: ")
         if type(ham) == types.StringType and ham != "" : break
+    print ham
     story_filter.train_filter((" "+ham+" ")*weight,"ham",removeDuplicates=False)
     if trainforspam:
         while True:
             spam=inputfunc("Enter a few space separated words describing topics you DON'T like: ")
             if type(spam) == types.StringType and spam != "" : break
+        story_filter.train_filter((" "+spam+" ")*weight,"spam",removeDuplicates=False)
+
+def manual_train_filter_no_func(ham, spam=False):
+    """Trains the filter with words given in function parameters"""
+    import story_filter
+    weight = 6
+    story_filter.train_filter((" "+ham+" ")*weight,"ham",removeDuplicates=False)
+    if spam:
         story_filter.train_filter((" "+spam+" ")*weight,"spam",removeDuplicates=False)
 
 def get_filter_stats():

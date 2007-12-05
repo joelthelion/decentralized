@@ -1,0 +1,14 @@
+<ui>
+  <menubar name="Menubar">
+    <menu action="FileMenu">
+      <menuitem action="Quit" />
+    </menu>
+    <menu action="ActionsMenu">
+      <menuitem action="Refresh"/>
+    </menu>
+    <menu action="ToolsMenu">
+      <menuitem action="ManualTrain"/>
+      <menuitem action="FilterInfo"/>
+    </menu>
+  </menubar>
+</ui>

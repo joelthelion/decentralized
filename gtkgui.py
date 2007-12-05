@@ -7,12 +7,14 @@ from interface_functions import refresh_stories,manual_train_filter_no_func,reev
 import utils
 
 COLUMN_SCORE, COLUMN_URL, COLUMN_OTHERS_LIKED = (0, 1, 2)
+COLUMN_TAGS = 0
 
-#TODO: update_status
 
-#TODO: Status bar code
-#TODO: Threading
-#TODO: gtk.Window + gtk.Treeview for selecting spam+ham tags
+#TODO: Add functionality to status bar code*
+#TODO: Threading**
+#TODO: Fix initial dimensions of HamSpamWin()
+#TODO: Enable saving of current Ham/Spam tags
+#TODO: Keyboard shortcuts/double-click to view
 
 class UserTags():
     def __init__(self, init_tags=None):
@@ -34,6 +36,203 @@ class UserTags():
 
     def all_tags(self):
         return ' '.join(list(self.tags))
+    
+    def tags_iter(self):
+        for tag in self.tags: yield tag
+
+class HamSpamWin(gtk.Window):
+    def __init__(self, parent, title="Configure User Interests"):
+        gtk.gdk.threads_init()
+        gtk.Window.__init__(self)
+        
+
+        self.ham_tags = parent.ham_tags
+        self.spam_tags = parent.spam_tags
+        self.setup_win(parent, title)
+
+    def setup_win(self, parent, title):
+        self.set_screen(parent.get_screen())
+        self.set_title(title)
+        self.set_border_width(8)
+        self.set_default_size(200, 250)
+        
+
+        vbox = gtk.VBox(False, 2)
+        self.add(vbox)
+
+        ham_lstore = self.ham_lstore = self.make_ham_lstore()
+        ham_treeview = self.ham_treeview  = gtk.TreeView(ham_lstore)
+        spam_lstore = self.spam_lstore = self.make_spam_lstore()
+        spam_treeview = self.spam_treeview = gtk.TreeView(self.spam_lstore)
+
+        ## Widget layout looks like this:
+        ## Tree: Vbox
+        ##
+        ## Vbox: ham_label, ham_hbox, ham_entry, spam_label, spam_hbox, spam_entry
+        ##
+        ## ham_hbox: ham_scroll, ham_vbox
+        ## ham_scroll: ham_treeview
+        ## ham_vbox: ham_add_button, ham_remove_button
+        ##
+        ## spam_hbox: spam_scroll, spam_vbox
+        ## spam_scroll: spam_treeview
+        ## spam_vbox: spam_add_button, spam_remove_button
+
+        ### Ham entries 
+
+        ## Ham Label
+
+        ham_label = gtk.Label("Like Tags")
+        ham_label.set_justify(gtk.JUSTIFY_LEFT)
+        vbox.pack_start(ham_label, False, False)
+
+        ham_hbox = gtk.HBox(False, 2)
+
+        ## Ham Scrolled-treeview
+
+        ham_scroll = gtk.ScrolledWindow()
+        ham_scroll.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        ham_scroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        treeselect = self.ham_treeview.get_selection() # Grab selection and set single selection mode
+        treeselect.set_mode(gtk.SELECTION_SINGLE)
+        ham_scroll.add(ham_treeview)
+        ham_hbox.pack_start(ham_scroll)
+
+        ## Ham buttons
+        ham_button_vbox = gtk.VBox(False, 2)
+        ham_add_button = gtk.Button()
+        ham_add_button.connect("clicked", self.ham_add_callback)
+        ham_add_button.set_label("Add")
+        ham_remove_button = gtk.Button()
+        ham_remove_button.connect("clicked", lambda w: self.remove_selected_ham())
+        ham_remove_button.set_label("Remove")
+        ham_button_vbox.pack_start(ham_add_button, False, False)
+        ham_button_vbox.pack_start(ham_remove_button, False, False)
+        ham_hbox.pack_start(ham_button_vbox)
+        vbox.pack_start(ham_hbox)
+
+        ## Ham Text Entry
+
+        self.ham_entry = ham_entry = gtk.Entry(max=0)
+        self.ham_entry.connect("activate", self.ham_add_callback)
+        vbox.pack_start(ham_entry)
+
+        ### Spam section
+
+        ## Spam label
+        
+        spam_label = gtk.Label("Dislike Tags")
+        spam_label.set_justify(gtk.JUSTIFY_LEFT)
+        vbox.pack_start(spam_label, False, False)
+
+        spam_hbox = gtk.HBox(False, 2)
+
+        ## Spam Scrolled-Treeview
+
+        spam_scroll = gtk.ScrolledWindow()
+        spam_scroll.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        spam_scroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        treeselect = self.spam_treeview.get_selection() # Grab selection and set single selection mode
+        treeselect.set_mode(gtk.SELECTION_SINGLE)
+        spam_scroll.add(spam_treeview)
+        spam_hbox.pack_start(spam_scroll)
+
+        ## Spam add and remove buttons
+
+        spam_button_vbox = gtk.VBox(False, 2)
+        spam_add_button = gtk.Button()
+        spam_add_button.connect("clicked", self.spam_add_callback)
+        spam_add_button.set_label("Add")
+        spam_remove_button = gtk.Button()
+        spam_remove_button.connect("clicked", lambda w: self.remove_selected_spam())
+        spam_remove_button.set_label("Remove")
+        spam_button_vbox.pack_start(spam_add_button, False, False)
+        spam_button_vbox.pack_start(spam_remove_button, False, False)
+        spam_hbox.pack_start(spam_button_vbox)
+
+        vbox.pack_start(spam_hbox)
+
+        self.spam_entry = spam_entry = gtk.Entry(max=0)
+        self.spam_entry.connect("activate", self.spam_add_callback)
+        vbox.pack_start(spam_entry)
+
+        self.ham_add_columns()
+        #self.load_ham()
+        self.spam_add_columns()
+        #self.load_spam()
+
+        self.show_all()
+
+    def make_ham_lstore(self):
+        lstore = gtk.ListStore(gobject.TYPE_STRING)
+        self.populate_ham_lstore(lstore)
+        return lstore
+
+    def populate_ham_lstore(self, lstore):
+        for tag in self.ham_tags.tags_iter(): lstore.append([tag])
+
+    def make_spam_lstore(self):
+        lstore = gtk.ListStore(gobject.TYPE_STRING)
+        self.populate_spam_lstore(lstore)
+        return lstore
+
+    def populate_spam_lstore(self, lstore):
+        for tag in self.spam_tags.tags_iter(): lstore.append([tag])
+
+    def ham_add_columns(self):
+        column = gtk.TreeViewColumn("Tags", gtk.CellRendererText(), text=COLUMN_TAGS)
+        column.set_sort_column_id(COLUMN_TAGS)
+        self.ham_treeview.append_column(column)
+
+    def load_ham(self):
+        self.populate_ham_lstore(self.ham_lstore)
+
+    def spam_add_columns(self):
+        column = gtk.TreeViewColumn("Tags", gtk.CellRendererText(), text=COLUMN_TAGS)
+        column.set_sort_column_id(COLUMN_TAGS)
+        self.spam_treeview.append_column(column)
+
+    def spam_add_callback(self, widget):
+        text = self.spam_entry.get_text()
+        if text:
+            self.spam_tags.add_tags(text)
+            self.spam_entry.set_text('')
+            self.spam_lstore.clear()
+            self.populate_spam_lstore(self.spam_lstore)
+
+    def ham_add_callback(self, widget):
+        text = self.ham_entry.get_text()
+        if text:
+            self.ham_tags.add_tags(text)
+            self.ham_entry.set_text('')
+            self.ham_lstore.clear()
+            self.populate_ham_lstore(self.ham_lstore)
+
+    def get_tag_selection(self, treeview):
+        treeselect = treeview.get_selection()
+        (model, model_iter) = treeselect.get_selected()
+        return model.get_value(model_iter, COLUMN_TAGS)
+
+    def get_spam_selection(self):
+        treeselect = self.ham_treeview.get_selection()
+        (model, model_iter) = treeselect.get_selected()
+        return model.get_value(model_iter, COLUMN_TAGS)
+
+    def get_ham_selection(self):
+        treeselect = self.spam_treeview.get_selection()
+        (model, model_iter) = treeselect.get_selected()
+        return model.get_value(model_iter, COLUMN_TAGS)
+
+    def remove_selected_ham(self):
+        self.ham_tags.remove_tags(self.get_tag_selection(self.ham_treeview))
+        self.ham_lstore.clear()
+        self.populate_ham_lstore(self.ham_lstore)
+
+    def remove_selected_spam(self):
+        self.spam_tags.remove_tags(self.get_tag_selection(self.spam_treeview))
+        self.spam_lstore.clear()
+        self.populate_spam_lstore(self.spam_lstore)
+
 
 class KolmoWin(gtk.Window):
     def __init__(self, parent=None, title="KolmoGNUS intelligent feed reader"):
@@ -43,10 +242,8 @@ class KolmoWin(gtk.Window):
         self.stories = None # Dictionary of story entries
         self.slist = None # Sorted tuples of the stories of form (story.score, story.url)
         
-        self.slist = [(0.2, "http://www.google.com")]
-        self.ham_tags = UserTags("lisp ruby java c c++ factor smalltalk python") # Example default ham tags, to be changed later
-        self.spam_tags = UserTags("digg") # Example default spam tags, to be changed later
-        manual_train_filter_no_func(self.ham_tags.all_tags(), self.spam_tags.all_tags())
+        #self.slist = [(0.2, "http://www.google.com")]
+        #manual_train_filter_no_func(self.ham_tags.all_tags(), self.spam_tags.all_tags())
 
 
         self.setup_win(parent, title)
@@ -66,6 +263,9 @@ class KolmoWin(gtk.Window):
         vbox = gtk.VBox(False, 2)
         self.add(vbox)
 
+        menubar = self.make_menu()
+        vbox.pack_start(menubar, expand=False)
+
         stories_lstore = self.make_lstore()
         stories_treeview = gtk.TreeView(stories_lstore)
         stories_treeview.set_rules_hint(False)
@@ -82,7 +282,7 @@ class KolmoWin(gtk.Window):
         dislike_button.connect("clicked", self.train_spam, stories_lstore, stories_treeview)
         dislike_button.set_label("Bad!")
         refresh_button = gtk.Button()
-        refresh_button.connect("clicked", lambda widget, treeview: self.refresh_story_list(treeview), stories_lstore)
+        refresh_button.connect("clicked", lambda widget: self.refresh_story_list())
         refresh_button.set_label("Refresh")
         view_button = gtk.Button()
         view_button.connect("clicked", lambda widget, treeview: self.open_page(treeview), stories_treeview)
@@ -154,7 +354,7 @@ class KolmoWin(gtk.Window):
         column.set_sort_column_id(COLUMN_OTHERS_LIKED)
         treeview.append_column(column)
 
-    def refresh_story_list(self, lstore, hard=True):
+    def refresh_story_list(self, hard=True):
         self.update_status("Refreshing stories, please be patient...")
         if hard:
             on_update = lambda x: self.update_status("Please wait... " + x)
@@ -164,8 +364,31 @@ class KolmoWin(gtk.Window):
             self.stories = refresh_stories(feeds, on_update)
             self.slist = reevaluate_all(self.stories, on_update)
             self.slist = sort_stories(self.stories, on_update)
-        lstore.clear()
-        self.populate_stories(lstore)
+        self.stories_lstore.clear()
+        self.populate_stories(self.stories_lstore)
+
+    def make_menu(self):
+
+        ag = gtk.ActionGroup('WindowActions')
+        actions = [
+            ('FileMenu', None, '_File'),
+            ('Quit',     gtk.STOCK_QUIT, '_Quit', '<control>Q',
+             'Quit application', self.quit_win),
+            ('ActionsMenu', None, '_Actions'),
+            ('Refresh', None, '_Refresh', '<control>R',
+             'Refresh stories', lambda action: self.refresh_story_list()),
+            ('ToolsMenu', None, '_Tools'),
+            ('ManualTrain', None, 'Manually Train Filter', None, 'Manually Train Filter',
+             lambda action: HamSpamWin(self)),
+            ('FilterInfo', None, 'Filter Info', None, 'Filter Information')
+            ]
+        ag.add_actions(actions)
+        self.ui = gtk.UIManager()
+        self.ui.insert_action_group(ag, 0)
+        self.ui.add_ui_from_file("gtkgui_menu.xml")
+        self.add_accel_group(self.ui.get_accel_group())
+
+        return self.ui.get_widget("/Menubar")
 
     def get_current_url(self, treeview):
         treeselect = treeview.get_selection()
@@ -175,12 +398,12 @@ class KolmoWin(gtk.Window):
     def train_ham(self, widget, lstore, treeview):
         url = self.get_current_url(treeview)
         train_filter(self.stories[url], 'ham')
-        self.refresh_story_list(lstore, False)
+        self.refresh_story_list(hard=False)
 
     def train_spam(self, widget, lstore, treeview):
         url = self.get_current_url(treeview)
         train_filter(self.stories[url], 'spam')
-        self.refresh_story_list(lstore, False)
+        self.refresh_story_list(hard=False)
 
     def open_page(self, treeview, url=None):
         import webbrowser
@@ -216,10 +439,10 @@ class KolmoWin(gtk.Window):
         try:
             load_filter()
         except utils.UntrainedFilterException:
-            # TODO: Prompt for filters
+            HamSpamWin() # If no tags are loaded, display tag-request window
             print "utils.UntrainedFilterException"
         else:
-            self.refresh_story_list(lstore)
+            self.refresh_story_list()
 
     def quit_win(self, widget):
         save_stories(self.stories)
