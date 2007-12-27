@@ -46,8 +46,8 @@ class HamSpamWin(gtk.Window):
         gtk.Window.__init__(self)
         
 
-        self.ham_tags = parent.ham_tags
-        self.spam_tags = parent.spam_tags
+        self.ham_tags = UserTags() #parent.ham_tags
+        self.spam_tags = UserTags() #parent.spam_tags
         self.setup_win(parent, title)
 
     def setup_win(self, parent, title):
@@ -439,7 +439,7 @@ class KolmoWin(gtk.Window):
         try:
             load_filter()
         except utils.UntrainedFilterException:
-            HamSpamWin() # If no tags are loaded, display tag-request window
+            HamSpamWin(self) # If no tags are loaded, display tag-request window
             print "utils.UntrainedFilterException"
         else:
             self.refresh_story_list()
