@@ -2,10 +2,14 @@
 
 import MySQLdb
 
-db=MySQLdb.connect('localhost','test3','abc','prout')
-cursor=db.cursor()
+def connect_db():
+	return MySQLdb.connect('localhost','test3','abc','prout')
 
-cursor.execute('select * from users')
-for k,row in enumerate(cursor.fetchall()):
-	print k,row
+def login_list(db):
+	cursor=db.cursor()
+	cursor.execute('select * from users')
+	return [user[0] for user in cursor.fetchall()]
 
+if __name__=='__main__':
+	db=connect_db()
+	print login_list(db)
