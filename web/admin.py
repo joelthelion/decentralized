@@ -17,13 +17,13 @@ def adduser(params,db):
 	""" login password: add user to database"""
 	#parse parameters
 	if len(params)!=2:
-		return this.__doc__
+		return "adduser"+adduser.__doc__
 	else:
 		login=params[0]
 		passwd=params[1]
 
 	#add user
-	if login in sql.login_list(db):
+	if sql.login_exists(login,db):
 		return "can't add user %s: already in database..." % login
 	else:
 		db.query("insert into users (login,pass) values ('%s',PASSWORD('%s'))" % (login,passwd))
@@ -33,16 +33,30 @@ def remuser(params,db):
 	""" login: remove user from database"""
 	#parse parameters
 	if len(params)!=1:
-		return this.__doc__
+		return "remuser"+remuser.__doc__
 	else:
 		login=params[0]
 
 	#remove user
-	if not login in sql.login_list(db):
+	if not sql.login_exists(login,db):
 		return "can't remove user %s: not in database..." % login
 	else:
 		db.query("delete from users where login='%s'" % login)
 		return "user %s removed from database" % login
+
+def testlogin(params,db):
+	""" login password: test password for user"""
+	#parse parameters
+	if len(params)!=2:
+		return "testlogin"+testlogin.__doc__
+	else:
+		login=params[0]
+		passwd=params[1]
+
+	if sql.login_paswd_test(login,passwd,db):
+		return "password ok"
+	else:
+		return "password err"
 
 def listuser(params,db):
 	""": list users in database"""
@@ -64,10 +78,12 @@ commands={
 	'adduser'	: adduser,
 	'add'		: adduser,
 	'remuser'	: remuser,
-	'rem'		: remuser,
+	'rm'		: remuser,
 	'usage'		: usage,
 	'help'		: usage,
-	'h'		: usage}
+	'h'		: usage,
+	'testlogin'	: testlogin,
+	'test'		: testlogin}
 
 #user interface
 def get_command():
