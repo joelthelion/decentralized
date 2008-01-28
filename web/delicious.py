@@ -45,9 +45,7 @@ if __name__=="__main__":
 		feed="test_user.xml"
 
 	import xml.sax
-	parser=xml.sax.make_parser()
 	handler=DeliciousHandler()
-	parser.setContentHandler(handler)
-	parser.parse(feed)
+	xml.sax.parse(feed,handler)
 	print handler
 	print len(handler.tags)
