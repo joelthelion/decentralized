@@ -42,7 +42,7 @@ if __name__=="__main__":
 	if len(sys.argv)>1:
 		feed=sys.argv[1]
 	else:
-		feed="test_user.xml"
+		feed="http://del.icio.us/rss/tag/c++"
 
 	import xml.sax
 	handler=DeliciousHandler()
