@@ -28,6 +28,21 @@ def login_test(login,password,db):
 		print "query error: %s..." % db.error()
 		return False
 
+#service oriented
+def service_list(db):
+		cursor=db.cursor()
+		cursor.execute('select name,status from service')
+		return cursor.fetchall()
+
+def service_set_status(service,status,db):
+		return query("update service set status='%s' where name='%s'" % (status,service),db)
+
+#fetcher oriented
+def tag_list(db):
+		cursor=db.cursor()
+		cursor.execute('select name from tag')
+		return [tag[0] for tag in cursor.fetchall()]
+
 if __name__=='__main__':
 	db=connect_db()
 	print login_list(db)

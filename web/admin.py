@@ -29,10 +29,27 @@ def usage(params,db):
 	return '\n'.join([','.join(cmds)+function.__doc__ for function,cmds in functions.items()])
 
 #fetcher oriented command
+@as_param_number(0)
+def cleartags(params,db):
+	""": clear fetcher tags"""
+	if sql.query("truncate table tag",db):
+		return "tags cleared"
+
 @as_param_number(1)
-def addtag(params,db):
-	""" tag: add tag to fetcher"""
-	pass
+def addtags(params,db):
+	""" tag tag ... : add tags to fetcher"""
+	added_tags=0
+	for tag in params:
+		if sql.query("insert into tag (name,fetched_count) values ('%s',0)" % tag,db):
+			added_tags=added_tags+1
+		else:
+			return "can't add tag %s..." % tag
+	return "added %d tags" % added_tags
+
+@as_param_number(0)
+def listtag(params,db):
+	""":list fetcher tag"""
+	return 'tags: '+' '.join(sql.tag_list(db))
 
 #user oriented command
 @as_param_number(2)
@@ -41,7 +58,6 @@ def adduser(params,db):
 	login=params[0]
 	passwd=params[1]
 
-	#add user
 	if sql.query("insert into kolmognus_user (login,pass) values ('%s',PASSWORD('%s'))" % (login,passwd),db):
 		return  "user %s added to database" % login  
 	else:
@@ -52,7 +68,6 @@ def remuser(params,db):
 	""" login: remove user from database"""
 	login=params[0]
 
-	#remove user
 	if sql.query("delete from kolmognus_user where login='%s'" % login,db):
 		return "user %s removed from database" % login
 	else:
@@ -85,6 +100,10 @@ def quit(params,db):
 commands={
 	'quit'		: quit,
 	'q'		: quit,
+	'usage'		: usage,
+	'help'		: usage,
+	'h'		: usage,
+
 	'listuser'	: listuser,
 	'list'  	: listuser,
 	'ls'		: listuser,
@@ -92,11 +111,15 @@ commands={
 	'add'		: adduser,
 	'remuser'	: remuser,
 	'rm'		: remuser,
-	'usage'		: usage,
-	'help'		: usage,
-	'h'		: usage,
 	'testlogin'	: testlogin,
-	'test'		: testlogin}
+	'test'		: testlogin,
+
+	'cleartags'	: cleartags,
+	'cltags'	: cleartags,
+	'addtags'	: addtags,
+	'addt'		: addtags,
+	'listtags'	: listtag,
+	'tags'		: listtag}
 
 #user interface
 def get_command():
