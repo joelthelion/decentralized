@@ -43,6 +43,12 @@ def tag_list(db):
 		cursor.execute('select name from tag')
 		return [tag[0] for tag in cursor.fetchall()]
 
+max_incoming_url=100
+def is_incoming_full(db):
+                cursor=db.cursor()
+                cursor.execute('select url from incoming_url')
+                return cursor.rowcount>max_incoming_url
+
 if __name__=='__main__':
 	db=connect_db()
 	print login_list(db)
