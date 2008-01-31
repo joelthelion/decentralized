@@ -6,7 +6,7 @@ import time
 if __name__ == '__main__':
     import delicious
     import time
-    sql.service_set_status('fetcher','started',db)
+    sql.service_set_status('fetcher','started')
     while True:
         #is incoming full??
         #build url list from recent and requested tags
