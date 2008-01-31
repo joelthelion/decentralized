@@ -12,8 +12,9 @@ create table if not exists kolmognus_user (
 
 create table if not exists cached_url (
 	url_md5 char(32) primary key,
-	symbols text(32000),
-	fetchedi_count int(8)
+	next_fetch datetime,
+	urls text(32000),
+	fetched_count int(8)
 );
 
 create table if not exists incoming_url (
@@ -23,7 +24,7 @@ create table if not exists incoming_url (
 
 create table if not exists tag (
 	name varchar(64) primary key,
-	last_time_fetched date,
+	last_time_fetched datetime,
 	fetched_count int(8)
 );
 

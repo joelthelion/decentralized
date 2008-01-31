@@ -1,71 +1,62 @@
 #!/usr/bin/env python
 #delicious content parser for sax xml parser implementation
 
-
 import xml.sax.handler
 import xml.sax
+import md5
+import sql
 from urllib2 import HTTPError
 
-last_delicious_fetch_date=-1
-min_delicious_hammer_delay=3
-
-def acquire_delicious():
-    """Checks if we are not hammering delicious too much. If so, wait"""
-    import time
-    current=time.time()
-    if current - globals()['last_delicious_fetch_date'] < globals()['min_delicious_hammer_delay']:
-        print "Delicious hammer delay..."
-        time.sleep(min_delicious_hammer_delay-(current-globals()['last_delicious_fetch_date']))
-        print "Ok!"
-    globals()['last_delicious_fetch_date']=time.time()
-
+#delicious urls parsing
 def get_recent_urls():
-    """Returns a list of URLs concerning a certain tag"""
+    """Returns a list of recent URLs"""
     feed='http://delicious.com/rss/recent'
-    handler=DeliciousTagHandler()
-    acquire_delicious()
-    try:
-        xml.sax.parse(feed,handler)
-    except HTTPError,e:
-        print "ERROR: Could not retrieve recent delicious urls"
-        print e
-        return []
-    return handler.urls
+    return get_urls_for_feed(feed)
 
 def get_urls_for_tag(tag):
     """Returns a list of URLs concerning a certain tag"""
     feed='http://delicious.com/rss/tag/%s' % tag
-    handler=DeliciousTagHandler()
-    acquire_delicious()
-    try:
-        xml.sax.parse(feed,handler)
-    except HTTPError:
-        return []
-    return handler.urls
+    return get_urls_for_feed(feed)
 
-def get_delicious_data_for_url(url):
-    """Returns all the relevent delicious data concerning URL"""
-    import md5
-    feed='http://delicious.com/rss/url/%s' % md5.md5(url).hexdigest()
-    handler=DeliciousURLHandler()
-    acquire_delicious()
+def get_urls_for_feed(feed):
+    feed_md5=md5.md5(feed).hexdigest()
+    urls=get_valid_cached_urls_for_feed(feed_md5)
+    if not urls:
+        print "INFO: request for urls from feed '%s': fetching delicious" % feed
+        urls=fetch_urls_for_feed(feed)
+    else:
+        print "INFO: request for urls from feed '%s': using cache" % feed
+    update_urls_cache(feed_md5,urls)
+    return urls
+
+def get_valid_cached_urls_for_feed(feed_md5):
+    rows=sql.request("select urls from cached_url where url_md5='%s' and next_fetch >= now()" % feed_md5)
+    if rows:
+        return rows[0][0].split('|')
+    else:
+        return []
+
+def fetch_urls_for_feed(feed):
+    handler=DeliciousTagHandler()
     try:
         xml.sax.parse(feed,handler)
-    except HTTPError:
-        return ([],[],[],-1)
-    tags=list(set(handler.tags))
-    import time
-    pub_dates=[]
-    for delicious_date_string in handler.bookmark_dates:
-        try:
-            pub_dates.append(time.mktime(time.strptime(delicious_date_string,"%Y-%m-%jT%H:%M:%SZ")))
-        except ValueError:
-            print "Warning : unable to parse date string %s" % delicious_date_string
-    pub_date = min(pub_dates)
-    return (handler.authors,tags,handler.descriptions,pub_date)
+        return handler.urls
+    except HTTPError,e:
+        print "ERROR: Could not retrieve delicious urls for feed '%s'" % feed
+        print e
+        return []
     
+def update_urls_cache(feed_md5,urls):
+    joined_urls='|'.join(urls)
+    rows=sql.request("select fetched_count from cached_url where url_md5='%s'" % feed_md5)
+    if rows: #already in database
+        fetched_count=rows[0][0]+1
+        sql.query("update cached_url set fetched_count='%d', urls='%s', next_fetch=addtime(now(),'00:30:00') where url_md5='%s'" % (fetched_count,joined_urls,feed_md5))
+    else:
+        sql.query("insert into cached_url (url_md5,next_fetch,urls,fetched_count) values ('%s',addtime(now(),'00:30:00'),'%s',1)" % (feed_md5,joined_urls))
+
 class DeliciousURLHandler(xml.sax.handler.ContentHandler):
-    """Parses a delicious rss of the form delicious/rss/md5"""
+    """Parses a delicious rss of the form delicious/rss/url_md5"""
     def __init__(self):
         self.logins=[]
         self.tags=[]
@@ -110,6 +101,27 @@ class DeliciousURLHandler(xml.sax.handler.ContentHandler):
         elif name =="dc:date":
             self.in_bookmark_date=False
 
+#delicious tag parsing
+def get_delicious_data_for_url(url):
+    """Returns all the relevent delicious data concerning URL"""
+    feed='http://delicious.com/rss/url/%s' % md5.md5(url).hexdigest()
+    handler=DeliciousURLHandler()
+    acquire_delicious()
+    try:
+        xml.sax.parse(feed,handler)
+    except HTTPError,e:
+        return ([],[],[],-1)
+    tags=list(set(handler.tags))
+    import time
+    pub_dates=[]
+    for delicious_date_string in handler.bookmark_dates:
+        try:
+            pub_dates.append(time.mktime(time.strptime(delicious_date_string,"%Y-%m-%jT%H:%M:%SZ")))
+        except ValueError:
+            print "WARNING: unable to parse date string %s" % delicious_date_string
+    pub_date = min(pub_dates)
+    return (handler.authors,tags,handler.descriptions,pub_date)
+    
 class DeliciousTagHandler(xml.sax.handler.ContentHandler):
     """Parses a delicious rss of the form delicious/rss/tag/c++"""
     def __init__(self):

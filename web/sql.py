@@ -21,7 +21,7 @@ def request(request):
         return cursor.fetchall()
     except ProgrammingError:
         print "'%s' request error: %s..." % (request,db.error())
-        return False
+        return []
     
 #user oriented
 def login_list():
