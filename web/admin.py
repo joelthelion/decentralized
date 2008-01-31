@@ -3,7 +3,7 @@
 import sql
 
 #param number decorator
-def as_param_number(n_params):
+def has_param_number(n_params):
 	def test_param(func):
 		def new_func(params,db):
 			if len(params)>=n_params or n_params<0:
@@ -17,7 +17,7 @@ def as_param_number(n_params):
 
 #commands implementation
 #help
-@as_param_number(0)
+@has_param_number(0)
 def usage(params,db):
 	""": display commands help"""
 	functions={}
@@ -29,13 +29,13 @@ def usage(params,db):
 	return '\n'.join([','.join(cmds)+function.__doc__ for function,cmds in functions.items()])
 
 #fetcher oriented command
-@as_param_number(0)
+@has_param_number(0)
 def cleartags(params,db):
 	""": clear fetcher tags"""
 	if sql.query("truncate table tag",db):
 		return "tags cleared"
 
-@as_param_number(1)
+@has_param_number(1)
 def addtags(params,db):
 	""" tag tag ... : add tags to fetcher"""
 	added_tags=0
@@ -46,13 +46,13 @@ def addtags(params,db):
 			return "can't add tag %s..." % tag
 	return "added %d tags" % added_tags
 
-@as_param_number(0)
+@has_param_number(0)
 def listtag(params,db):
 	""":list fetcher tag"""
 	return 'tags: '+' '.join(sql.tag_list(db))
 
 #user oriented command
-@as_param_number(2)
+@has_param_number(2)
 def adduser(params,db):
 	""" login password: add user to database"""
 	login=params[0]
@@ -63,7 +63,7 @@ def adduser(params,db):
 	else:
 		return "can't add user %s..." % login
 
-@as_param_number(1)
+@has_param_number(1)
 def remuser(params,db):
 	""" login: remove user from database"""
 	login=params[0]
@@ -73,7 +73,7 @@ def remuser(params,db):
 	else:
 		return "can't remove user %s: not in database..." % login
 		
-@as_param_number(2)
+@has_param_number(2)
 def testlogin(params,db):
 	""" login password: test password for user"""
 	login=params[0]
@@ -84,12 +84,12 @@ def testlogin(params,db):
 	else:
 		return "password err"
 
-@as_param_number(0)
+@has_param_number(0)
 def listuser(params,db):
 	""": list users in database"""
 	return "users: "+" ".join(sql.login_list(db))
 
-@as_param_number(0)
+@has_param_number(0)
 def quit(params,db):
 	""": quit the command line"""
 	import sys
