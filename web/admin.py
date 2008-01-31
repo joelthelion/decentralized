@@ -5,9 +5,9 @@ import sql
 #param number decorator
 def has_param_number(n_params):
 	def test_param(func):
-		def new_func(params,db):
+		def new_func(params):
 			if len(params)>=n_params or n_params<0:
-				return func(params,db)
+				return func(params)
 			else:
 				return func.__name__+func.__doc__
 		new_func.__name__=func.__name__
@@ -17,8 +17,8 @@ def has_param_number(n_params):
 
 #commands implementation
 #help
-@has_param_number(0)
-def usage(params,db):
+has_param_number(0)
+def usage(params):
 	""": display commands help"""
 	functions={}
 	for command,function in commands.items():
@@ -30,67 +30,67 @@ def usage(params,db):
 
 #fetcher oriented command
 @has_param_number(0)
-def cleartags(params,db):
+def cleartags(params):
 	""": clear fetcher tags"""
-	if sql.query("truncate table tag",db):
+	if sql.query("truncate table tag"):
 		return "tags cleared"
 
 @has_param_number(1)
-def addtags(params,db):
+def addtags(params):
 	""" tag tag ... : add tags to fetcher"""
 	added_tags=0
 	for tag in params:
-		if sql.query("insert into tag (name,fetched_count) values ('%s',0)" % tag,db):
+		if sql.query("insert into tag (name,fetched_count) values ('%s',0)" % tag):
 			added_tags=added_tags+1
 		else:
 			return "can't add tag %s..." % tag
 	return "added %d tags" % added_tags
 
 @has_param_number(0)
-def listtag(params,db):
+def listtag(params):
 	""":list fetcher tag"""
-	return 'tags: '+' '.join(sql.tag_list(db))
+	return 'tags: '+' '.join(sql.tag_list())
 
 #user oriented command
 @has_param_number(2)
-def adduser(params,db):
+def adduser(params):
 	""" login password: add user to database"""
 	login=params[0]
 	passwd=params[1]
 
-	if sql.query("insert into kolmognus_user (login,pass) values ('%s',PASSWORD('%s'))" % (login,passwd),db):
+	if sql.query("insert into kolmognus_user (login,pass) values ('%s',PASSWORD('%s'))" % (login,passwd)):
 		return  "user %s added to database" % login  
 	else:
 		return "can't add user %s..." % login
 
 @has_param_number(1)
-def remuser(params,db):
+def remuser(params):
 	""" login: remove user from database"""
 	login=params[0]
 
-	if sql.query("delete from kolmognus_user where login='%s'" % login,db):
+	if sql.query("delete from kolmognus_user where login='%s'" % login):
 		return "user %s removed from database" % login
 	else:
 		return "can't remove user %s: not in database..." % login
 		
 @has_param_number(2)
-def testlogin(params,db):
+def testlogin(params):
 	""" login password: test password for user"""
 	login=params[0]
 	password=params[1]
 
-	if sql.login_test(login,password,db):
+	if sql.login_test(login,password):
 		return "password ok"
 	else:
 		return "password err"
 
 @has_param_number(0)
-def listuser(params,db):
+def listuser(params):
 	""": list users in database"""
-	return "users: "+" ".join(sql.login_list(db))
+	return "users: "+" ".join(sql.login_list())
 
 @has_param_number(0)
-def quit(params,db):
+def quit(params):
 	""": quit the command line"""
 	import sys
 	sys.exit()
@@ -124,15 +124,13 @@ commands={
 #user interface
 def get_command():
 	while True:
-		words=[word for word in raw_input('kolmognus$').split(' ') if word]
+		words=[word for word in raw_input('kolmognus$ ').split(' ') if word]
 		if len(words)==1:
 			return words[0],[]
 		elif len(words)>1:
 			return words[0],words[1:]
 
 def main():
-	#connect to database
-	db=sql.connect_db()
 
 	#main loop
 	while True:
@@ -141,7 +139,7 @@ def main():
 		except EOFError:
 			break
 		try:
-			print commands[action](params,db)
+			print commands[action](params)
 		except KeyError:
 			print "unknow command %s..." % action
 

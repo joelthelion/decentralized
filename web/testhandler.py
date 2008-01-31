@@ -2,12 +2,11 @@ from mod_python import apache
 from web import sql
 
 def handler(req):
-    db=sql.connect_db()
     req.content_type='text/plain'
 
-    logins=sql.login_list(db)
-    tags=sql.tag_list(db)
-    services=sql.service_list(db)
+    logins=sql.login_list()
+    tags=sql.tag_list()
+    services=sql.service_list()
 
     req.write('kolmognus info:\n')
     req.write('\tusers: '+' '.join(logins)+'\n')

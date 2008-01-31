@@ -26,3 +26,11 @@ create table if not exists tag (
 	last_time_fetched date,
 	fetched_count int(8)
 );
+
+create table if not exists recommended_urls (
+	url varchar(1000),
+	url_md5 char(32),
+	login varchar(30),
+	liked int(3),
+	primary key (url_md5,login)
+);

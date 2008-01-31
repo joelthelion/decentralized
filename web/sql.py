@@ -2,24 +2,33 @@
 
 import MySQLdb
 
-def connect_db():
-	return MySQLdb.connect('localhost','test3','abc','prout')
+db = MySQLdb.connect('localhost','test3','abc','prout')
 
-def query(query,db):
+def query(query):
 	try:
 		db.query(query)
 		return True
 	except:
 		print "query error: %s..." % db.error()
 		return False
+
+def request(request):
+    try:
+        cursor=db.cursor()
+        cursor.execute(request)
+        return cursor.fetchall()
+    except:
+        print "query error: %s..." % db.error()
+        return False
+        
 	
 #user oriented
-def login_list(db):
+def login_list():
 		cursor=db.cursor()
 		cursor.execute('select login from kolmognus_user')
 		return [user[0] for user in cursor.fetchall()]
 
-def login_test(login,password,db):
+def login_test(login,password):
 	try:
 		cursor=db.cursor()
 		cursor.execute("select login from kolmognus_user where login='%s' and pass=PASSWORD('%s')" % (login,password))
@@ -29,26 +38,19 @@ def login_test(login,password,db):
 		return False
 
 #service oriented
-def service_list(db):
+def service_list():
 		cursor=db.cursor()
 		cursor.execute('select name,status from service')
 		return cursor.fetchall()
 
-def service_set_status(service,status,db):
-		return query("update service set status='%s' where name='%s'" % (status,service),db)
+def service_set_status(service,status):
+		return query("update service set status='%s' where name='%s'" % (status,service))
 
 #fetcher oriented
-def tag_list(db):
+def tag_list():
 		cursor=db.cursor()
 		cursor.execute('select name from tag')
 		return [tag[0] for tag in cursor.fetchall()]
 
-max_incoming_url=100
-def is_incoming_full(db):
-                cursor=db.cursor()
-                cursor.execute('select url from incoming_url')
-                return cursor.rowcount>max_incoming_url
-
 if __name__=='__main__':
-	db=connect_db()
-	print login_list(db)
+	print login_list()

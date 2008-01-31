@@ -7,7 +7,7 @@ import xml.sax
 
 def get_recent_urls():
 	"""Returns a list of URLs concerning a certain tag"""
-	feed='http://delicious.com/rss/'
+	feed='http://delicious.com/rss/recent'
 	handler=DeliciousTagHandler()
 	xml.sax.parse(feed,handler)
 	return handler.urls
