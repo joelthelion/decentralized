@@ -196,11 +196,6 @@ class DeliciousTagHandler(xml.sax.handler.ContentHandler):
 
 if __name__=="__main__":
     
-    print get_urls_for_tag("c++")
-    print get_recent_urls()
+    print get_stories_for_tag("c++")
+    print get_recent_stories()
 
-    logins,tags,descriptions,date=get_delicious_data_for_url("http://www.lemonde.fr/")
-    print descriptions
-    print logins
-    print tags
-    print date

@@ -17,9 +17,9 @@ if __name__ == '__main__':
         #fetch urls
         if not has_enough_urls(): 
             print "INFO: Fetch start"
-            for url in delicious.get_recent_urls():
+            for url in delicious.get_recent_stories():
                 print "INFO: Getting symbols"
-                symbols = get_symbols_for_story(url)
+                symbols = delicious.get_symbols_for_story(url)
                 print "INFO: ",symbols
         else:
             print "INFO: fetcher waiting for more urls to be needed"
