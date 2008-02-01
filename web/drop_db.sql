@@ -1,6 +1,7 @@
-drop table service;
+drop table story;
 drop table kolmognus_user;
-drop table tag;
-drop table cached_url;
-drop table incoming_url;
-drop table recommended_urls;
+drop table recommended_story;
+drop table feed;
+drop table service;
+drop table feed_story;
+drop table bayes_data;

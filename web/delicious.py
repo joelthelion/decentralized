@@ -3,41 +3,43 @@
 
 import xml.sax.handler
 import xml.sax
-import md5
 import sql
 from urllib2 import HTTPError
 
-#delicious urls parsing
-def get_recent_urls():
+#delicious feed parsing
+def get_recent_stories():
     """Returns a list of recent URLs"""
     feed='http://delicious.com/rss/recent'
-    return get_urls_for_feed(feed)
+    return get_stories_for_feed(feed)
 
-def get_urls_for_tag(tag):
+def get_stories_for_tag(tag):
     """Returns a list of URLs concerning a certain tag"""
     feed='http://delicious.com/rss/tag/%s' % tag
-    return get_urls_for_feed(feed)
+    return get_stories_for_feed(feed)
 
-def get_urls_for_feed(feed):
-    feed_md5=md5.md5(feed).hexdigest()
-    urls=get_valid_cached_urls_for_feed(feed_md5)
+def get_stories_for_feed(feed):
+    urls=get_valid_cached_stories_for_feed(feed)
     if not urls: #if cache invalid
         print "INFO: request for urls from feed '%s': fetching delicious" % feed
-        urls=fetch_urls_for_feed(feed)
-        update_urls_cache(feed_md5,urls,change_date=True)
+        urls=fetch_stories_for_feed(feed)
+        update_feed_cache(feed,urls,change_date=True)
     else:
         print "INFO: request for urls from feed '%s': using cache" % feed
-        update_urls_cache(feed_md5,urls,change_date=False)
+        update_feed_cache(feed,urls,change_date=False)
     return urls
 
-def get_valid_cached_urls_for_feed(feed_md5):
-    rows=sql.request("select urls from cached_url where url_md5='%s' and next_fetch >= now()" % feed_md5)
+def get_valid_cached_stories_for_feed(feed):
+    rows=sql.request(u"select story.url from feed_story,feed,story\
+                      where story.id=feed_story.story_id\
+                        and feed_story.feed_id=feed.id\
+                        and feed.url_md5=md5('%s')\
+                        and addtime(feed.fetch_date,'00:30:00') >= now()" % feed)
     if rows:
-        return rows[0][0].split('|')
+        return [row[0] for row in rows]
     else:
         return []
 
-def fetch_urls_for_feed(feed):
+def fetch_stories_for_feed(feed):
     handler=DeliciousTagHandler()
     try:
         xml.sax.parse(feed,handler)
@@ -46,21 +48,21 @@ def fetch_urls_for_feed(feed):
         print "ERROR: Could not retrieve delicious urls for feed '%s'" % feed
         print e
         return []
-    
-def update_feed_count(feed_md5):
-    """Increment the fetch count for a feed"""
-    
-def update_urls_cache(feed_md5,urls,change_date=False):
-    rows=sql.request("select fetched_count from cached_url where url_md5='%s'" % feed_md5)
-    if rows: #already in database
-        if change_date:
-            joined_urls='|'.join(urls)
-            sql.query("update cached_url set fetched_count=fetched_count+1, urls='%s', next_fetch=addtime(now(),'00:30:00') where url_md5='%s'" % (joined_urls,feed_md5))
-        else:
-            sql.query("update cached_url set fetched_count=fetched_count+1 where url_md5='%s';" % feed_md5)
-    else:
-        joined_urls='|'.join(urls)
-        sql.query("insert into cached_url (url_md5,next_fetch,urls,fetched_count) values ('%s',addtime(now(),'00:30:00'),'%s',1)" % (feed_md5,joined_urls))
+
+def update_feed_cache(feed,urls,change_date=False):
+    sql.query("insert into feed (url,url_md5,fetch_date,hit_count) values ('%s',md5('%s'),now(),1)\
+                    on duplicate key update hit_count=hit_count+1" % (feed,feed))
+    if change_date:
+        sql.query("update feed set fetch_date=now() where url_md5=md5('%s')"%feed)
+        for url in urls:
+            sql.query("insert into story (url,url_md5,hit_count) values ('%s',md5('%s'),0)\
+              on duplicate key update id=id" % (url,url)) #nice hack
+            sql.query("insert into feed_story (story_id,feed_id)\
+              select story.id,feed.id\
+              from story,feed\
+              where story.url_md5=md5('%s')\
+              and feed.url_md5=md5('%s')\
+              on duplicate key update story_id=story_id" %(url,feed)) #nice hack II
 
 class DeliciousURLHandler(xml.sax.handler.ContentHandler):
     """Parses a delicious rss of the form delicious/rss/url_md5"""
@@ -108,26 +110,75 @@ class DeliciousURLHandler(xml.sax.handler.ContentHandler):
         elif name =="dc:date":
             self.in_bookmark_date=False
 
-#delicious tag parsing
-def get_delicious_data_for_url(url):
+#delicious story parsing
+def get_symbols_for_story(url):
+    symbols=get_valid_cached_symbols_for_story(url)
+    if not symbols: #if cache invalid
+        print "INFO: request for symbols for story '%s': fetching delicious" % url
+        symbols=fetch_symbols_for_url(url)
+        print "INFO: fetched symbols: ",symbols
+        update_story_cache(url,symbols,change_date=True)
+    else:
+        print "INFO: request for urls from feed '%s': using cache" % url
+        update_story_cache(url,symbols,change_date=False)
+    return symbols
+
+def update_story_cache(url,symbols,change_date=False):
+    sql.query("insert into story\
+                 (url,url_md5,symbols,fetch_date,hit_count)\
+                 values ('%s',md5('%s'),'%s',now(),1)\
+                 on duplicate key update hit_count=hit_count+1"%(url,url,symbols))
+    if change_date:
+        sql.query("update story set\
+                     fetch_date=now() where\
+                     url_md5=md5('%s')" % url)
+        sql.query("update story set\
+                     symbols='%s' where\
+                     url_md5=md5('%s')"%(symbols,url))
+    
+def get_valid_cached_symbols_for_story(url):
+    rows=sql.request("select symbols from story where\
+                        url_md5=md5('%s')\
+                        and addtime(fetch_date,'00:30:00') >= now()" % url)
+    if rows:
+        return rows[0][0]
+    else: 
+        return u""
+    
+def fetch_symbols_for_url(url):
     """Returns all the relevent delicious data concerning URL"""
-    feed='http://delicious.com/rss/url/%s' % md5.md5(url).hexdigest()
+    import md5,re
+    del_format_url = url
+    if not re.search(r"(.*//.*/.*\.|/$)",url): #try to format url according to delicious "norms"
+        del_format_url+='/'
+    feed='http://delicious.com/rss/url/%s' % md5.md5(del_format_url).hexdigest()
+    print url,del_format_url,feed
     handler=DeliciousURLHandler()
-    acquire_delicious()
     try:
         xml.sax.parse(feed,handler)
-    except HTTPError,e:
-        return ([],[],[],-1)
-    tags=list(set(handler.tags))
-    import time
-    pub_dates=[]
-    for delicious_date_string in handler.bookmark_dates:
+        tags=list(set(handler.tags))
+        import time
+        pub_dates=[]
+        for delicious_date_string in handler.bookmark_dates:
+            try:
+                pub_dates.append(time.mktime(time.strptime(delicious_date_string,"%Y-%m-%jT%H:%M:%SZ")))
+            except ValueError:
+                print "WARNING: unable to parse date string %s" % delicious_date_string
         try:
-            pub_dates.append(time.mktime(time.strptime(delicious_date_string,"%Y-%m-%jT%H:%M:%SZ")))
+            pub_date = min(pub_dates)
         except ValueError:
-            print "WARNING: unable to parse date string %s" % delicious_date_string
-    pub_date = min(pub_dates)
-    return (handler.authors,tags,handler.descriptions,pub_date)
+            pub_date = time.time()
+        print handler.authors,tags,handler.descriptions,pub_date
+        return create_symbol_list(handler.authors,tags,handler.descriptions,pub_date)
+    except HTTPError,e:
+        print "WARNING: fetching symbols failed: ",e
+        return create_symbol_list([],[],[],-1)
+
+def create_symbol_list(authors,tags,descriptions,date):
+    symbols = u' '.join(tags)
+    if authors:
+        symbols += u'liked_by_' + u' liked_by_'.join(authors)
+    return symbols
     
 class DeliciousTagHandler(xml.sax.handler.ContentHandler):
     """Parses a delicious rss of the form delicious/rss/tag/c++"""

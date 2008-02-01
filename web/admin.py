@@ -30,34 +30,29 @@ def usage(params):
 
 #fetcher oriented command
 @has_param_number(0)
-def cleartags(params):
-    """: clear fetcher tags"""
-    if sql.query("truncate table tag"):
-        return "tags cleared"
-
-@has_param_number(0)
-def clearincoming(params):
-    """: Clear incomming table"""
-    if sql.query("truncate table incoming_url"):
-        return "incoming urls cleared"
+def clearfeeds(params):
+    """: clear fetcher feeds"""
+    if sql.query("truncate table feed"):
+        return "feeds cleared"
 
 @has_param_number(1)
 def addtags(params):
-    """ tag tag ... : add tags to fetcher"""
-    added_tags=0
+    """ tag [tag]... : add delicious tag feeds to fetcher"""
+    added_feeds=0
     for tag in params:
-        if sql.query("insert into tag (name,fetched_count) values ('%s',0)" % tag):
-            added_tags=added_tags+1
+        feed='http://delicious.com/rss/tag/%s' % tag
+        if sql.query("insert into feed (url,url_md5,hit_count) values ('%s',MD5('%s'),0)" % (feed,feed)):
+            added_feeds+=1
         else:
-            return "can't add tag %s..." % tag
-    return "added %d tags" % added_tags
+            return "can't add feed %s..." % feed
+    return "added %d feeds" % added_feeds
 
 @has_param_number(0)
-def listtag(params):
-    """:list fetcher tag"""
-    return 'tags: '+' '.join(sql.tag_list())
+def listfeed(params):
+    """:list fetcher feed"""
+    return 'feeds: '+' '.join(sql.feed_list())
 
-#user oriented command
+#user oriented commands
 @has_param_number(2)
 def adduser(params):
     """ login password: add user to database"""
@@ -120,15 +115,13 @@ commands={
     'testlogin'     : testlogin,
     'test'          : testlogin,
 
-    'cleartags'     : cleartags,
-    'cltags'        : cleartags,
+    'clearfeeds'     : clearfeeds,
+    'clfeeds'        : clearfeeds,
     'addtags'       : addtags,
-    'addt'          : addtags,
-    'listtags'      : listtag,
-    'tags'          : listtag,
-        
-    'clinc'         : clearincoming,
-    'clearincoming' : clearincoming}
+    'addt'           : addtags,
+    'listfeeds'      : listfeed,
+    'feeds'          : listfeed
+}        
 
 #user interface
 def get_command():

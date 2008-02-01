@@ -2,12 +2,15 @@
 
 import MySQLdb
 
+#db = MySQLdb.connect('localhost','test3','abc','prout',use_unicode = True, charset = "utf8")
 db = MySQLdb.connect('localhost','test3','abc','prout')
 
 def query(query):
     from _mysql_exceptions import ProgrammingError
     try:
-        db.query(query.encode('utf8'))
+        print "query",type(query)
+        #db.query(query.encode('utf-8'))
+        db.query(str(query))
         return True
     except ProgrammingError:
         print "'%s' query error: %s..." % (query,db.error())
@@ -16,9 +19,12 @@ def query(query):
 def request(request):
     from _mysql_exceptions import ProgrammingError
     try:
+        print "request", type(request)
         cursor=db.cursor()
-        cursor.execute(request.encode('utf8'))
-        return cursor.fetchall()
+        #cursor.execute(request.encode('utf-8'))
+        cursor.execute(str(request))
+        results = cursor.fetchall()
+        return results
     except ProgrammingError:
         print "'%s' request error: %s..." % (request,db.error())
         return []
@@ -48,10 +54,10 @@ def service_set_status(service,status):
         return query("update service set status='%s' where name='%s'" % (status,service))
 
 #fetcher oriented
-def tag_list():
+def feed_list():
         cursor=db.cursor()
-        cursor.execute('select name from tag')
-        return [tag[0] for tag in cursor.fetchall()]
+        cursor.execute('select url from feed')
+        return [url[0] for url in cursor.fetchall()]
 
 if __name__=='__main__':
     print login_list()

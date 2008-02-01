@@ -1,4 +1,4 @@
-all: nil
+all: drop create clean
 
 clean:
 	$(RM) *.log *.pyc

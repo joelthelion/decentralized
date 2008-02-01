@@ -3,15 +3,9 @@
 import sql
 import time
 
-def is_incomming_full():
-    return sql.request("select count(url) from incoming_url;")[0][0] > 100
+def has_enough_urls():
+    return sql.request("select count(id) from story where rated_date is null")[0][0] > 100
 
-def get_url_symbols(url):
-    import delicious
-    authors,tags,descriptions,date = delicious.get_delicious_data_for_url(url)
-    symbols = u' '.join(tags)
-    symbols += u'liked_by_' + u' liked_by_'.join(authors)
-    return symbols
 
 if __name__ == '__main__':
     import delicious
@@ -21,14 +15,12 @@ if __name__ == '__main__':
         #is incoming full??
         #build url list from recent and requested tags
         #fetch urls
-        if not is_incomming_full(): #If there are less than 100 urls in the incoming table
-            print "Fetch start"
+        if not has_enough_urls(): 
+            print "INFO: Fetch start"
             for url in delicious.get_recent_urls():
-                print "Getting symbols"
-                symbols = get_url_symbols(url)
-                print "Inserting line into incoming"
-                query_string = (u"""insert into incoming_url values("%s","%s");""") % (url,symbols)
-                sql.query(query_string)
+                print "INFO: Getting symbols"
+                symbols = get_symbols_for_story(url)
+                print "INFO: ",symbols
         else:
-            print "Incoming full"
+            print "INFO: fetcher waiting for more urls to be needed"
             time.sleep(60) 
