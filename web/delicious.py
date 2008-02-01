@@ -21,12 +21,13 @@ def get_urls_for_tag(tag):
 def get_urls_for_feed(feed):
     feed_md5=md5.md5(feed).hexdigest()
     urls=get_valid_cached_urls_for_feed(feed_md5)
-    if not urls:
+    if not urls: #if cache invalid
         print "INFO: request for urls from feed '%s': fetching delicious" % feed
         urls=fetch_urls_for_feed(feed)
+        update_urls_cache(feed_md5,urls,change_date=True)
     else:
         print "INFO: request for urls from feed '%s': using cache" % feed
-    update_urls_cache(feed_md5,urls)
+        update_urls_cache(feed_md5,urls,change_date=False)
     return urls
 
 def get_valid_cached_urls_for_feed(feed_md5):
@@ -46,13 +47,19 @@ def fetch_urls_for_feed(feed):
         print e
         return []
     
-def update_urls_cache(feed_md5,urls):
-    joined_urls='|'.join(urls)
+def update_feed_count(feed_md5):
+    """Increment the fetch count for a feed"""
+    
+def update_urls_cache(feed_md5,urls,change_date=False):
     rows=sql.request("select fetched_count from cached_url where url_md5='%s'" % feed_md5)
     if rows: #already in database
-        fetched_count=rows[0][0]+1
-        sql.query("update cached_url set fetched_count='%d', urls='%s', next_fetch=addtime(now(),'00:30:00') where url_md5='%s'" % (fetched_count,joined_urls,feed_md5))
+        if change_date:
+            joined_urls='|'.join(urls)
+            sql.query("update cached_url set fetched_count=fetched_count+1, urls='%s', next_fetch=addtime(now(),'00:30:00') where url_md5='%s'" % (joined_urls,feed_md5))
+        else:
+            sql.query("update cached_url set fetched_count=fetched_count+1 where url_md5='%s';" % feed_md5)
     else:
+        joined_urls='|'.join(urls)
         sql.query("insert into cached_url (url_md5,next_fetch,urls,fetched_count) values ('%s',addtime(now(),'00:30:00'),'%s',1)" % (feed_md5,joined_urls))
 
 class DeliciousURLHandler(xml.sax.handler.ContentHandler):
