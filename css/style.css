@@ -1,0 +1,22 @@
+div.debug {
+font-size: 8pt;
+margin: 20px 0px;
+/*background-color: yellow;*/
+}
+div.debug span.key {
+font-weight: bold;
+}
+
+div {
+margin: 5px 0px 0px 0px;
+}
+h1 {
+font-size: 14pt;
+margin: 0px;
+}
+p {
+margin: 0px 0px 0px 20px;
+}
+body {
+font-size: 10pt;
+}

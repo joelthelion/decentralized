@@ -114,12 +114,11 @@ class DeliciousURLHandler(xml.sax.handler.ContentHandler):
 def get_symbols_for_story(url):
     symbols=get_valid_cached_symbols_for_story(url)
     if not symbols: #if cache invalid
-        print "INFO: request for symbols for story '%s': fetching delicious" % url
+        print "INFO: request for symbols from story '%s': fetching delicious" % url
         symbols=fetch_symbols_for_url(url)
-        print "INFO: fetched symbols: ",symbols
         update_story_cache(url,symbols,change_date=True)
     else:
-        print "INFO: request for urls from feed '%s': using cache" % url
+        print "INFO: request for symbols from story '%s': using cache" % url
         update_story_cache(url,symbols,change_date=False)
     return symbols
 
@@ -152,7 +151,6 @@ def fetch_symbols_for_url(url):
     if not re.search(r"(.*//.*/.*\.|/$)",url): #try to format url according to delicious "norms"
         del_format_url+='/'
     feed='http://delicious.com/rss/url/%s' % md5.md5(del_format_url).hexdigest()
-    print url,del_format_url,feed
     handler=DeliciousURLHandler()
     try:
         xml.sax.parse(feed,handler)
@@ -168,7 +166,6 @@ def fetch_symbols_for_url(url):
             pub_date = min(pub_dates)
         except ValueError:
             pub_date = time.time()
-        print handler.authors,tags,handler.descriptions,pub_date
         return create_symbol_list(handler.authors,tags,handler.descriptions,pub_date)
     except HTTPError,e:
         print "WARNING: fetching symbols failed: ",e
@@ -177,7 +174,7 @@ def fetch_symbols_for_url(url):
 def create_symbol_list(authors,tags,descriptions,date):
     symbols = u' '.join(tags)
     if authors:
-        symbols += u'liked_by_' + u' liked_by_'.join(authors)
+        symbols += ' '+' '.join(['liked_by_'+author for author in authors])
     return symbols
     
 class DeliciousTagHandler(xml.sax.handler.ContentHandler):

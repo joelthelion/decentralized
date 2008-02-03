@@ -2,15 +2,15 @@
 
 import MySQLdb
 
-#db = MySQLdb.connect('localhost','test3','abc','prout',use_unicode = True, charset = "utf8")
-db = MySQLdb.connect('localhost','test3','abc','prout')
+db=MySQLdb.connect(host='localhost',user='test3',passwd='abc',db='prout',use_unicode=True,charset="utf8")
+#db = MySQLdb.connect('localhost','test3','abc','prout')
 
 def query(query):
     from _mysql_exceptions import ProgrammingError
     try:
-        print "query",type(query)
-        #db.query(query.encode('utf-8'))
-        db.query(str(query))
+        #print "query",type(query)
+        db.query(query.encode('utf-8'))
+        #db.query(query)
         return True
     except ProgrammingError:
         print "'%s' query error: %s..." % (query,db.error())
@@ -19,10 +19,10 @@ def query(query):
 def request(request):
     from _mysql_exceptions import ProgrammingError
     try:
-        print "request", type(request)
+        #print "request", type(request)
         cursor=db.cursor()
-        #cursor.execute(request.encode('utf-8'))
-        cursor.execute(str(request))
+        cursor.execute(request.encode('utf-8'))
+        #cursor.execute(request)
         results = cursor.fetchall()
         return results
     except ProgrammingError:

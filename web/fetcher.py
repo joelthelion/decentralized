@@ -12,15 +12,16 @@ if __name__ == '__main__':
     import time
     sql.service_set_status('fetcher','started')
     while True:
-        #is incoming full??
-        #build url list from recent and requested tags
         #fetch urls
+        #is incoming full??
         if not has_enough_urls(): 
             print "INFO: Fetch start"
+            #build url list from recent and requested tags
             for url in delicious.get_recent_stories():
                 print "INFO: Getting symbols"
                 symbols = delicious.get_symbols_for_story(url)
                 print "INFO: ",symbols
         else:
             print "INFO: fetcher waiting for more urls to be needed"
-            time.sleep(60) 
+        print "INFO: sleeping"
+        time.sleep(60) 
