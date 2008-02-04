@@ -1,12 +1,25 @@
+/*debug footer*/
 div.debug {
 font-size: 8pt;
 margin: 20px 0px;
-/*background-color: yellow;*/
 }
 div.debug span.key {
 font-weight: bold;
 }
 
+/*main header*/
+div.menu {
+font-family: monospace;
+font-weight: bold;
+font-size: 14pt;
+}
+div.menu a {
+text-decoration: none;
+color: #3091f1;
+}
+
+
+/*general css*/
 div {
 margin: 5px 0px 0px 0px;
 }
