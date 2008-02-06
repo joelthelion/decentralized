@@ -1,14 +1,13 @@
-from mod_python import apache,util
+from mod_python import apache,util,Session
 from web import sql
 import time
 
-def html_page(body,title="kolmognus"):
-    template="""<html><head><title>%s</title><link rel="stylesheet" href="/css/style.css"/></head><body>%s</body></html>"""
-    return template % (title,body)
+def html_page(header,main,footer,title="kolmognus"):
+    template="""<html><head><title>%s</title><link rel="stylesheet" href="/css/style.css"/></head><body><div class="header">%s</div><div class="main">%s</div><div class="footer">%s</div></body></html>"""
+    return template % (title,header,main,footer)
 
-def html_debug(request):
+def html_debug(param,request):
     template="""<div class="debug"><span class="key">parameters:</span> %s<br/><span class="key">uri:</span> %s<br/>generated in %.2fms</div>"""
-    param=util.FieldStorage(request,keep_blank_values=True)
     formatted_param=' '.join(param.keys())
     return template % (formatted_param,request.uri,1000*(time.time()-request.request_time))
 
@@ -17,10 +16,38 @@ def html_menu():
         ('/',"home"),
         ('/mp-info',"modpython")
     ]
-    template="""<div class="menu"><img src="/image/logo.png"/><br/>%s</div>"""
+    template="""<div class="menu"><img src="/image/logo.png"/><p>%s</p></div>"""
     menu_template="""<a href="%s">%s</a>"""
     return template % ' '.join([menu_template % (menu[0],menu[1].upper()) for menu in menus])
 
+def html_session(param,request):
+    template="""<div class="session"><p>%s</p><p>%s</p></div>"""
+    form_template="""<form action="" method="post"><input name="login" type="text" value="login"/><br/><input name="passwd" type="password" value="****"/><br/><input type="submit" value="go!!"/><input name="login_hidden" type="hidden"/><label>"""
+    logged_template="""Welcome %s!!<br/><a href="?logout">logout</a>"""
+
+    session=Session.Session(request,timeout=60)
+    if param.has_key('logout'):
+        session.invalidate()
+        util.redirect(request,'/')
+        return template % (form_template,'bye!!')
+    if param.has_key('login_hidden') and param.has_key('login') and param.has_key('passwd'):
+        login=param['login']
+        passwd=param['passwd']
+        if sql.request("select id from kolmognus_user where login='%s' and pass=PASSWORD('%s')" % (login,passwd)):
+            session['login']=login
+            session['hits']=0
+            session.save()
+            return template % (logged_template % session['login'],"%d hits" % session['hits'])
+        else:
+            return template % (form_template,"bad login")
+    elif not session.is_new():
+        session['hits']+=1
+        session.save()
+        return template % (logged_template % session['login'],"%d hits" % session['hits'])
+    else:
+        session.invalidate()
+        return template % (form_template,"please login")
+    
 def html_users():
     template="""<div class="users"><h1>%d user(s):</h1><p>%s<p></div>"""
     users=sql.login_list()
@@ -74,22 +101,28 @@ def handler(request):
     #request.discard_requestuest_body()
     request.send_http_header()
 
+    param=util.FieldStorage(request,keep_blank_values=True)
     uri_param=request.uri.split('/')
-    body=''
-    body+=html_menu()
+
+    header=''
+    header+=html_session(param,request)
+    header+=html_menu()
+
+    main_frame=''
     if len(uri_param)>2:
         if uri_param[1]=='feed':
-            body+=html_feed_info(uri_param[2])
+            main_frame+=html_feed_info(uri_param[2])
         elif uri_param[1]=='story':
-            body+=html_story_info(uri_param[2])
+            main_frame+=html_story_info(uri_param[2])
         else:
-            body+="<h1>Crottei%s</h1>" % repr(uri_param)
+            main_frame+="<h1>Crottei%s</h1>" % repr(uri_param)
     else:
-        body+=html_feeds()
-        body+=html_stories()
-        body+=html_users()
+        main_frame+=html_feeds()
+        main_frame+=html_stories()
+        main_frame+=html_users()
 
-    body+=html_debug(request)
+    footer=''
+    footer+=html_debug(param,request)
 
-    request.write(html_page(body).encode('utf-8'))
+    request.write(html_page(header,main_frame,footer).encode('utf-8'))
     return apache.OK

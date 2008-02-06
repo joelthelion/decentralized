@@ -5,7 +5,8 @@ use prout;
 create table if not exists kolmognus_user (
 	id int primary key auto_increment,
 	login varchar(30) unique,
-	pass char(41) -- for md5 hash of the pass
+	pass char(41), -- for md5 hash of the pass
+        last_login_date datetime 
 );
 
 create table if not exists story (
