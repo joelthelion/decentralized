@@ -2,7 +2,8 @@
 
 import MySQLdb
 
-db=MySQLdb.connect(host='localhost',user='test3',passwd='abc',db='prout',use_unicode=True,charset="utf8")
+db=MySQLdb.connect(host='localhost',user='kolmo_agent',passwd='abc',db='prout',use_unicode=True,charset="utf8")
+#db=MySQLdb.connect(host='localhost',user='test3',passwd='abc',db='prout',use_unicode=True,charset="utf8")
 #db = MySQLdb.connect('localhost','test3','abc','prout')
 
 def query(query):

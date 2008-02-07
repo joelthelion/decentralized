@@ -12,15 +12,25 @@ font-family: monospace;
 font-weight: bold;
 font-size: 14pt;
 }
+div.menu img {
+border: 0px;
+}
 div.menu p a {
 text-decoration: none;
 color: #3091f1;
 }
 /*session frame*/
 div.session {
-background-color: red;
 float: right;
 text-align: right;
+}
+div.session form {
+padding: 5px;
+}
+div.session form input {
+margin: 3px;
+background-color: #acd6f4;
+border: 2px solid #3091f1;
 }
 
 /*main frame*/
