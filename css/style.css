@@ -1,35 +1,47 @@
-/*debug footer*/
-div.debug {
-font-size: 8pt;
-margin: 20px 0px;
-}
-div.debug span.key {
-font-weight: bold;
+body {
+margin: 30px;
 }
 
 /*main header*/
-div.menu {
+div.header {
+}
+/*menu*/
+div.menu p {
+margin: 0px;
 font-family: monospace;
 font-weight: bold;
 font-size: 14pt;
 }
-div.menu a {
+div.menu p a {
 text-decoration: none;
 color: #3091f1;
 }
-
-
-/*general css*/
-div {
-margin: 5px 0px 0px 0px;
+/*session frame*/
+div.session {
+background-color: red;
+float: right;
+text-align: right;
 }
-h1 {
+
+/*main frame*/
+div.main {
+margin: 5px 0px 0px 0px;
+font-size: 10pt;
+}
+div.main h1 {
 font-size: 14pt;
 margin: 0px;
 }
-p {
+div.main p {
 margin: 0px 0px 0px 20px;
 }
-body {
-font-size: 10pt;
+
+/*footer*/
+div.footer {
+font-size: 8pt;
+margin: 20px 0px;
+}
+/*debug footer*/
+div.debug span.key {
+font-weight: bold;
 }
