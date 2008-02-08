@@ -21,14 +21,26 @@ color: #3091f1;
 }
 /*session frame*/
 div.session {
+font-size: 10pt;
 float: right;
 text-align: right;
 }
+div.session p {
+margin: 3px;
+}
 div.session form {
-padding: 5px;
+margin: 3px;
 }
 div.session form input {
-margin: 3px;
+margin: 0px 0px 0px 6px;
+background-color: #acd6f4;
+border: 2px solid #3091f1;
+}
+div.session p a {
+margin: 0px 0px 0px 6px;
+padding: 1px 6px;
+color: #000000;
+text-decoration: none;
 background-color: #acd6f4;
 border: 2px solid #3091f1;
 }
@@ -37,6 +49,11 @@ border: 2px solid #3091f1;
 div.main {
 margin: 5px 0px 0px 0px;
 font-size: 10pt;
+}
+div.main div.welcome {
+text-align: center;
+margin: 30px;
+font-size: 20px;
 }
 div.main h1 {
 font-size: 14pt;

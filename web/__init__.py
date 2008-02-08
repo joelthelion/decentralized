@@ -1,1 +1,1 @@
-__all__=['testhandler','sql']
+__all__=['testhandler','feedhandler','storyhandler','sql','common']

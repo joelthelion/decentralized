@@ -14,6 +14,7 @@ create table if not exists story (
 	url text(32000),
 	url_md5 char(32) unique, -- for the unique constraint, can't do on the full URL
 	symbols text,
+	symbol_count int,
 	fetch_date datetime,
 	hit_count int, -- number of times a url was given in a feed
 	rated_date datetime
