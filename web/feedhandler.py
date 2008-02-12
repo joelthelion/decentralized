@@ -1,9 +1,10 @@
 from mod_python import apache,util
+from xml.sax import saxutils
 import sql
 import common    
 
 def html_feed_info(feed_md5):
-    template="""<div class="feed_info"><h1><a href="%s">%s</a></h1><p>fetched %d times, last fetching %s</p><h1>stories:</h1><p>%s</p></div>"""
+    template="""<div class="feed_info"><h1><a href="%s">%.50s</a></h1><p>fetched %d times, last fetching %s</p><h1>stories:</h1><p>%s</p></div>"""
     error_template="""<div class="feed_info"><h1>can't found feed info!!!</h1></div>"""
     story_template="""<a href="/story/%s">%s</a> (%d hits) [%.50s]"""
 
@@ -13,7 +14,7 @@ def html_feed_info(feed_md5):
         feed=feed[0][1:]
         stories=sql.request("select story.url_md5,story.url,story.hit_count,story.symbols\
             from story,feed_story where story.id=feed_story.story_id and feed_story.feed_id=%d" % feed_id)
-        return template % (feed+("<br/>".join([story_template % story for story in stories]),))
+        return template % (feed[0],feed[1],feed[2],feed[3],"<br/>".join([story_template % (story[0],saxutils.escape(story[1]),story[2],saxutils.escape(story[3])) for story in stories]))
     else:
         return error_template
 

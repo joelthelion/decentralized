@@ -1,4 +1,5 @@
 from mod_python import apache,util
+from xml.sax import saxutils
 import sql
 import common    
 
@@ -13,7 +14,7 @@ def html_story_info(story_md5):
         story=story[0][1:]
         feeds=sql.request("select feed.url_md5,feed.url,feed.hit_count\
             from feed,feed_story where feed.id=feed_story.feed_id and feed_story.story_id=%d" % story_id)
-        return template % (story+("<br/>".join([feed_template % feed for feed in feeds]),))
+        return template % (saxutils.escape(story[0]),saxutils.escape(story[1]),story[2],story[3],story[4],saxutils.escape(story[5]),"<br/>".join([feed_template % feed for feed in feeds]))
     else:
         return error_template
 
@@ -23,12 +24,12 @@ def html_stories_info():
     never_fetched_story_template="""<a href="/story/%s">%s</a>"""
     no_symbol_story_template="""%s"""
 
-    fetched_story=sql.request("select url_md5,url,hit_count,symbol_count from story where not isnull(fetch_date) and not isnull(symbols) order by hit_count asc")
+    fetched_story=sql.request("select url_md5,url,hit_count,symbol_count from story where not isnull(fetch_date) and not isnull(symbols) order by symbol_count desc")
     never_fetched_story=sql.request("select url_md5,url from story where isnull(fetch_date) order by id desc")
     no_symbol_story=sql.request("select url from story where isnull(symbols) order by id desc")
-    return template % (len(fetched_story),"<br/>".join([fetched_story_template % story for story in fetched_story])\
-                      ,len(never_fetched_story),"<br/>".join([never_fetched_story_template % story for story in never_fetched_story])\
-                      ,len(no_symbol_story),"<br/>".join([no_symbol_story_template % story for story in no_symbol_story]))
+    return template % (len(fetched_story),"<br/>".join([fetched_story_template % (story[0], saxutils.escape(story[1]), story[2], story[3]) for story in fetched_story])\
+                      ,len(never_fetched_story),"<br/>".join([never_fetched_story_template % (story[0], saxutils.escape(story[1])) for story in never_fetched_story])\
+                      ,len(no_symbol_story),"<br/>".join([no_symbol_story_template % saxutils.escape(story) for story in no_symbol_story]))
 
 def handler(request):
     request.content_type='application/xhtml+xml'

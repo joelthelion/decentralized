@@ -1,4 +1,5 @@
 from mod_python import apache,util
+from xml.sax import saxutils
 import sql
 import common    
 
@@ -15,9 +16,9 @@ def html_feeds():
 
 def html_stories():
     template="""<div class="stories"><h1>recent stories:</h1><p>%s</p></div>"""
-    story_template="""<a href="/story/%s">%.100s</a> %d hits, %d symbols [%.50s]"""
+    story_template="""<a href="/story/%s">%.50s</a> %d hits, %d symbols [%.50s]"""
     stories=sql.request("select url_md5,url,hit_count,symbol_count,symbols from story where not isnull(symbol_count) and not symbol_count=0 order by fetch_date asc limit 10")
-    return template % "<br/>".join([story_template % story for story in stories])
+    return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[1]),story[2],story[3],saxutils.escape(story[4])) for story in stories])
 
 def handler(request):
     welcome="""<div class="welcome"><p>Welcome on KolmoGNUS, the rss feeds bayesian classifier that search the web for you!!!</p></div>"""
