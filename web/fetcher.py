@@ -19,7 +19,7 @@ def fetch():
         stories=[story[0] for story in sql.request("select url from story where isnull(fetch_date) or addtime(fetch_date,'01:00:00') < now()")]
         print "INFO: found %d updatable stories" % len(stories)
         for k,story in enumerate(stories):
-            print "INFO: updating %d/%d story %.50s" % (k+1,len(stories),feed)
+            print "INFO: updating %d/%d story %.50s" % (k+1,len(stories),story)
             delicious.get_symbols_for_story(story)
     else:
         print "INFO: no more urls needed"
