@@ -21,7 +21,7 @@ def html_stories():
     return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[1]),story[2],story[3],saxutils.escape(story[4])) for story in stories])
 
 def handler(request):
-    welcome="""<div class="welcome"><p>Welcome on KolmoGNUS, the rss feeds bayesian classifier that search the web for you!!!</p></div>"""
+    welcome="""<div class="welcome"><p>Welcome to KolmoGNUS, the bayesian classifier that finds cool links for YOU</p></div>"""
     request.content_type='application/xhtml+xml'
     #request.discard_requestuest_body()
     request.send_http_header()

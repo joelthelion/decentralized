@@ -13,7 +13,7 @@ create table if not exists story (
 	id int primary key auto_increment,
 	url text(32000),
 	url_md5 char(32) unique, -- for the unique constraint, can't do on the full URL
-	symbols text,
+	symbols text default '',
 	symbol_count int,
 	fetch_date datetime,
 	hit_count int, -- number of times a url was given in a feed
@@ -34,9 +34,11 @@ create table if not exists feed_story (
 
 	primary key (story_id,feed_id),
 	foreign key (story_id)
-	  references story(id),
+	  references story(id)
+	  on delete cascade,
 	foreign key (feed_id)
 	  references feed(id)
+	  on delete cascade
 );
 
 create table if not exists recommended_story (
@@ -48,9 +50,11 @@ create table if not exists recommended_story (
 	
 	primary key (user_id,story_id),
 	foreign key (user_id) 
-	  references kolmognus_user(id),
+	  references kolmognus_user(id)
+	  on delete cascade,
 	foreign key (story_id)
 	  references story(id)
+	  on delete cascade
 );
 
 create table if not exists bayes_data ( -- this table is not needed per se, but still there for performance reasons

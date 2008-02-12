@@ -12,7 +12,7 @@ class BayesianClassifier(Classifier):
     def __init__(self,login):
         import sql
         bayes_data = sql.request("select bayes_data.symbol,bayes_data.good_count,bayes_data.bad_count\
-            from bayes_data,kolmognus_user where bayes_data.user_id=kolmognus_user.user_id and kolmognus_user.login=%s" % login)
+            from bayes_data,kolmognus_user where bayes_data.user_id=kolmognus_user.user_id and kolmognus_user.login=%s" , login)
         symb_ratio={}
         self.sum_good,self.sum_bad=0,0
         for symbol,good,bad in bayes_data:

@@ -41,7 +41,7 @@ def addtags(params):
     added_feeds=0
     for tag in params:
         feed='http://delicious.com/rss/tag/%s' % tag
-        if sql.query("insert into feed (url,url_md5,hit_count) values ('%s',MD5('%s'),0)" % (feed,feed)):
+        if sql.query("insert into feed (url,url_md5,hit_count) values (%s,MD5(%s),0)" , (feed,feed)):
             added_feeds+=1
         else:
             return "can't add feed %s..." % feed
@@ -59,7 +59,7 @@ def adduser(params):
     login=params[0]
     passwd=params[1]
 
-    if sql.query("insert into kolmognus_user (login,pass) values ('%s',PASSWORD('%s'))" % (login,passwd)):
+    if sql.query("insert into kolmognus_user (login,pass) values (%s,PASSWORD(%s))" , (login,passwd)):
         return  "user %s added to database" % login  
     else:
         return "can't add user %s..." % login
@@ -69,7 +69,7 @@ def remuser(params):
     """ login: remove user from database"""
     login=params[0]
 
-    if sql.query("delete from kolmognus_user where login='%s'" % login):
+    if sql.query("delete from kolmognus_user where login=%s" , login):
         return "user %s removed from database" % login
     else:
         return "can't remove user %s: not in database..." % login

@@ -12,3 +12,5 @@ create:
 nil:
 	echo "By default, do nothing"
 
+cleandb:
+	mysql -u root -p -D '' <clean_db.sql> clean_db.log

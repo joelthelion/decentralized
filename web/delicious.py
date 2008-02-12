@@ -29,11 +29,11 @@ def get_stories_for_feed(feed):
     return urls
 
 def get_valid_cached_stories_for_feed(feed):
-    rows=sql.request(u"select story.url from feed_story,feed,story\
+    rows=sql.request("select story.url from feed_story,feed,story\
                       where story.id=feed_story.story_id\
                         and feed_story.feed_id=feed.id\
-                        and feed.url_md5=md5('%s')\
-                        and addtime(feed.fetch_date,'00:30:00') >= now()" % feed)
+                        and feed.url_md5=md5(%s)\
+                        and addtime(feed.fetch_date,'00:30:00') >= now()" , feed)
     if rows:
         return [row[0] for row in rows]
     else:
@@ -42,7 +42,7 @@ def get_valid_cached_stories_for_feed(feed):
 def fetch_stories_for_feed(feed):
     handler=DeliciousTagHandler()
     try:
-        xml.sax.parse(feed,handler)
+        xml.sax.parse(feed.encode('utf-8'),handler)
         return handler.urls
     except HTTPError,e:
         print "ERROR: Could not retrieve delicious urls for feed '%s'" % feed
@@ -50,19 +50,19 @@ def fetch_stories_for_feed(feed):
         return []
 
 def update_feed_cache(feed,urls,change_date=False):
-    sql.query("insert into feed (url,url_md5,fetch_date,hit_count) values ('%s',md5('%s'),now(),1)\
-                    on duplicate key update hit_count=hit_count+1" % (feed,feed))
+    sql.query("insert into feed (url,url_md5,fetch_date,hit_count) values (%s,md5(%s),now(),1)\
+                    on duplicate key update hit_count=hit_count+1" , (feed,feed))
     if change_date:
-        sql.query("update feed set fetch_date=now() where url_md5=md5('%s')"%feed)
+        sql.query("update feed set fetch_date=now() where url_md5=md5(%s)",feed)
         for url in urls:
-            sql.query("insert into story (url,url_md5,hit_count) values ('%s',md5('%s'),0)\
-              on duplicate key update id=id" % (url,url)) #nice hack
+            sql.query("insert into story (url,url_md5,hit_count) values (%s,md5(%s),0)\
+              on duplicate key update id=id" , (url,url)) #nice hack
             sql.query("insert into feed_story (story_id,feed_id)\
               select story.id,feed.id\
               from story,feed\
-              where story.url_md5=md5('%s')\
-              and feed.url_md5=md5('%s')\
-              on duplicate key update story_id=story_id" %(url,feed)) #nice hack II
+              where story.url_md5=md5(%s)\
+              and feed.url_md5=md5(%s)\
+              on duplicate key update story_id=story_id" ,(url,feed)) #nice hack II
 
 class DeliciousURLHandler(xml.sax.handler.ContentHandler):
     """Parses a delicious rss of the form delicious/rss/url_md5"""
@@ -126,20 +126,20 @@ def update_story_cache(url,symbols,change_date=False):
     symbol_count=len(symbols.split(' '))
     sql.query("insert into story\
                  (url,url_md5,symbols,symbol_count,fetch_date,hit_count)\
-                 values ('%s',md5('%s'),'%s',%d,now(),1)\
-                 on duplicate key update hit_count=hit_count+1"%(url,url,symbols,symbol_count))
+                 values (%s,md5(%s),%s,%s,now(),1)\
+                 on duplicate key update hit_count=hit_count+1",(url,url,symbols,symbol_count))
     if change_date:
         sql.query("update story set\
                      fetch_date=now() where\
-                     url_md5=md5('%s')" % url)
+                     url_md5=md5(%s)" , url)
         sql.query("update story set\
-                     symbols='%s', symbol_count=%d where\
-                     url_md5=md5('%s')"%(symbols,symbol_count,url))
+                     symbols=%s, symbol_count=%s where\
+                     url_md5=md5(%s)",(symbols,symbol_count,url))
     
 def get_valid_cached_symbols_for_story(url):
     rows=sql.request("select symbols from story where\
-                        url_md5=md5('%s')\
-                        and addtime(fetch_date,'00:30:00') >= now()" % url)
+                        url_md5=md5(%s)\
+                        and addtime(fetch_date,'00:30:00') >= now()" , url)
     if rows:
         return rows[0][0]
     else: 

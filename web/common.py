@@ -36,7 +36,7 @@ def html_session(param,request):
     if param.has_key('login_hidden') and param.has_key('login') and param.has_key('passwd'):
         login=param['login']
         passwd=param['passwd']
-        if sql.request("select id from kolmognus_user where login='%s' and pass=PASSWORD('%s')" % (login,passwd)):
+        if sql.request("select id from kolmognus_user where login=%s and pass=PASSWORD(%s)" , (login,passwd)):
             session['login']=login
             session['hits']=0
             session.save()

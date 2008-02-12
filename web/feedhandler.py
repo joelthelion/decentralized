@@ -8,12 +8,12 @@ def html_feed_info(feed_md5):
     error_template="""<div class="feed_info"><h1>can't found feed info!!!</h1></div>"""
     story_template="""<a href="/story/%s">%s</a> (%d hits) [%.50s]"""
 
-    feed=sql.request("select id,url,url,hit_count,fetch_date from feed where url_md5='%s'" % feed_md5)
+    feed=sql.request("select id,url,url,hit_count,fetch_date from feed where url_md5=%s" , feed_md5)
     if feed:
         feed_id=feed[0][0]
         feed=feed[0][1:]
         stories=sql.request("select story.url_md5,story.url,story.hit_count,story.symbols\
-            from story,feed_story where story.id=feed_story.story_id and feed_story.feed_id=%d" % feed_id)
+            from story,feed_story where story.id=feed_story.story_id and feed_story.feed_id=%s" , feed_id)
         return template % (feed[0],feed[1],feed[2],feed[3],"<br/>".join([story_template % (story[0],saxutils.escape(story[1]),story[2],saxutils.escape(story[3])) for story in stories]))
     else:
         return error_template
