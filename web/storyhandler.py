@@ -31,7 +31,8 @@ def html_stories_info():
                       ,len(no_symbol_story),"<br/>".join([no_symbol_story_template % story for story in no_symbol_story]))
 
 def handler(request):
-    request.content_type='text/html'
+    request.content_type='application/xhtml+xml'
+    #request.content_type='text/html'
     #request.discard_requestuest_body()
     request.send_http_header()
 

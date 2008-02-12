@@ -21,7 +21,7 @@ def html_stories():
 
 def handler(request):
     welcome="""<div class="welcome"><p>Welcome on KolmoGNUS, the rss feeds bayesian classifier that search the web for you!!!</p></div>"""
-    request.content_type='text/html'
+    request.content_type='application/xhtml+xml'
     #request.discard_requestuest_body()
     request.send_http_header()
 

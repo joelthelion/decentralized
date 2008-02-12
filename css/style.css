@@ -72,3 +72,10 @@ margin: 20px 0px;
 div.debug span.key {
 font-weight: bold;
 }
+div.validation {
+float: right;
+}
+div.validation a img {
+border: 0px;
+margin: 0px 0px 0px 6px;
+}

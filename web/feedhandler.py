@@ -28,7 +28,8 @@ def html_feeds_info():
                       ,len(never_fetched_feed),"<br/>".join([never_fetched_feed_template % feed for feed in never_fetched_feed]))
 
 def handler(request):
-    request.content_type='text/html'
+    request.content_type='application/xhtml+xml'
+    #request.content_type='text/html'
     request.send_http_header()
 
     param=util.FieldStorage(request,keep_blank_values=True)
