@@ -10,12 +10,13 @@ if __name__ == '__main__':
     classifiers={}
     for user_id,login in users: #rate stories for each user
         if not user_id in classifiers:
-            #classifiers[user]=BayesianClassifier(user)
-            classifiers[user_id]=classifier.DumbClassifier()
+            classifiers[user_id]=classifier.BayesianClassifier(user_id)
+            #classifiers[user_id]=classifier.DumbClassifier()
         classif=classifiers[user_id]
         for url_id,umd5,url,symbols in stories:
             sql.query("insert into recommended_story (user_id,story_id,computed_rating)\
                 values(%s,%s,%s)",(user_id,url_id,classif.rate(symbols)))
 
     for url_id,umd5,url,symbols in stories: #mark stories as rated
+        print url_id
         sql.query("update story set rated_date=now() where id=%s;",url_id)
