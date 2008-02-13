@@ -45,7 +45,7 @@ create table if not exists recommended_story (
 	user_id int,
 	story_id int,
 	computed_rating float,
-	user_rating enum('G','B','?'), -- Good, Bad or Unknown
+	user_rating enum('G','B','?') default '?', -- Good, Bad or Unknown
 	learned boolean,
 	
 	primary key (user_id,story_id),
