@@ -33,7 +33,7 @@ def handler(request):
     #request.content_type='text/html'
     request.send_http_header()
 
-    param=util.FieldStorage(request,keep_blank_values=True)
+    param=common.decode_param_strings(util.FieldStorage(request,keep_blank_values=True))
     uri_param=request.uri.split('/')
 
     header=''

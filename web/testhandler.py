@@ -26,7 +26,7 @@ def handler(request):
     #request.discard_requestuest_body()
     request.send_http_header()
 
-    param=util.FieldStorage(request,keep_blank_values=True)
+    param=common.decode_param_strings(util.FieldStorage(request,keep_blank_values=True))
 
     header=''
     header+=common.html_session(param,request)

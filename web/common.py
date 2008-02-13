@@ -2,6 +2,13 @@ from mod_python import util,Session
 from web import sql
 import time
 
+def decode_param_strings(param):
+    """This function is needed to decode the utf-8 returned by mod_python"""
+    unicode_dict={}
+    for f in param.list:
+        unicode_dict[f.name.decode('utf-8')]=f.value.decode('utf-8') #there is no way to tell what encoding the user uses
+    return unicode_dict
+
 def html_page(header,main,footer,title="kolmognus"):
     template="""<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><title>%s</title><link rel="stylesheet" href="/css/style.css"/></head><body><div class="header">%s</div><div class="main">%s</div><div class="footer">%s</div></body></html>"""
     return template % (title,header,main,footer)
