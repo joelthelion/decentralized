@@ -123,18 +123,19 @@ def get_symbols_for_story(url):
     return symbols
 
 def update_story_cache(url,symbols,change_date=False):
-    symbol_count=len(symbols.split(' '))
+    if symbols:
+        symbol_count=len(symbols.split(' '))
+    else:
+        symbol_count=0
+
     sql.query("insert into story\
                  (url,url_md5,symbols,symbol_count,fetch_date,hit_count)\
                  values (%s,md5(%s),%s,%s,now(),1)\
                  on duplicate key update hit_count=hit_count+1",(url,url,symbols,symbol_count))
     if change_date:
         sql.query("update story set\
-                     fetch_date=now() where\
-                     url_md5=md5(%s)" , url)
-        sql.query("update story set\
-                     symbols=%s, symbol_count=%s where\
-                     url_md5=md5(%s)",(symbols,symbol_count,url))
+                     fetch_date=now(), symbols=%s, symbol_count=%s where\
+                     url_md5=md5(%s)" , (symbols,symbol_count,url))
     
 def get_valid_cached_symbols_for_story(url):
     rows=sql.request("select symbols from story where\

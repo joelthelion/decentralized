@@ -23,24 +23,19 @@ def html_stories_info():
     never_fetched_story_template="""<a href="/story/%s">%s</a>"""
     no_symbol_story_template="""%s"""
 
-    fetched_story=sql.request("select url_md5,url,hit_count,symbol_count from story where not isnull(fetch_date) and not isnull(symbols) order by symbol_count desc")
+    fetched_story=sql.request("select url_md5,url,hit_count,symbol_count from story where not isnull(fetch_date) and not symbol_count=0 order by symbol_count desc")
     never_fetched_story=sql.request("select url_md5,url from story where isnull(fetch_date) order by id desc")
-    no_symbol_story=sql.request("select url from story where isnull(symbols) order by id desc")
+    no_symbol_story=sql.request("select url from story where not isnull(fetch_date) and symbol_count=0 order by id desc")
     return template % (len(fetched_story),"<br/>".join([fetched_story_template % (story[0], saxutils.escape(story[1]), story[2], story[3]) for story in fetched_story])\
                       ,len(never_fetched_story),"<br/>".join([never_fetched_story_template % (story[0], saxutils.escape(story[1])) for story in never_fetched_story])\
                       ,len(no_symbol_story),"<br/>".join([no_symbol_story_template % saxutils.escape(story[0]) for story in no_symbol_story]))
 
 def handler(request):
-    request.content_type='application/xhtml+xml'
-    #request.content_type='text/html'
-    #request.discard_requestuest_body()
-    request.send_http_header()
-
-    param=common.decode_param_strings(util.FieldStorage(request,keep_blank_values=True))
+    param,session=common.init_request(request)
     uri_param=request.uri.split('/')
 
     header=''
-    header+=common.html_session(param,request)
+    header+=common.html_session(param,session,request)
     header+=common.html_menu()
 
     main_frame=''

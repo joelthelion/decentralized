@@ -1,5 +1,5 @@
 -- alter database prout default character set utf8;
-create database prout character set utf8;
+create database if not exists prout character set utf8;
 use prout;
 
 create table if not exists kolmognus_user (

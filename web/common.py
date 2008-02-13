@@ -9,6 +9,14 @@ def decode_param_strings(param):
         unicode_dict[f.name.decode('utf-8')]=f.value.decode('utf-8') #there is no way to tell what encoding the user uses
     return unicode_dict
 
+def init_request(request):
+    request.content_type='application/xhtml+xml'
+    request.send_http_header()
+    param=decode_param_strings(util.FieldStorage(request,keep_blank_values=True))
+    session=Session.Session(request,timeout=60)
+    return param,session
+    
+
 def html_page(header,main,footer,title="kolmognus"):
     template="""<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><title>%s</title><link rel="stylesheet" href="/css/style.css"/></head><body><div class="header">%s</div><div class="main">%s</div><div class="footer">%s</div></body></html>"""
     return template % (title,header,main,footer)
@@ -30,12 +38,11 @@ def html_menu():
     menu_template="""<a href="%s">%s</a>"""
     return template % ' '.join([menu_template % (menu[0],menu[1].upper()) for menu in menus])
 
-def html_session(param,request):
+def html_session(param,session,request):
     template="""<div class="session">%s<p>%s</p></div>"""
     form_template="""<form action="" method="post"><p><input name="login" type="text" value="login" tabindex="1" onfocus="value=''"/><input name="passwd" type="password" value="****" tabindex="2" onfocus="value=''"/><input type="submit" value="go!!"/><input name="login_hidden" type="hidden"/></p></form>"""
-    logged_template="""<p>Welcome %s!! <a href="?logout">logout</a></p>"""
+    logged_template="""<p>Welcome %s!! <a href='/'>my links</a> <a href="?logout">logout</a></p>"""
 
-    session=Session.Session(request,timeout=60)
     if param.has_key('logout'):
         session.invalidate()
         util.redirect(request,'/')
@@ -49,6 +56,7 @@ def html_session(param,request):
             session.save()
             return template % (logged_template % session['login'],"%d hits" % session['hits'])
         else:
+            session.invalidate()
             return template % (form_template,"bad login")
     elif not session.is_new():
         session['hits']+=1

@@ -50,11 +50,6 @@ div.main {
 margin: 5px 0px 0px 0px;
 font-size: 10pt;
 }
-div.main div.welcome {
-text-align: center;
-margin: 30px;
-font-size: 20px;
-}
 div.main h1 {
 font-size: 14pt;
 margin: 0px;
@@ -62,6 +57,35 @@ margin: 0px;
 div.main p {
 margin: 0px 0px 0px 20px;
 }
+/*welcome message*/
+div.main div.welcome {
+text-align: center;
+margin: 30px;
+font-size: 20px;
+}
+/*recommended stories*/
+div.main div.recommended_stories {
+margin: 30px 0px;
+}
+div.main div.recommended_stories form input.good {
+margin: 0px 0px 0px 6px;
+background-color: #00d200;
+border: 2px solid #00b600;
+}
+div.main div.recommended_stories form input.bad {
+margin: 0px 0px 0px 6px;
+background-color: #ed2c00;
+border: 2px solid #cd2c00;
+}
+div.main div.recommended_stories form a.view_it {
+margin: 0px 0px 0px 6px;
+padding: 1px 6px;
+color: #000000;
+text-decoration: none;
+background-color: #acd6f4;
+border: 2px solid #3091f1;
+}
+
 
 /*footer*/
 div.footer {
