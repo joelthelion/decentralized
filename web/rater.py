@@ -15,7 +15,7 @@ if __name__ == '__main__':
         classif=classifiers[user_id]
         for url_id,umd5,url,symbols in stories:
             sql.query("insert into recommended_story (user_id,story_id,computed_rating)\
-                values(%s,%s,%s)",(user_id,url_id,classif.rate(symbols)))
+                values(%s,%s,%s)",(user_id,url_id,classif.rate(symbols.split())))
 
     for url_id,umd5,url,symbols in stories: #mark stories as rated
         print url_id

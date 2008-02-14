@@ -4,14 +4,10 @@ class Classifier:
     def rate(self,symbols):
         """Returns a value between 0 (very good) and 1 (very bad)"""
         assert(False)
-    def train(self,symbols,isgood):
-        """Train the filter on a certain number of symbols"""
-        assert(False)
 
 class DumbClassifier(Classifier):
     def rate(self,symbols):
         return 0.5
-    def train(self,symbols,isgood): pass
 
 class BayesianClassifier(Classifier):
     """This is an implementation of the Robinson-Fisher spam filtering scheme,
@@ -26,23 +22,20 @@ class BayesianClassifier(Classifier):
 
         for symbol,good,bad in bayes_data: #compute f(w) for each word
             self.symb_ratio[symbol]=(BayesianClassifier.s*BayesianClassifier.x + good) / (BayesianClassifier.s + bad + good)
+            #print type(symbol),symbol,self.symb_ratio[symbol]
         
     def rate(self,symbols):
         """Returns a value between 0 (very good) and 1 (very bad)"""
         import operator
         import math
         try: H = self.chi2P(-2. * math.log(reduce(operator.mul,[self.symb_ratio.get(a,BayesianClassifier.x) for a in symbols],1.)),2*len(symbols))
-        except OverflowError: H = 0.0
+        except OverflowError: print "h overflow";H = 0.0
         try: S = self.chi2P(-2. * math.log(reduce(operator.mul,[1. - self.symb_ratio.get(a,BayesianClassifier.x) for a in symbols],1.)),2*len(symbols))
-        except OverflowError: S = 0.0
+        except OverflowError: print "s overflow";S = 0.0
+        #print symbols,H,S,(1+H-S)/2.,[i for i in symbols],[self.symb_ratio.get(a,BayesianClassifier.x) for a in symbols]
+        #print self.symb_ratio.items()
         return (1+H-S)/2.
         
-    def train(self,symbols,isgood):
-        """Train the filter on a certain number of symbols"""
-        assert(False)
-    def dump(self):
-        import sql
-        pass
     def chi2P(self,chi, df):
         """ return P(chisq >= chi, with df degree of freedom)
 
