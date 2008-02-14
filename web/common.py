@@ -13,7 +13,7 @@ def init_request(request):
     request.content_type='application/xhtml+xml'
     request.send_http_header()
     param=decode_param_strings(util.FieldStorage(request,keep_blank_values=True))
-    session=Session.Session(request,timeout=60)
+    session=Session.Session(request,timeout=240)
     return param,session
     
 
@@ -24,7 +24,7 @@ def html_page(header,main,footer,title="kolmognus"):
 def html_debug(param,request):
     template="""<div class="debug"><span class="key">parameters:</span> %s<br/><span class="key">uri:</span> %s<br/>generated in %.2fms</div>"""
     valid_template="""<div class="validation"><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11-blue" alt="Valid XHTML 1.1"/></a><a href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Fsd-12155.dedibox.fr%3A8080%2Fcss%2Fstyle.css"><img src="http://www.w3.org/Icons/valid-css-blue" alt="Valid CSS!"/></a></div>"""
-    formatted_param=' '.join(param.keys())
+    formatted_param=' '.join(["%s=%s" % item for item in param.items()])
     return valid_template + template % (formatted_param,request.uri,1000*(time.time()-request.request_time))
 
 def html_menu():
@@ -41,11 +41,10 @@ def html_menu():
 def html_session(param,session,request):
     template="""<div class="session">%s<p>%s</p></div>"""
     form_template="""<form action="" method="post"><p><input name="login" type="text" value="login" tabindex="1" onfocus="value=''"/><input name="passwd" type="password" value="****" tabindex="2" onfocus="value=''"/><input type="submit" value="go!!"/><input name="login_hidden" type="hidden"/></p></form>"""
-    logged_template="""<p>Welcome %s!! <a href='/'>my links</a> <a href="?logout">logout</a></p>"""
+    logged_template="""<form action="" method="post"><p>Welcome %s!! <a href='/'>my links</a> <input type="submit" value="logout" name="logout"/></p></form>"""
 
     if param.has_key('logout'):
         session.invalidate()
-        util.redirect(request,'/')
         return template % (form_template,'bye!!')
     if param.has_key('login_hidden') and param.has_key('login') and param.has_key('passwd'):
         login=param['login']

@@ -65,7 +65,7 @@ font-size: 20px;
 }
 /*recommended stories*/
 div.main div.recommended_stories {
-margin: 30px 0px;
+margin: 30px 0px 0px 0px;
 }
 div.main div.recommended_stories form input.good {
 margin: 0px 0px 0px 6px;
@@ -85,7 +85,10 @@ text-decoration: none;
 background-color: #acd6f4;
 border: 2px solid #3091f1;
 }
-
+/*rated stories*/
+div.main div.rated_stories {
+margin: 0px 0px 30px 0px;
+}
 
 /*footer*/
 div.footer {
