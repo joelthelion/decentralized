@@ -32,3 +32,4 @@ if __name__ == '__main__':
     sql.service_set_status('fetcher','started')
     fetch()
     sql.service_set_status('fetcher','stopped')
+    sql.db.close()
