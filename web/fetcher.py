@@ -2,6 +2,7 @@
 
 import sql
 import delicious
+import time
 
 def fetch():
     #is incoming full??
@@ -14,6 +15,8 @@ def fetch():
         for k,feed in enumerate(feeds):
             print "INFO: updating %d/%d feed %s" % (k+1,len(feeds),feed)
             stories.extend(delicious.get_stories_for_feed(feed))
+            time.sleep(1)
+
         #fetch stories for symbols
         print "INFO: building updatable stories list"
         stories=[story[0] for story in sql.request("select url from story where isnull(fetch_date) or addtime(fetch_date,'01:00:00') < now()")]
@@ -21,6 +24,8 @@ def fetch():
         for k,story in enumerate(stories):
             print "INFO: updating %d/%d story %.50s" % (k+1,len(stories),story)
             delicious.get_symbols_for_story(story)
+            time.sleep(1)
+
     else:
         print "INFO: no more urls needed"
     #clean stories with no symbols

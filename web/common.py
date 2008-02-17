@@ -23,7 +23,9 @@ def html_page(header,main,footer,title="kolmognus"):
 
 def html_debug(param,request):
     template="""<div class="debug"><span class="key">parameters:</span> %s<br/><span class="key">uri:</span> %s<br/>generated in %.2fms</div>"""
-    valid_template="""<div class="validation"><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11-blue" alt="Valid XHTML 1.1"/></a><a href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Fsd-12155.dedibox.fr%3A8080%2Fcss%2Fstyle.css"><img src="http://www.w3.org/Icons/valid-css-blue" alt="Valid CSS!"/></a></div>"""
+    valid_template="""<div class="validation"><a href="http://www.python.org/"><img src="/image/python.png" alt="Python powered"/></a>\
+        <a href="http://validator.w3.org/check?uri=referer"><img src="/image/xhtml11.png" alt="Valid XHTML 1.1"/></a>\
+        <a href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Fsd-12155.dedibox.fr%3A8080%2Fcss%2Fstyle.css"><img src="/image/css.png" alt="Valid CSS!"/></a></div>"""
     formatted_param=' '.join(["%s=%s" % item for item in param.items()])
     return valid_template + template % (formatted_param,request.uri,1000*(time.time()-request.request_time))
 
@@ -32,7 +34,7 @@ def html_menu():
         ('/',"home"),
 	('/feed',"feed"),
 	('/story',"story"),
-        ('/mp-info',"modpython")
+        ('http://sd-12155.dedibox.fr/',"infos")
     ]
     template="""<div class="menu"><a href="/"><img src="/image/logo.png" alt="KolmoGNUS"/></a><p>%s</p></div>"""
     menu_template="""<a href="%s">%s</a>"""
