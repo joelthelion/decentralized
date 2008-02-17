@@ -43,7 +43,7 @@ def html_menu():
 def html_session(param,session,request):
     template="""<div class="session">%s<p>%s</p></div>"""
     form_template="""<form action="" method="post"><p><input name="login" type="text" value="login" tabindex="1" onfocus="value=''"/><input name="passwd" type="password" value="****" tabindex="2" onfocus="value=''"/><input type="submit" value="go!!"/><input name="login_hidden" type="hidden"/></p></form>"""
-    logged_template="""<form action="" method="post"><p>Welcome %s!! <a href='/'>my links</a> <input type="submit" value="logout" name="logout"/></p></form>"""
+    logged_template="""<form action="" method="post"><p>Welcome %s!! <a href='/'>my stories</a> <input type="submit" value="logout" name="logout"/></p></form>"""
 
     if param.has_key('logout'):
         session.invalidate()

@@ -22,7 +22,7 @@ def html_stories():
 
 def html_recommended_stories(session):
     template="""<div class="recommended_stories"><h1>recommended stories:</h1><p>%s</p></div>"""
-    recommended_story_template="""<form method="post" action=""><a href="%s" class="view_it">view it</a> <input type="submit" class="good" value="good" name="rating"/> <input type="submit" class="bad" value="bad" name="rating"/> <a href="/story/%s">%s</a> <span class="rating">%.2f</span><input type="hidden" name="story_id" value="%d"/></form>"""
+    recommended_story_template="""<form method="post" action=""><a href="%s" class="view_it" target="_blank">view it</a> <input type="submit" class="good" value="good" name="rating"/> <input type="submit" class="bad" value="bad" name="rating"/> <a href="/story/%s">%s</a> <span class="rating">%.2f</span><input type="hidden" name="story_id" value="%d"/></form>"""
     recommended_stories=sql.request("select story.url_md5, story.url, recommended_story.computed_rating, story.id from story, recommended_story, kolmognus_user\
         where recommended_story.user_id=kolmognus_user.id and recommended_story.story_id=story.id\
         and kolmognus_user.login=%s and recommended_story.user_rating='?'\
