@@ -20,6 +20,7 @@ if __name__ == '__main__':
                 on duplicate key update computed_rating=%s",(user_id,url_id,rating,rating))
 
     for url_id,umd5,url,symbols in stories: #mark stories as rated
-        print url_id
         sql.query("update story set rated_date=now() where id=%s;",url_id)
     sql.db.close()
+    import time
+    print "INFO: (%s) rated %d stories for %d users" % (time.asctime(),len(stories),len(users))
