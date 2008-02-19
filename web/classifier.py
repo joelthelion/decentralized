@@ -19,8 +19,11 @@ class BayesianClassifier(Classifier):
         bayes_data = sql.request("select symbol,good_count,bad_count\
             from bayes_data where user_id=%s" , user_id)
         self.symb_ratio={}
+        liked_symbols=set(sql.request("select liked_symbols from kolmognus_user where id=%s",user_id)[0][0].split())
 
         for symbol,good,bad in bayes_data: #compute f(w) for each word
+            if symbol in liked_symbols:
+                good+=5 #empirical bonus added to symbols the user manually tagged as good
             self.symb_ratio[symbol]=(BayesianClassifier.s*BayesianClassifier.x + good) / (BayesianClassifier.s + bad + good)
             #print type(symbol),symbol,self.symb_ratio[symbol]
         

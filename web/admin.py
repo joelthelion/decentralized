@@ -53,13 +53,14 @@ def listfeed(params):
     return 'feeds: '+' '.join(sql.feed_list())
 
 #user oriented commands
-@has_param_number(2)
+@has_param_number(3)
 def adduser(params):
-    """ login password: add user to database"""
+    """ login password likedsymbol1 [liked_symbol...]: add user to database"""
     login=params[0]
     passwd=params[1]
+    symbols=' '.join(params[2:])
 
-    if sql.query("insert into kolmognus_user (login,pass) values (%s,PASSWORD(%s))" , (login,passwd)):
+    if sql.query("insert into kolmognus_user (login,pass,liked_symbols) values (%s,PASSWORD(%s),%s)" , (login,passwd,symbols)):
         return  "user %s added to database" % login  
     else:
         return "can't add user %s..." % login
