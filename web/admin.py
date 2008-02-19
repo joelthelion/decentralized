@@ -140,6 +140,7 @@ def main():
         try:
             action,params=get_command()
         except EOFError:
+            print 'Bye'
             break
         try:
             print commands[action](params)

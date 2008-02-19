@@ -1,6 +1,31 @@
 body {
 margin: 30px;
 }
+a:link {
+color: #3091f7;
+}
+a:visited, a:active {
+color: #acd6f4;
+}
+a:hover {
+/*font-weight: bold;*/
+}
+input {
+background-color: #acd6f4;
+border: 1px solid #3091f1;
+margin: 1px;
+}
+input.button_input {
+cursor: pointer;
+}
+a.button_input {
+padding: 1px 6px;
+color: #000000;
+text-decoration: none;
+background-color: #acd6f4;
+border: 1px solid #3091f1;
+margin: 1px;
+}
 
 /*main header*/
 div.header {
@@ -33,16 +58,9 @@ margin: 3px;
 }
 div.session form input {
 margin: 0px 0px 0px 6px;
-background-color: #acd6f4;
-border: 2px solid #3091f1;
 }
-div.session p a {
+div.session form a {
 margin: 0px 0px 0px 6px;
-padding: 1px 6px;
-color: #000000;
-text-decoration: none;
-background-color: #acd6f4;
-border: 2px solid #3091f1;
 }
 
 /*main frame*/
@@ -68,22 +86,20 @@ div.main div.recommended_stories {
 margin: 30px 0px 0px 0px;
 }
 div.main div.recommended_stories form input.good {
-margin: 0px 0px 0px 6px;
 background-color: #00d200;
-border: 2px solid #00b600;
+border: 1px solid #00b600;
+cursor: pointer;
 }
 div.main div.recommended_stories form input.bad {
-margin: 0px 0px 0px 6px;
 background-color: #ed2c00;
-border: 2px solid #cd2c00;
+border: 1px solid #cd2c00;
+cursor: pointer;
 }
-div.main div.recommended_stories form a.view_it {
-margin: 0px 0px 0px 6px;
-padding: 1px 6px;
-color: #000000;
-text-decoration: none;
-background-color: #acd6f4;
-border: 2px solid #3091f1;
+/*symbols*/
+div.main div.liked_symbols form input.text_input {
+background-color: #FFFFFF;
+border: 1px solid #FFFFFF;
+margin: 1px;
 }
 /*rated stories*/
 div.main div.rated_stories {

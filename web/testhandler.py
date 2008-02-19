@@ -20,15 +20,33 @@ def html_stories():
     stories=sql.request("select url_md5,url,hit_count,symbol_count,symbols from story where not isnull(symbols) and not symbol_count=0 order by fetch_date asc limit 10")
     return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[1]),story[2],story[3],saxutils.escape(story[4])) for story in stories])
 
+def compute_size(gcbc,min=0,max=8,min_size=10,max_size=20):
+    if gcbc<=min:
+        return min_size
+    elif gcbc>=max:
+        return max_size
+    else:
+        return int(min_size+(max_size-min_size)*(gcbc-min)/(max-min))
+
+def html_liked_symbols(param,session):
+    if param.has_key("update_liked_symbols"):
+        sql.request("update kolmognus_user set liked_symbols=%s where login=%s",(param["liked_symbols"],session["login"]))
+    template="""<div class="liked_symbols"><h1>symbols you said you like:</h1><form action=""><p><input class="button_input" type="submit" value="update" name="update_liked_symbols"/><input class="text_input" size="100" maxlength="200" type="text" name="liked_symbols" value="%s"/></p></form><h1>symbols kolmognus thinks you like:</h1><p>%s</p></div>"""
+    user_liked_symbols=sql.request("select liked_symbols from kolmognus_user where login=%s",session["login"])[0][0]
+    kolmognus_liked_symbol_template="""<span class="symbol" style="font-size: %dpt">%s(%d)</span>"""
+    kolmognus_liked_symbols=sql.request("select symbol, good_count-bad_count\
+        from bayes_data, kolmognus_user where bayes_data.user_id=kolmognus_user.id and kolmognus_user.login=%s order by good_count-bad_count desc limit 10",session["login"])
+    return template % (saxutils.escape(user_liked_symbols)," ".join([kolmognus_liked_symbol_template % (compute_size(symbol[1]),saxutils.escape(symbol[0]),symbol[1]) for symbol in kolmognus_liked_symbols]))
+
 def html_recommended_stories(session):
-    template="""<div class="recommended_stories"><h1>recommended stories:</h1><p>%s</p></div>"""
-    recommended_story_template="""<form method="post" action=""><a href="%s" class="view_it" target="_blank">view it</a> <input type="submit" class="good" value="good" name="rating"/> <input type="submit" class="bad" value="bad" name="rating"/> <a href="/story/%s">%s</a> <span class="rating">%.2f</span><input type="hidden" name="story_id" value="%d"/></form>"""
+    template="""<div class="recommended_stories"><h1>recommended stories:</h1>%s</div>"""
+    recommended_story_template="""<form method="post" action=""><p><a class="button_input" href="/story/%s">view it</a><input type="submit" class="good" value="good" name="rating"/><input type="submit" class="bad" value="bad" name="rating"/> <a href="%s" target="_blank">%s</a> <span class="rating">%.2f</span><input type="hidden" name="story_id" value="%d"/></p></form>"""
     recommended_stories=sql.request("select story.url_md5, story.url, recommended_story.computed_rating, story.id from story, recommended_story, kolmognus_user\
         where recommended_story.user_id=kolmognus_user.id and recommended_story.story_id=story.id\
         and kolmognus_user.login=%s and recommended_story.user_rating='?'\
         order by recommended_story.computed_rating desc\
         limit 10",session['login'])
-    return template % "<br/>".join([recommended_story_template % (saxutils.escape(story[1]),story[0],saxutils.escape(story[1]),story[2],story[3]) for story in recommended_stories])
+    return template % "".join([recommended_story_template % (story[0],saxutils.escape(story[1]),saxutils.escape(story[1]),story[2],story[3]) for story in recommended_stories])
 
 def html_rated_stories(session):
     template="""<div class="rated_stories"><h1>rated stories:</h1><p>%s</p></div>"""
@@ -56,12 +74,16 @@ def handler(request):
     main_frame=''
     if session.has_key('login'): #user logged in
         main_frame+=html_recommended_stories(session)
+        main_frame+=html_liked_symbols(param,session)
         main_frame+=html_rated_stories(session)
+        main_frame+=html_feeds()
+        main_frame+=html_stories()
+        main_frame+=html_users()
     else:
         main_frame+=welcome
-    main_frame+=html_feeds()
-    main_frame+=html_stories()
-    main_frame+=html_users()
+        main_frame+=html_feeds()
+        main_frame+=html_stories()
+        main_frame+=html_users()
 
     footer=''
     footer+=common.html_debug(param,request)

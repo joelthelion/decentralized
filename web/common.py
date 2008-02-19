@@ -1,4 +1,5 @@
 from mod_python import util,Session
+from xml.sax import saxutils
 from web import sql
 import time
 
@@ -27,7 +28,7 @@ def html_debug(param,request):
         <a href="http://validator.w3.org/check?uri=referer"><img src="/image/xhtml11.png" alt="Valid XHTML 1.1"/></a>\
         <a href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Fsd-12155.dedibox.fr%3A8080%2Fcss%2Fstyle.css"><img src="/image/css.png" alt="Valid CSS!"/></a></div>"""
     formatted_param=' '.join(["%s=%s" % item for item in param.items()])
-    return valid_template + template % (formatted_param,request.uri,1000*(time.time()-request.request_time))
+    return valid_template + template % (saxutils.escape(formatted_param),saxutils.escape(request.uri),1000*(time.time()-request.request_time))
 
 def html_menu():
     menus=[
@@ -42,8 +43,8 @@ def html_menu():
 
 def html_session(param,session,request):
     template="""<div class="session">%s<p>%s</p></div>"""
-    form_template="""<form action="" method="post"><p><input name="login" type="text" value="login" tabindex="1" onfocus="value=''"/><input name="passwd" type="password" value="****" tabindex="2" onfocus="value=''"/><input type="submit" value="go!!"/><input name="login_hidden" type="hidden"/></p></form>"""
-    logged_template="""<form action="" method="post"><p>Welcome %s!! <a href='/'>my stories</a> <input type="submit" value="logout" name="logout"/></p></form>"""
+    form_template="""<form action="" method="post"><p><input class="text_input" name="login" type="text" value="login" tabindex="1" onfocus="value=''"/><input class="text_input" name="passwd" type="password" value="****" tabindex="2" onfocus="value=''"/><input class="button_input" type="submit" value="go!!"/><input name="login_hidden" type="hidden"/></p></form>"""
+    logged_template="""<form action="" method="post"><p>Welcome %s!! <a href='/' class="button_input">my stories</a><input class="button_input" type="submit" value="logout" name="logout"/></p></form>"""
 
     if param.has_key('logout'):
         session.invalidate()
