@@ -187,7 +187,8 @@ def create_symbol_list(authors,tags,descriptions,date):
     symbols = u' '.join(tags)
     if authors:
         symbols += ' '+' '.join(['liked_by_'+author for author in authors])
-    return symbols.strip("""!"'()*,-./:;<>?[\]`{|}~""")
+    #return symbols.strip("""!"'()*,-./:;<>?[\]`{|}~""")
+    return symbols.strip("""!"'()*,-/:;<>?[\]`{|}~""") #some punctuation is useful
     
 class DeliciousTagHandler(xml.sax.handler.ContentHandler):
     """Parses a delicious rss of the form delicious/rss/tag/c++"""
