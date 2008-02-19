@@ -6,6 +6,13 @@ import xml.sax
 import sql
 from urllib2 import HTTPError
 
+def open_url_cleanly(url):
+    """Gets data from an url with the proper User Agent"""
+    import urllib2
+    req=urllib2.Request(url)
+    req.add_header("User-Agent","kolmognus_v0.0.1")
+    return urllib2.urlopen(req)
+
 #delicious feed parsing
 def get_recent_stories():
     """Returns a list of recent URLs"""
@@ -42,7 +49,7 @@ def get_valid_cached_stories_for_feed(feed):
 def fetch_stories_for_feed(feed):
     handler=DeliciousTagHandler()
     try:
-        xml.sax.parse(feed.encode('utf-8'),handler)
+        xml.sax.parse(open_url_cleanly(feed.encode('utf-8')),handler)
         return handler.urls
     except HTTPError,e:
         print "ERROR: Could not retrieve delicious urls for feed '%s'" % feed
@@ -155,7 +162,7 @@ def fetch_symbols_for_url(url):
     feed='http://delicious.com/rss/url/%s' % md5.md5(del_format_url).hexdigest()
     handler=DeliciousURLHandler()
     try:
-        xml.sax.parse(feed,handler)
+        xml.sax.parse(open_url_cleanly(feed),handler)
         tags=list(set(handler.tags))
         import time
         pub_dates=[]
@@ -197,4 +204,6 @@ if __name__=="__main__":
     
     print get_stories_for_tag("c++")
     print get_recent_stories()
+    for i in open_url_cleanly("http://www.useragent.org/").readlines():
+        print i
 

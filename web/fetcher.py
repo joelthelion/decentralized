@@ -6,7 +6,7 @@ import time
 
 def fetch():
     #is incoming full??
-    if sql.request("select count(id) from story where rated_date is null")[0][0]<50:
+    if sql.request("select count(id) from story where rated_date is null")[0][0]<250:
         #build feed list from recent and requested tags
         print "INFO: building feed list"
         feeds=[feed[0] for feed in sql.request("select url from feed where isnull(fetch_date) or addtime(fetch_date,'01:00:00') < now()")]
@@ -24,7 +24,7 @@ def fetch():
         for k,story in enumerate(stories):
             print "INFO: updating %d/%d story %.50s" % (k+1,len(stories),story)
             delicious.get_symbols_for_story(story)
-            time.sleep(1)
+            time.sleep(3)
 
     else:
         print "INFO: no more urls needed"
