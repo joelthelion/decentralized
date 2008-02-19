@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sql
+import time
 
 def increment(dic,user_id,symbol):
     if not dic.has_key(user_id): dic[user_id]={}
@@ -15,8 +16,12 @@ if __name__=='__main__':
     all_users=set()
     all_stories=set()
     learned=[]
+    header_printed=False
     for user_id,story_id,user_rating,symbols in sql.request("select user_id,story_id,user_rating,symbols from recommended_story,story \
             where id=story_id and user_rating != '?' and isnull(learned)"):
+        if not header_printed:
+            print "INFO: (%s) :"%time.asctime(),
+            header_printed=True
         print ".",
         all_users.add(user_id)
         learned.append((user_id,story_id))
