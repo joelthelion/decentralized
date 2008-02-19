@@ -20,6 +20,9 @@ def get_best_feeds(feed_number=10):
     keys.sort(key=lambda t:t[1])
     return keys[-feed_number:]
 
+def get_best_feeds2(feed_number=10):
+    return sql.request("select symbol,good_count - bad_count from bayes_data order by good_count-bad_count")[-feed_number:]
+
 def open_url_cleanly(url):
     """Gets data from an url with the proper User Agent"""
     import urllib2
@@ -216,9 +219,9 @@ class DeliciousTagHandler(xml.sax.handler.ContentHandler):
 
 if __name__=="__main__":
     
-    print get_stories_for_tag("c++")
-    print get_recent_stories()
+    #print get_stories_for_tag("c++")
+    #print get_recent_stories()
     for i in open_url_cleanly("http://www.useragent.org/").readlines():
         print i
-    print get_best_feeds()
+    print get_best_feeds2()
 
