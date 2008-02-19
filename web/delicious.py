@@ -7,21 +7,7 @@ import sql
 from urllib2 import HTTPError
 
 def get_best_feeds(feed_number=10):
-    symbols=sql.request("select symbol from bayes_data")
-
-    symb_ratio={}
-    for s in symbols:
-        gc,bc=sql.request("select sum(good_count),sum(bad_count) from bayes_data where symbol=%s",s)[0]
-        gc,bc=float(gc),float(bc)
-        s_param=1.;x_param=.5
-        symb_ratio[s]=(s_param*x_param + gc) / (s_param + bc + gc)
-
-    keys=symb_ratio.items()
-    keys.sort(key=lambda t:t[1])
-    return keys[-feed_number:]
-
-def get_best_feeds2(feed_number=10):
-    return sql.request("select symbol,good_count - bad_count from bayes_data order by good_count-bad_count")[-feed_number:]
+    return sql.request("select symbol,good_count - bad_count from bayes_data order by good_count-bad_count desc limit %s",feed_number)
 
 def open_url_cleanly(url):
     """Gets data from an url with the proper User Agent"""
@@ -201,7 +187,7 @@ def create_symbol_list(authors,tags,descriptions,date):
     symbols = u' '.join(tags)
     if authors:
         symbols += ' '+' '.join(['liked_by_'+author for author in authors])
-    return symbols
+    return symbols.strip("""!"'()*,-./:;<>?[\]`{|}~""")
     
 class DeliciousTagHandler(xml.sax.handler.ContentHandler):
     """Parses a delicious rss of the form delicious/rss/tag/c++"""
@@ -223,5 +209,5 @@ if __name__=="__main__":
     #print get_recent_stories()
     for i in open_url_cleanly("http://www.useragent.org/").readlines():
         print i
-    print get_best_feeds2()
+    print get_best_feeds()
 
