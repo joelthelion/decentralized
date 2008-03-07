@@ -26,7 +26,8 @@ create table if not exists feed (
 	url text(32000),
 	url_md5 char(32) unique,
 	fetch_date datetime,
-	hit_count int
+	hit_count int,
+	added_by varchar(30) default "root_user"
 );
 
 create table if not exists feed_story (
