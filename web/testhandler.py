@@ -31,12 +31,18 @@ def compute_size(gcbc,min=0,max=8,min_size=10,max_size=20):
 def html_liked_symbols(param,session):
     if param.has_key("update_liked_symbols"):
         sql.request("update kolmognus_user set liked_symbols=%s where login=%s",(param["liked_symbols"],session["login"]))
-    template="""<div class="liked_symbols"><h1>symbols you said you like:</h1><form action=""><p><input class="button_input" type="submit" value="update" name="update_liked_symbols"/><input class="text_input" size="100" maxlength="200" type="text" name="liked_symbols" value="%s"/></p></form><h1>symbols kolmognus thinks you like:</h1><p>%s</p></div>"""
+    template="""<div class="liked_symbols"><h1>symbols you said you like:</h1><form action=""><p><input class="button_input" type="submit" value="update" name="update_liked_symbols"/><input class="text_input" size="200" maxlength="200" type="text" name="liked_symbols" value="%s"/></p></form><h1>symbols kolmognus thinks you like:</h1><p>%s</p></div>"""
     user_liked_symbols=sql.request("select liked_symbols from kolmognus_user where login=%s",session["login"])[0][0]
     kolmognus_liked_symbol_template="""<span class="symbol" style="font-size: %dpt">%s(%d)</span>"""
     kolmognus_liked_symbols=sql.request("select symbol, good_count-bad_count\
         from bayes_data, kolmognus_user where bayes_data.user_id=kolmognus_user.id and kolmognus_user.login=%s order by good_count-bad_count desc limit 10",session["login"])
     return template % (saxutils.escape(user_liked_symbols)," ".join([kolmognus_liked_symbol_template % (compute_size(symbol[1]),saxutils.escape(symbol[0]),symbol[1]) for symbol in kolmognus_liked_symbols]))
+
+def html_feed_submitter(param,session):
+    if param.has_key("update_submit_feed"):
+        sql.request("insert into feed (url,url_md5,hit_count,added_by) values (%s,md5(%s),0,%s)",(param["submit_feed"],param["submit_feed"],session["login"]))
+    template="""<div class="feed_submitter"><h1>submit a feed:</h1><form action=""><p><input class="button_input" type="submit" value="update" name="update_submit_feed"/><input class="text_input" size="200" maxlength="200" type="text" name="submit_feed" value=""/></p></form></div>"""
+    return template
 
 def html_recommended_stories(session):
     template="""<div class="recommended_stories"><h1>recommended stories:</h1>%s</div>"""
@@ -75,6 +81,7 @@ def handler(request):
     if session.has_key('login'): #user logged in
         main_frame+=html_recommended_stories(session)
         main_frame+=html_liked_symbols(param,session)
+        main_frame+=html_feed_submitter(param,session)
         main_frame+=html_rated_stories(session)
         main_frame+=html_feeds()
         main_frame+=html_stories()
