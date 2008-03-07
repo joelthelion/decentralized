@@ -1,3 +1,4 @@
+||| DESACTIVATED FOR SECURITY REASONS (AVOID BEING THROTTLED) |||
 #!/usr/bin/env python
 
 import sql

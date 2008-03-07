@@ -6,7 +6,7 @@ create table if not exists kolmognus_user (
 	id int primary key auto_increment,
 	login varchar(30) unique not null,
 	pass char(41), -- for md5 hash of the pass
-	liked_symbols varchar(10000) default "" not null, --symbols the user likes
+	liked_symbols text(10000) not null default '', -- symbols the user likes
         last_login_date datetime 
 );
 
