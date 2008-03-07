@@ -36,6 +36,17 @@ def clearfeeds(params):
         return "feeds cleared"
 
 @has_param_number(1)
+def addfeeds(params):
+    """ feed [feed.xml]... : add a feed to fetcher"""
+    added_feeds=0
+    for feed in params:
+        if sql.query("insert into feed (url,url_md5,hit_count) values (%s,MD5(%s),0)" , (feed,feed)):
+            added_feeds+=1
+        else:
+            return "can't add feed %s..." % feed
+    return "added %d feeds" % added_feeds
+
+@has_param_number(1)
 def addtags(params):
     """ tag [tag]... : add delicious tag feeds to fetcher"""
     added_feeds=0
@@ -120,6 +131,7 @@ commands={
     'clfeeds'        : clearfeeds,
     'addtags'       : addtags,
     'addt'           : addtags,
+    'feed'           : added_feeds,
     'listfeeds'      : listfeed,
     'feeds'          : listfeed
 }        
