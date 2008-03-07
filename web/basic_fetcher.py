@@ -5,7 +5,7 @@ import delicious
 import time
 
 def get_stories(feed,added_by):
-    import feedparser , md5
+    import feedparser , md5, re
     stories=[]
     for e in feedparser.parse(feed).entries:
         link=e["link"]
@@ -14,6 +14,7 @@ def get_stories(feed,added_by):
         elif story_age < 3e7 : date_symbol = " special_notold "
         else : date_symbol = " special_oldstory " # if story was created more than a year ago, it is old
         symbols=" ".join(["special_author_"+e.get("author","unknown"),e["title"],date_symbol,"special_rssfeed_"+md5.md5(feed).hexdigest(),"special_feedsubmitter_"+added_by])
+        re.sub("""[!"'()*,-/:;<>?[\]`{|}~]""",' ',symbols)
         stories.append((link,symbols))
     return stories
 
