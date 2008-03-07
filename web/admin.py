@@ -131,7 +131,7 @@ commands={
     'clfeeds'        : clearfeeds,
     'addtags'       : addtags,
     'addt'           : addtags,
-    'feed'           : added_feeds,
+    'feed'           : addfeeds,
     'listfeeds'      : listfeed,
     'feeds'          : listfeed
 }        
