@@ -9,10 +9,13 @@ def get_stories(feed,added_by):
     stories=[]
     for e in feedparser.parse(feed).entries:
         link=e["link"]
-        story_age=time.time() - time.mktime(e.updated_parsed)
-        if story_age < 260000 : date_symbol = " special_newsstory " # if story has less than three days, it is news
-        elif story_age < 3e7 : date_symbol = " special_notold "
-        else : date_symbol = " special_oldstory " # if story was created more than a year ago, it is old
+        try:
+            story_age=time.time() - time.mktime(e.updated_parsed)
+            if story_age < 260000 : date_symbol = " special_newsstory " # if story has less than three days, it is news
+            elif story_age < 3e7 : date_symbol = " special_notold "
+            else : date_symbol = " special_oldstory " # if story was created more than a year ago, it is old
+        except TypeError: #Occurs when item doesn't have date information
+            date_symbol=""
         symbols=" ".join(["special_author_"+e.get("author","unknown"),e["title"],date_symbol,"special_rssfeed_"+md5.md5(feed).hexdigest(),"special_feedsubmitter_"+added_by])
         symbols=re.sub("""[!"'()*,-/:;<>?[\]`{|}~]""",' ',symbols)
         stories.append((link,symbols))
