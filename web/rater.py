@@ -8,9 +8,10 @@ if __name__ == '__main__':
     stories=sql.request("select id,url_md5,url,symbols from story where addtime(fetch_date,'12:00:00') > now() and (not isnull(fetch_date)) and (isnull(rated_date) or addtime(rated_date,%s) < now())" , rerate_delay) #do not rerate old news
     users=sql.request("select id,login from kolmognus_user")
     classifiers={}
+    alluser_info=classifier.get_alluser_info()
     for user_id,login in users: #rate stories for each user
         if not user_id in classifiers:
-            classifiers[user_id]=classifier.BayesianClassifier(user_id)
+            classifiers[user_id]=classifier.BayesianClassifier(user_id,alluser_info)
             #classifiers[user_id]=classifier.DumbClassifier()
         classif=classifiers[user_id]
         for url_id,umd5,url,symbols in stories:
