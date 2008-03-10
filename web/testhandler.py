@@ -41,7 +41,7 @@ def html_liked_symbols(param,session):
 def html_feed_submitter(param,session):
     if param.has_key("update_submit_feed"):
         sql.request("insert into feed (url,url_md5,hit_count,added_by) values (%s,md5(%s),0,%s)",(param["submit_feed"],param["submit_feed"],session["login"]))
-    template="""<div class="feed_submitter"><h1>submit a feed:</h1><form action=""><p><input class="button_input" type="submit" value="update" name="update_submit_feed"/><input class="text_input" size="100" maxlength="500" type="text" name="submit_feed" value=""/></p></form></div>"""
+    template="""<div class="feed_submitter"><h1>submit a feed:</h1><form method="post" action=""><p><input class="button_input" type="submit" value="update" name="update_submit_feed"/><input class="text_input" size="80%" maxlength="500" type="text" name="submit_feed" value=""/></p></form></div>"""
     return template
 
 def html_recommended_stories(session):
