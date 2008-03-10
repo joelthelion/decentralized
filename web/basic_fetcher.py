@@ -18,7 +18,7 @@ def get_stories(feed,added_by):
             date_symbol=""
         symbols=" ".join(["special_author_"+e.get("author","unknown"),e["title"],date_symbol,"special_rssfeed_"+md5.md5(feed).hexdigest(),"special_feedsubmitter_"+added_by])
         symbols=re.sub("""[!"'()*,-/:;<>?[\]`{|}~]""",' ',symbols)
-        stories.append((link,symbols))
+        stories.append((link,e["title"],symbols))
     return stories
 
 def fetch():
@@ -32,9 +32,9 @@ def fetch():
         print "INFO: found %d updatable feeds" % len(feeds)
         for k,(feed,added_by) in enumerate(feeds):
             print"INFO: updating %d/%d feed %s" % (k+1,len(feeds),feed)
-            for url,symbols in get_stories(feed,added_by):
-                sql.query("insert into story (url,url_md5,hit_count,symbols,symbol_count,fetch_date) values (%s,md5(%s),0,%s,%s,now())\
-                  on duplicate key update id=id" , (url,url,symbols,len(symbols.split()))) #nice hack
+            for url,title,symbols in get_stories(feed,added_by):
+                sql.query("insert into story (url,url_md5,hit_count,symbols,symbol_count,fetch_date,title) values (%s,md5(%s),0,%s,%s,now(),%s)\
+                  on duplicate key update title=%s" , (url,url,symbols,len(symbols.split()),title,title)) 
                 sql.query("insert into feed_story (story_id,feed_id)\
                   select story.id,feed.id\
                   from story,feed\

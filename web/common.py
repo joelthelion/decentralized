@@ -14,7 +14,7 @@ def init_request(request):
     request.content_type='application/xhtml+xml'
     request.send_http_header()
     param=decode_param_strings(util.FieldStorage(request,keep_blank_values=True))
-    session=Session.Session(request,timeout=240)
+    session=Session.Session(request,timeout=3600)
     return param,session
     
 

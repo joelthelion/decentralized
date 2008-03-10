@@ -18,7 +18,8 @@ create table if not exists story (
 	symbol_count int,
 	fetch_date datetime,
 	hit_count int, -- number of times a url was given in a feed
-	rated_date datetime
+	rated_date datetime,
+	title varchar(255) default '' not null
 );
 
 create table if not exists feed (

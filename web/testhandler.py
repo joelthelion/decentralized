@@ -47,12 +47,12 @@ def html_feed_submitter(param,session):
 def html_recommended_stories(session):
     template="""<div class="recommended_stories"><h1>recommended stories:</h1>%s</div>"""
     recommended_story_template="""<form method="post" action=""><p><a class="button_input" href="/story/%s">view it</a><input type="submit" class="good" value="good" name="rating"/><input type="submit" class="bad" value="bad" name="rating"/> <a href="%s">%s</a> <span class="rating">%.2f</span><input type="hidden" name="story_id" value="%d"/></p></form>"""
-    recommended_stories=sql.request("select story.url_md5, story.url, recommended_story.computed_rating, story.id from story, recommended_story, kolmognus_user\
+    recommended_stories=sql.request("select story.url_md5, story.url, recommended_story.computed_rating, story.id,if(story.title='',story.url,story.title) from story, recommended_story, kolmognus_user\
         where recommended_story.user_id=kolmognus_user.id and recommended_story.story_id=story.id\
         and kolmognus_user.login=%s and recommended_story.user_rating='?'\
         order by recommended_story.computed_rating desc\
         limit 10",session['login'])
-    return template % "".join([recommended_story_template % (story[0],saxutils.escape(story[1]),saxutils.escape(story[1]),story[2],story[3]) for story in recommended_stories])
+    return template % "".join([recommended_story_template % (story[0],saxutils.escape(story[1]),saxutils.escape(story[4]),story[2],story[3]) for story in recommended_stories])
 
 def html_rated_stories(session):
     template="""<div class="rated_stories"><h1>rated stories:</h1><p>%s</p></div>"""
