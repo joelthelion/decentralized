@@ -25,13 +25,13 @@ def fetch():
     #is incoming full??
     if sql.request("select count(id) from story where rated_date is null")[0][0]<250:
         #build feed list from recent and requested tags
-        print "INFO: building feed list"
-        feeds=sql.request("select url,added_by from feed where isnull(fetch_date) or addtime(fetch_date,'01:00:00') < now()")
+        #print "INFO: building feed list"
+        feeds=sql.request("select url,added_by from feed where isnull(fetch_date) and not url= '' or addtime(fetch_date,'01:00:00') < now()")
         #feeds=["rss.xml"]
         stories=[]
-        print "INFO: found %d updatable feeds" % len(feeds)
+        #print "INFO: found %d updatable feeds" % len(feeds)
         for k,(feed,added_by) in enumerate(feeds):
-            print"INFO: updating %d/%d feed %s" % (k+1,len(feeds),feed)
+            #print"INFO: updating %d/%d feed %s" % (k+1,len(feeds),feed)
             for url,title,symbols in get_stories(feed,added_by):
                 sql.query("insert into story (url,url_md5,hit_count,symbols,symbol_count,fetch_date,title) values (%s,md5(%s),0,%s,%s,now(),%s)\
                   on duplicate key update title=%s" , (url,url,symbols,len(symbols.split()),title,title)) 
@@ -42,6 +42,7 @@ def fetch():
                   and feed.url_md5=md5(%s)\
                   on duplicate key update story_id=story_id" ,(url,feed)) #nice hack II
             sql.query("update feed set fetch_date=now() where url_md5=md5(%s)",feed)
+        print "INFO: updated %d feeds (%s)" % (len(feeds),time.ctime())
 
     else:
         print "INFO: no more urls needed"

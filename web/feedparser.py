@@ -2636,7 +2636,6 @@ def parse(url_file_stream_or_string, etag=None, modified=None, agent=None, refer
     result['entries'] = feedparser.entries
     result['version'] = result['version'] or feedparser.version
     result['namespaces'] = feedparser.namespacesInUse
-    print "Finished parsing normally."
     return result
 
 if __name__ == '__main__':
