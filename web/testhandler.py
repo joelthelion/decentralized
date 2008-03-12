@@ -17,8 +17,8 @@ def html_feeds():
 def html_stories():
     template="""<div class="stories"><h1>recent stories:</h1><p>%s</p></div>"""
     story_template="""<a href="/story/%s">%s</a> %d hits, %d symbols [%.50s]"""
-    stories=sql.request("select url_md5,url,hit_count,symbol_count,symbols from story where not isnull(symbols) and not symbol_count=0 order by fetch_date asc limit 10")
-    return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[1]),story[2],story[3],saxutils.escape(story[4])) for story in stories])
+    stories=sql.request("select url_md5,url,hit_count,symbol_count,symbols,title from story where not isnull(symbols) and not symbol_count=0 order by fetch_date desc limit 10")
+    return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[5]),story[2],story[3],saxutils.escape(story[4])) for story in stories])
 
 def compute_size(gcbc,min=0,max=8,min_size=10,max_size=20):
     if gcbc<=min:
@@ -59,13 +59,14 @@ def html_rated_stories(session):
     rated_story_template="""<a href="/story/%s">%s</a> <span class="rating">%s</span>"""
     rated_stories=sql.request("select story.url_md5, story.url, recommended_story.user_rating from story, recommended_story, kolmognus_user\
         where recommended_story.user_id=kolmognus_user.id and recommended_story.story_id=story.id\
-        and kolmognus_user.login=%s and not recommended_story.user_rating='?'",session['login'])
+        and kolmognus_user.login=%s and not recommended_story.user_rating='?' order by recommended_story.userrating_date desc limit 20",session['login'])
     return template % "<br/>".join([rated_story_template % (story[0],saxutils.escape(story[1]),story[2]) for story in rated_stories])
 
 def rate_story(param,session):
     rating_translation={'good':'G', 'bad':'B'}
     if session.has_key('login') and param.has_key('rating') and param.has_key('story_id'):
-        sql.query("update kolmognus_user, recommended_story set recommended_story.user_rating=%s\
+        sql.query("update kolmognus_user, recommended_story\
+            set recommended_story.user_rating=%s, recommended_story.userrating_date=now()\
             where kolmognus_user.id=recommended_story.user_id and kolmognus_user.login=%s and recommended_story.story_id=%s", (rating_translation[param["rating"]],session['login'],param['story_id']))
 
 def handler(request):

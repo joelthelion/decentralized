@@ -57,7 +57,8 @@ create table if not exists recommended_story (
 	  on delete cascade,
 	foreign key (story_id)
 	  references story(id)
-	  on delete cascade
+	  on delete cascade,
+	userrating_date datetime
 );
 
 create table if not exists bayes_data ( -- this table is not needed per se, but still there for performance reasons
