@@ -49,15 +49,23 @@ def html_feed_submitter(param,session):
     template="""<div class="feed_submitter"><h1>submit a feed:</h1><form method="post" action=""><p><input class="button_input" type="submit" value="submit" name="update_submit_feed"/><input class="text_input" size="60" maxlength="500" type="text" name="submit_feed" value=""/></p></form></div>"""
     return template
 
+def compute_rating_color(rating,min=0.7,max=0.85):
+    if rating<min:
+        return "black"
+    elif rating>=max:
+        return "red"
+    else:
+        return "rgb(%d,0,0)" % (255.0*(rating-min)/(max-min))
+
 def html_recommended_stories(session):
     template="""<div class="recommended_stories"><h1>recommended stories:</h1>%s</div>"""
-    recommended_story_template="""<form method="post" action=""><p><a class="button_input" href="/story/%s">view it</a><input type="submit" class="good" value="good" name="rating"/><input type="submit" class="bad" value="bad" name="rating"/> <a href="%s">%s</a> <span class="rating">%.2f</span><input type="hidden" name="story_id" value="%d"/></p></form>"""
+    recommended_story_template="""<form method="post" action=""><p><input type="submit" class="good" value="good" name="rating"/><input type="submit" class="bad" value="bad" name="rating"/> <a href="%s">%s</a> <span style="color: %s;">%.2f</span> <a class="details" href="/story/%s">show details</a><input type="hidden" name="story_id" value="%d"/></p></form>"""
     recommended_stories=sql.request("select story.url_md5, story.url, recommended_story.computed_rating, story.id,if(story.title='',story.url,story.title) from story, recommended_story, kolmognus_user\
         where recommended_story.user_id=kolmognus_user.id and recommended_story.story_id=story.id\
         and kolmognus_user.login=%s and recommended_story.user_rating='?'\
         order by recommended_story.computed_rating desc\
         limit 10",session['login'])
-    return template % "".join([recommended_story_template % (story[0],saxutils.escape(story[1]),saxutils.escape(story[4]),story[2],story[3]) for story in recommended_stories])
+    return template % "".join([recommended_story_template % (saxutils.escape(story[1]),saxutils.escape(story[4]),compute_rating_color(story[2]),story[2],story[0],story[3]) for story in recommended_stories])
 
 def html_rated_stories(session):
     template="""<div class="rated_stories"><h1>rated stories:</h1><p>%s</p></div>"""

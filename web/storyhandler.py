@@ -8,7 +8,7 @@ def html_story_info(story_md5):
     error_template="""<div class="story_info"><h1>can't found story info!!!</h1></div>"""
     feed_template="""<a href="/feed/%s">%s</a> (%d hits)"""
 
-    story=sql.request("select id,url,url,hit_count,symbol_count,fetch_date,symbols from story where url_md5=%s" , story_md5)
+    story=sql.request("select id,url,url,hit_count,symbol_count,fetch_date,symbols from story where url_md5=%s limit 30" , story_md5)
     if story:
         story_id=story[0][0]
         story=story[0][1:]
@@ -18,12 +18,12 @@ def html_story_info(story_md5):
         return error_template
 
 def html_stories_info():
-    template="""<div class="stories_info"><h1>%d fetched stories:</h1><p>%s</p><h1>%d never fetched stories:</h1><p>%s</p><h1>%d no symbol stories:</h1><p>%s</p></div>"""
+    template="""<div class="stories_info"><h1>%d last fetched stories:</h1><p>%s</p><h1>%d never fetched stories:</h1><p>%s</p><h1>%d no symbol stories:</h1><p>%s</p></div>"""
     fetched_story_template="""<a href="/story/%s">%s</a> (%d hits, %d symbols)"""
     never_fetched_story_template="""<a href="/story/%s">%s</a>"""
     no_symbol_story_template="""%s"""
 
-    fetched_story=sql.request("select url_md5,url,hit_count,symbol_count from story where not isnull(fetch_date) and not symbol_count=0 order by symbol_count desc")
+    fetched_story=sql.request("select url_md5,url,hit_count,symbol_count from story where not isnull(fetch_date) and not symbol_count=0 order by symbol_count desc limit 30")
     never_fetched_story=sql.request("select url_md5,url from story where isnull(fetch_date) order by id desc")
     no_symbol_story=sql.request("select url from story where not isnull(fetch_date) and symbol_count=0 order by id desc")
     return template % (len(fetched_story),"<br/>".join([fetched_story_template % (story[0], saxutils.escape(story[1]), story[2], story[3]) for story in fetched_story])\
