@@ -35,7 +35,7 @@ def html_liked_symbols(param,session):
     user_liked_symbols=sql.request("select liked_symbols from kolmognus_user where login=%s",session["login"])[0][0]
     kolmognus_liked_symbol_template="""<span class="symbol" style="font-size: %dpt">%s(%d)</span>"""
     kolmognus_liked_symbols=sql.request("select symbol, good_count-bad_count\
-        from bayes_data, kolmognus_user where bayes_data.user_id=kolmognus_user.id and kolmognus_user.login=%s order by good_count-bad_count desc limit 10",session["login"])
+        from bayes_data, kolmognus_user where length(bayes_data.symbol) > 3 and bayes_data.symbol not like 'special\_%%' and bayes_data.user_id=kolmognus_user.id and kolmognus_user.login=%s order by good_count-bad_count desc limit 10",session["login"])
     return template % (saxutils.escape(user_liked_symbols)," ".join([kolmognus_liked_symbol_template % (compute_size(symbol[1]),saxutils.escape(symbol[0]),symbol[1]) for symbol in kolmognus_liked_symbols]))
 
 def html_feed_submitter(param,session):
