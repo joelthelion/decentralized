@@ -59,7 +59,7 @@ def compute_rating_color(rating,min=0.7,max=0.85):
 
 def html_recommended_stories(session):
     template="""<div class="recommended_stories"><h1>recommended stories:</h1>%s</div>"""
-    recommended_story_template="""<form method="post" action=""><p><input type="submit" class="good" value="good" name="rating"/><input type="submit" class="bad" value="bad" name="rating"/> <a href="%s">%s</a> <span style="color: %s;">%.2f</span> <a class="details" href="/story/%s">show details</a><input type="hidden" name="story_id" value="%d"/></p></form>"""
+    recommended_story_template="""<form method="post" action=""><p><input type="image" class="good" value="good" name="rating" src="/image/good.png" alt="good"/><input type="image" class="bad" value="bad" name="rating" src="/image/bad.png" alt="bad"/> <a href="%s">%s</a> <span style="color: %s;">%.2f</span> <a class="details" href="/story/%s">show details</a><input type="hidden" name="story_id" value="%d"/></p></form>"""
     recommended_stories=sql.request("select story.url_md5, story.url, recommended_story.computed_rating, story.id,if(story.title='',story.url,story.title) from story, recommended_story, kolmognus_user\
         where recommended_story.user_id=kolmognus_user.id and recommended_story.story_id=story.id\
         and kolmognus_user.login=%s and recommended_story.user_rating='?'\

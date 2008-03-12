@@ -23,7 +23,7 @@ font-size: 14px;
 a.button_input {
 font-size: 14px;
 padding: 1px 6px;
-color: #000000;
+color: #white;
 text-decoration: none;
 background-color: #acd6f4;
 border: 1px solid #3091f1;
@@ -89,13 +89,13 @@ div.main div.recommended_stories {
 margin: 30px 0px 0px 0px;
 }
 div.main div.recommended_stories form input.good {
-background-color: #00d200;
-border: 1px solid #00b600;
+background-color: white;
+border: 0px;
 cursor: pointer;
 }
 div.main div.recommended_stories form input.bad {
-background-color: #ed2c00;
-border: 1px solid #cd2c00;
+background-color: white;
+border: 0px;
 cursor: pointer;
 }
 div.main div.recommended_stories form a.details {
