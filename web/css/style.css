@@ -1,4 +1,5 @@
 body {
+font-family: sans serif;
 margin: 30px;
 }
 a:link {
@@ -17,8 +18,10 @@ margin: 1px;
 }
 input.button_input {
 cursor: pointer;
+font-size: 14px;
 }
 a.button_input {
+font-size: 14px;
 padding: 1px 6px;
 color: #000000;
 text-decoration: none;
@@ -46,7 +49,7 @@ color: #3091f1;
 }
 /*session frame*/
 div.session {
-font-size: 10pt;
+/*font-size: 10pt;*/
 float: right;
 text-align: right;
 }
@@ -66,11 +69,11 @@ margin: 0px 0px 0px 6px;
 /*main frame*/
 div.main {
 margin: 5px 0px 0px 0px;
-font-size: 10pt;
+/*font-size: 10pt;*/
 }
 div.main h1 {
 font-size: 14pt;
-margin: 0px;
+margin: 8px 0px 0px 0px;
 }
 div.main p {
 margin: 0px 0px 0px 20px;
@@ -94,6 +97,9 @@ div.main div.recommended_stories form input.bad {
 background-color: #ed2c00;
 border: 1px solid #cd2c00;
 cursor: pointer;
+}
+div.main div.recommended_stories form a {
+/*font-family: serif;*/
 }
 /*symbols*/
 /*div.main div.liked_symbols form input.text_input {

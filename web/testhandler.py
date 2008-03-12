@@ -9,18 +9,18 @@ def html_users():
     return template % (len(users)," ".join(users))
 
 def html_feeds():
-    template="""<div class="feeds"><h1>Recent feeds:</h1><p>%s</p></div>"""
+    template="""<div class="feeds"><h1>recent feeds:</h1><p>%s</p></div>"""
     feed_template="""<a href="/feed/%s">%s</a>"""
     feeds=sql.request("select url_md5,url from feed order by fetch_date asc limit 10")
     return template % "<br/>".join([feed_template % feed for feed in feeds])
 
 def html_stories():
-    template="""<div class="stories"><h1>Popular stories:</h1><p>%s</p></div>"""
+    template="""<div class="stories"><h1>popular stories:</h1><p>%s</p></div>"""
     story_template="""<a href="/story/%s">%s</a> """
     stories=sql.request("select story.url_md5,story.url,story.hit_count,story.symbol_count,story.symbols,story.title from story,recommended_story where recommended_story.story_id=story.id and addtime(story.fetch_date,'12:00:00') > now() and recommended_story.user_rating='G' group by story.url order by count(*) desc limit 10")
     return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[5])) for story in stories])
 
-def compute_size(gcbc,min=0,max=8,min_size=10,max_size=20):
+def compute_size(gcbc,min=0,max=8,min_size=6,max_size=15):
     if gcbc<=min:
         return min_size
     elif gcbc>=max:
@@ -31,7 +31,7 @@ def compute_size(gcbc,min=0,max=8,min_size=10,max_size=20):
 def html_liked_symbols(param,session):
     if param.has_key("update_liked_symbols"):
         sql.request("update kolmognus_user set liked_symbols=%s where login=%s",(param["liked_symbols"],session["login"]))
-    template="""<div class="liked_symbols"><h1>symbols you said you like:</h1><form action=""><p><input class="button_input" type="submit" value="update" name="update_liked_symbols"/><input class="text_input" size="200" maxlength="200" type="text" name="liked_symbols" value="%s"/></p></form><h1>symbols kolmognus thinks you like:</h1><p>%s</p></div>"""
+    template="""<div class="liked_symbols"><h1>symbols you said you like:</h1><form action=""><p><input class="button_input" type="submit" value="submit" name="update_liked_symbols"/><input class="text_input" size="60" maxlength="200" type="text" name="liked_symbols" value="%s"/></p></form><h1>symbols kolmognus thinks you like:</h1><p>%s</p></div>"""
     user_liked_symbols=sql.request("select liked_symbols from kolmognus_user where login=%s",session["login"])[0][0]
     kolmognus_liked_symbol_template="""<span class="symbol" style="font-size: %dpt">%s(%d)</span>"""
     kolmognus_liked_symbols=sql.request("select symbol, good_count-bad_count\
@@ -39,9 +39,14 @@ def html_liked_symbols(param,session):
     return template % (saxutils.escape(user_liked_symbols)," ".join([kolmognus_liked_symbol_template % (compute_size(symbol[1]),saxutils.escape(symbol[0]),symbol[1]) for symbol in kolmognus_liked_symbols]))
 
 def html_feed_submitter(param,session):
-    if param.has_key("update_submit_feed"):
-        sql.request("insert into feed (url,url_md5,hit_count,added_by) values (%s,md5(%s),0,%s)",(param["submit_feed"],param["submit_feed"],session["login"]))
-    template="""<div class="feed_submitter"><h1>submit a feed:</h1><form method="post" action=""><p><input class="button_input" type="submit" value="update" name="update_submit_feed"/><input class="text_input" size="80%" maxlength="500" type="text" name="submit_feed" value=""/></p></form></div>"""
+    if param.has_key("update_submit_feed") and param["submit_feed"]!="":
+        import urllib2
+        try:
+            urllib2.urlopen(param["submit_feed"])
+            sql.request("insert into feed (url,url_md5,hit_count,added_by) values (%s,md5(%s),0,%s) on duplicate url=url",(param["submit_feed"],param["submit_feed"],session["login"]))
+        except (urllib2.URLError,ValueError):
+            pass
+    template="""<div class="feed_submitter"><h1>submit a feed:</h1><form method="post" action=""><p><input class="button_input" type="submit" value="submit" name="update_submit_feed"/><input class="text_input" size="60" maxlength="500" type="text" name="submit_feed" value=""/></p></form></div>"""
     return template
 
 def html_recommended_stories(session):
