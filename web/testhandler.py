@@ -88,14 +88,14 @@ def handler(request):
         main_frame+=html_recommended_stories(session)
         main_frame+=html_liked_symbols(param,session)
         main_frame+=html_feed_submitter(param,session)
-        main_frame+=html_rated_stories(session)
-        main_frame+=html_feeds()
         main_frame+=html_stories()
+        main_frame+=html_rated_stories(session)
+        #main_frame+=html_feeds()
         main_frame+=html_users()
     else:
         main_frame+=welcome
         main_frame+=html_stories()
-        main_frame+=html_feeds()
+        #main_frame+=html_feeds()
         main_frame+=html_users()
 
     footer=''
