@@ -9,16 +9,16 @@ def html_users():
     return template % (len(users)," ".join(users))
 
 def html_feeds():
-    template="""<div class="feeds"><h1>recent feeds:</h1><p>%s</p></div>"""
-    feed_template="""<a href="/feed/%s">%s</a> (%d hits)"""
-    feeds=sql.request("select url_md5,url,hit_count from feed order by fetch_date asc limit 10")
+    template="""<div class="feeds"><h1>Recent feeds:</h1><p>%s</p></div>"""
+    feed_template="""<a href="/feed/%s">%s</a>"""
+    feeds=sql.request("select url_md5,url from feed order by fetch_date asc limit 10")
     return template % "<br/>".join([feed_template % feed for feed in feeds])
 
 def html_stories():
-    template="""<div class="stories"><h1>recent stories:</h1><p>%s</p></div>"""
-    story_template="""<a href="/story/%s">%s</a> %d hits, %d symbols [%.50s]"""
-    stories=sql.request("select url_md5,url,hit_count,symbol_count,symbols,title from story where not isnull(symbols) and not symbol_count=0 order by fetch_date desc limit 10")
-    return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[5]),story[2],story[3],saxutils.escape(story[4])) for story in stories])
+    template="""<div class="stories"><h1>Popular stories:</h1><p>%s</p></div>"""
+    story_template="""<a href="/story/%s">%s</a> """
+    stories=sql.request("select story.url_md5,story.url,story.hit_count,story.symbol_count,story.symbols,story.title from story,recommended_story where recommended_story.story_id=story.id and addtime(story.fetch_date,'12:00:00') > now() and recommended_story.user_rating='G' group by story.url order by count(*) desc limit 10")
+    return template % "<br/>".join([story_template % (story[0],saxutils.escape(story[5])) for story in stories])
 
 def compute_size(gcbc,min=0,max=8,min_size=10,max_size=20):
     if gcbc<=min:
@@ -89,8 +89,8 @@ def handler(request):
         main_frame+=html_users()
     else:
         main_frame+=welcome
-        main_frame+=html_feeds()
         main_frame+=html_stories()
+        main_frame+=html_feeds()
         main_frame+=html_users()
 
     footer=''
