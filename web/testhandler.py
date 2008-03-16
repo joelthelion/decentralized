@@ -63,6 +63,7 @@ def html_recommended_stories(session):
     recommended_stories=sql.request("select story.url_md5, story.url, recommended_story.computed_rating, story.id,if(story.title='',story.url,story.title) from story, recommended_story, kolmognus_user\
         where recommended_story.user_id=kolmognus_user.id and recommended_story.story_id=story.id\
         and kolmognus_user.login=%s and recommended_story.user_rating='?'\
+        and addtime(story.fetch_date,'24:00:00') > now()\
         order by recommended_story.computed_rating desc\
         limit 10",session['login'])
     return template % "".join([recommended_story_template % (saxutils.escape(story[1]),saxutils.escape(story[4]),compute_rating_color(story[2]),story[2],story[0],story[3]) for story in recommended_stories])
