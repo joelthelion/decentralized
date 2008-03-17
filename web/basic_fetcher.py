@@ -16,7 +16,7 @@ def get_stories(feed,added_by):
             else : date_symbol = " special_oldstory " # if story was created more than a year ago, it is old
         except TypeError: #Occurs when item doesn't have date information
             date_symbol=""
-        symbols=" ".join(["special_author_"+e.get("author","unknown"),e["title"],date_symbol,"special_rssfeed_"+md5.md5(feed).hexdigest(),"special_feedsubmitter_"+added_by])
+        symbols=" ".join(["special_author_"+e.get("author","unknown"),e["title"],date_symbol,"special_rssfeed_"+md5.md5(feed).hexdigest(),"special_feedsubmitter_"+added_by,link])
         symbols=re.sub("""[!"'()*,-/:;<>?[\]`{|}~]""",' ',symbols)
         stories.append((link,e["title"],symbols))
     return stories
