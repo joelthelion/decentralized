@@ -76,12 +76,11 @@ if __name__=='__main__':
             add(current,m)
         cur=[]
         for k,count in current.items():
-            if k in already_seen:
-                already_seen[k]=now #this word is still being seen
+            if k in already_seen.keys():
+                already_seen[k]=now,already_seen[k][1]+count #this word is still being seen
             else:
                 if count>=SIGNIFICANCE_CONSTANT: #Discard low occurences, they don't represent a trend
                     cur.append((k,count))
-        cur=filter(lambda e:e[0] not in already_seen.keys(),cur) #Remove old trends
         cur.sort(key=lambda e:e[1])
         #compute rated stories
         story_ratings=[ (story,sum(current[w] for w in story_words \
@@ -89,14 +88,14 @@ if __name__=='__main__':
                 for story,story_words in ((s,tokenize(s)) for s in stories)]
         story_ratings.sort(key=lambda e:e[1])
 
-    for k,t in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
+    for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
         if now-t>86400*60:
                 del already_seen[k]
     if cur:
         print "The latest popular words are:"
         for word in cur:
             print "%s (%d)" % word
-            already_seen[word[0]]=now #Only update already_seen at the end
+            already_seen[word[0]]=now,word[1] #Only update already_seen at the end
     print "The most popular stories are:"
     for s,rating in story_ratings:
         if rating>0:
