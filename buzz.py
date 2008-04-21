@@ -50,8 +50,7 @@ def get_popurls_stories():
     #matches=re.findall("title=\"([^\/\"]*)",popurls_file)
     #return matches
 
-
-if __name__=='__main__':
+def show_original_stuff():
     now=time.time()
     try:
         f=open(os.path.expanduser("~/.popurls_alreadyseen.pck")) #we separate this from the rest of the stuff because this is the only critical piece of data
@@ -106,3 +105,24 @@ if __name__=='__main__':
     f=open(os.path.expanduser("~/.popurls.pck"),"wb")
     cPickle.dump((time_fetched,story_ratings,cur),f,-1)
     f.close()
+
+def show_popular_words():
+    import cPickle
+    common=set(unicode(open("common.txt").read(),"utf8").split(","))
+    a=cPickle.load(open("/home/schaerer/.popurls_alreadyseen.pck")).items()
+    a.sort(key=lambda e:e[1][1])
+    for k in a:
+        if k[0] not in common and len(k[0])>1 and k[1][1]>1: print "%s (%d)"%(k[0],k[1][1])
+
+if __name__=='__main__':
+    from sys import argv,exit
+    import getopt
+    optlist, args = getopt.getopt(argv[1:], '',['popular']) 
+
+    #user values                                                            
+    for o, a in optlist:
+        if o == "--popular":
+            show_popular_words()
+            sys.exit()
+    
+    show_original_stuff()
