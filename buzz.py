@@ -108,8 +108,9 @@ def show_original_stuff():
 
 def show_popular_words():
     import cPickle
+    import os
     common=set(unicode(open("common.txt").read(),"utf8").split(","))
-    a=cPickle.load(open("/home/schaerer/.popurls_alreadyseen.pck")).items()
+    a=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck"))).items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
         if k[0] not in common and len(k[0])>1 and k[1][1]>1: print "%s (%d)"%(k[0],k[1][1])
