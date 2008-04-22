@@ -109,7 +109,7 @@ def show_original_stuff():
 def show_popular_words():
     import cPickle
     import os
-    common=set(unicode(open("common.txt").read(),"utf8").split(","))
+    common=set(unicode(open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"common.txt")).read(),"utf8").split(","))
     a=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck"))).items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
