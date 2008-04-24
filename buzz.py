@@ -53,6 +53,10 @@ def show_original_stuff():
                 already_seen_links.add(s)
                 stories.append(s)
         raw_text=" ".join(stories)
+        if not stories==0: 
+            print "No new stories found"
+            import sys
+            sys.exit()
         time_fetched=now
         current={}
         for m in tokenize(raw_text):
