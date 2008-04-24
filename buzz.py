@@ -11,7 +11,7 @@ import sys
 SIGNIFICANCE_CONSTANT=1
 
 def tokenize(text):
-    text=re.sub(u"""[1234567890@#»”’.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
+    text=re.sub(u"""[/1234567890@#»”’.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
     
 def add(dict,key):
@@ -83,6 +83,7 @@ def show_original_stuff():
         for word in cur:
             print "%s (%d)" % word
             already_seen[word[0]]=now,word[1] #Only update already_seen at the end
+    print "Eliminated %d unoriginal stories" % sum(1 for s,rating in story_ratings if rating==0)
     print "The most popular stories are:"
     for s,rating in story_ratings:
         if rating>0:
