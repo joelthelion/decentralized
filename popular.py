@@ -31,7 +31,7 @@ if __name__=='__main__':
             disp_flag=True
         latest.append(popular)
         already_seen.add(popular)
-        if len(latest)>10:
+        if len(latest)>30:
             latest.pop(0)
         print ".",
     if disp_flag:
