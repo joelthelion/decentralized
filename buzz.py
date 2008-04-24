@@ -18,7 +18,7 @@ def myencodings(): #python's tables don't have all the codes used in fscking pop
     return zap,ent_defs,n2code
 
 def tokenize(text):
-    text=re.sub(u"""[”’.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
+    text=re.sub(u"""[»”’.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
     
 def clean_rawtext(text):
