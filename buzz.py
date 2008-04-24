@@ -10,26 +10,10 @@ import sys
 
 SIGNIFICANCE_CONSTANT=1
 
-def myencodings(): #python's tables don't have all the codes used in fscking popurls
-    import htmlentitydefs
-    n2code=htmlentitydefs.name2codepoint
-    ent_defs=htmlentitydefs.entitydefs
-    zap=["&amp;","&#39;","&nbsp;","&quot;","&#039;","&rsquo;","&rdquo;","quot"] #remove these
-    return zap,ent_defs,n2code
-
 def tokenize(text):
     text=re.sub(u"""[1234567890@#»”’.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
     
-def clean_rawtext(text):
-    #zap,ent_defs,n2code=myencodings()
-    #for k,v in ent_defs.items(): #convert html's &#XX; symbols to unicode
-    #    text=text.replace(unicode(v,"latin_1"),unichr(n2code.get(k,0)))
-    #for z in zap:#For some reason not all symbols are removed
-    #    text=text.replace(z," ")
-    #text=re.sub(u"""[’.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
-    return text
-
 def add(dict,key):
     dict[key]=dict.get(key,0)+1
 
@@ -40,25 +24,20 @@ def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r
         stories.extend(entry.title for entry in feedparser.parse(f).entries)
     return stories
 
-def get_popurls_stories():
-    import urllib2
-
-    print "Fetching data from popurls"
-    return []
-    #popurls_file=urllib2.urlopen("http://popurls.com").read().decode("utf8","ignore")
-    #popurls_file=re.sub("[^\ ]* diggs"," ",popurls_file)
-    #matches=re.findall("title=\"([^\/\"]*)",popurls_file)
-    #return matches
-
-def show_original_stuff():
-    now=time.time()
+def get_object_from_file(filename,default={}):
     try:
-        f=open(os.path.expanduser("~/.popurls_alreadyseen.pck")) #we separate this from the rest of the stuff because this is the only critical piece of data
-        already_seen=cPickle.load(f)
+        f=open(filename) #we separate this from the rest of the stuff because this is the only critical piece of data
+        mydict=cPickle.load(f)
         f.close()
     except IOError,e:
         print "already_seen file not found, creating a new one..."
-        already_seen={}
+        mydict=default
+    return mydict
+
+def show_original_stuff():
+    now=time.time()
+    already_seen=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
+    already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
     try:
         f=open(os.path.expanduser("~/.popurls.pck"))
         time_fetched,story_ratings,cur=cPickle.load(f)
@@ -67,7 +46,12 @@ def show_original_stuff():
         print "popurls file not found, creating a new one..."
         time_fetched,story_ratings,cur=0,None,[]
     if story_ratings is None or now-time_fetched>10 * 60: #if file is older than ten minutes
-        stories=get_feed_stories()
+        all_stories=get_feed_stories()
+        stories=[]
+        for s in all_stories:
+            if s not in already_seen_links:
+                already_seen_links.add(s)
+                stories.append(s)
         raw_text=" ".join(stories)
         time_fetched=now
         current={}
@@ -104,6 +88,9 @@ def show_original_stuff():
     f.close()
     f=open(os.path.expanduser("~/.popurls.pck"),"wb")
     cPickle.dump((time_fetched,story_ratings,cur),f,-1)
+    f.close()
+    f=open(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),"wb")
+    cPickle.dump(already_seen_links,f,-1)
     f.close()
 
 def show_popular_words():
