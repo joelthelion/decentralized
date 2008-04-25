@@ -76,7 +76,7 @@ def show_original_stuff():
         story_ratings.sort(key=lambda e:e[1])
 
     for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
-        if now-t>86400*60:
+        if now-t>86400*30:
                 del already_seen[k]
     if cur:
         print "The latest popular words are:"
