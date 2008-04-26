@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf8
 #Identify the latest trends on delicious
-
+from __future__ import division
 import os
 import re
 import cPickle
@@ -70,8 +70,8 @@ def show_original_stuff():
                     cur.append((k,count))
         cur.sort(key=lambda e:e[1])
         #compute rated stories
-        story_ratings=[ (story,sum(current[w] for w in story_words \
-                        if w not in already_seen and current[w]>=SIGNIFICANCE_CONSTANT))\
+        story_ratings=[ (story,int(100*sum(current[w] for w in story_words \
+                        if w not in already_seen and current[w]>=SIGNIFICANCE_CONSTANT)/len(story_words)))\
                 for story,story_words in ((s,tokenize(s)) for s in stories)]
         story_ratings.sort(key=lambda e:e[1])
 
