@@ -47,6 +47,7 @@ def show_original_stuff():
         print "popurls file not found, creating a new one..."
         time_fetched,story_ratings,cur=0,None,[]
     if story_ratings is None or now-time_fetched>10 * 60: #if file is older than ten minutes
+        common=set(unicode(open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"common.txt")).read(),"utf8").split(","))
         all_stories=get_feed_stories()
         stories=[]
         for s,feed in all_stories:
@@ -62,6 +63,8 @@ def show_original_stuff():
         current={}
         for m in tokenize(raw_text):
             add(current,m)
+        for word in current:
+            if word in common: current[word]=0 #Common words don't interest us
         cur=[]
         for k,count in current.items():
             if k in already_seen.keys():
