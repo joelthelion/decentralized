@@ -17,11 +17,12 @@ def tokenize(text):
 def add(dict,key):
     dict[key]=dict.get(key,0)+1
 
-def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/"]):
+def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://www.liberation.fr/interactif/rss/actualites/"]):
     import feedparser
     stories=[]
     for f in feeds:
-        stories.extend(entry.title for entry in feedparser.parse(f).entries)
+        print "Fetching %s..." % f
+        stories.extend((entry.title,f) for entry in feedparser.parse(f).entries)
     return stories
 
 def get_object_from_file(filename,default={}):
@@ -48,11 +49,11 @@ def show_original_stuff():
     if story_ratings is None or now-time_fetched>10 * 60: #if file is older than ten minutes
         all_stories=get_feed_stories()
         stories=[]
-        for s in all_stories:
+        for s,feed in all_stories:
             if s not in already_seen_links:
                 already_seen_links.add(s)
-                stories.append(s)
-        raw_text=" ".join(stories)
+                stories.append((s,feed))
+        raw_text=" ".join(s for s,f in stories)
         if not stories: 
             print "No new stories found"
             import sys
@@ -71,8 +72,8 @@ def show_original_stuff():
         cur.sort(key=lambda e:e[1])
         #compute rated stories
         story_ratings=[ (story,int(100*sum(current[w] for w in story_words \
-                        if w not in already_seen and current[w]>=SIGNIFICANCE_CONSTANT)/len(story_words)))\
-                for story,story_words in ((s,tokenize(s)) for s in stories)]
+                        if w not in already_seen and current[w]>=SIGNIFICANCE_CONSTANT)/len(story_words)),feed)\
+                for story,story_words,feed in ((s,tokenize(s),feed) for s,feed in stories)]
         story_ratings.sort(key=lambda e:e[1])
 
     for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
@@ -83,11 +84,11 @@ def show_original_stuff():
         for word in cur:
             print "%s (%d)" % word
             already_seen[word[0]]=now,word[1] #Only update already_seen at the end
-    print "Eliminated %d unoriginal stories" % sum(1 for s,rating in story_ratings if rating==0)
+    print "Eliminated %d unoriginal stories" % sum(1 for s,rating,feed in story_ratings if rating==0)
     print "The most original stories are:"
-    for s,rating in story_ratings:
+    for s,rating,feed in story_ratings:
         if rating>0:
-            print "%s (%d)"%(s,rating)
+            print "(%d) %s (%s)"%(rating,s,feed)
     f=open(os.path.expanduser("~/.popurls_alreadyseen.pck"),"wb")
     cPickle.dump((already_seen),f,-1)
     f.close()
