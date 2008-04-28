@@ -81,7 +81,8 @@ def show_original_stuff():
 
     for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
         if now-t>86400*30:
-                del already_seen[k]
+            print "Cleanup: removed %s from seen dictionnary" % k
+            del already_seen[k]
     if cur:
         print "The latest popular words are:"
         for word in cur:
