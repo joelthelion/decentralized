@@ -11,7 +11,7 @@ import sys
 SIGNIFICANCE_CONSTANT=1
 
 def tokenize(text):
-    text=re.sub(u"""[/1234567890@#«»”’.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
+    text=re.sub(u"""[/1234567890@#«»”’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
     
 def add(dict,key):
