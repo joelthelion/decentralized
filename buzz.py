@@ -94,8 +94,9 @@ def show_original_stuff():
     if cur:
         print "The latest popular words are:"
         for word in cur:
-            print "%s (%d)" % word
-            already_seen[word[0]]=now,word[1] #Only update already_seen at the end
+            if word[1]>0:
+                print "%s (%d)" % word
+                already_seen[word[0]]=now,word[1] #Only update already_seen at the end
     print "Eliminated %d unoriginal stories" % sum(1 for s,rating,feed in story_ratings if rating==0)
     print "The most original stories are:"
     for s,rating,feed in story_ratings:
