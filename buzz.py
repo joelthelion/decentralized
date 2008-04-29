@@ -73,7 +73,7 @@ def show_original_stuff():
         for m in tokenize(raw_text):
             add(current,m)
         for word in current:
-            if word in common: current[word]=0 #Common words don't interest us
+            if word in common or len(word)<2: current[word]=0 #Common words don't interest us
         cur=[]
         for k,count in current.items():
             if k in already_seen.keys():
@@ -118,7 +118,7 @@ def show_popular_words():
     a=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck"))).items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
-        if k[0] not in common and len(k[0])>1 and k[1][1]>1: print "%s (%.1f)"%(k[0],k[1][1])
+        if k[0] not in common and k[1][1]>1: print "%s (%.1f)"%(k[0],k[1][1])
 
 if __name__=='__main__':
     from sys import argv,exit
