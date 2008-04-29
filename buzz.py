@@ -8,7 +8,7 @@ import cPickle
 import time
 import sys
 
-SIGNIFICANCE_CONSTANT=1
+MAXIMUM_TOTAL_WEIGHT=10000 #Maximum number of word counts. After, apply geometric decay
 
 def tokenize(text):
     text=re.sub(u"""[/1234567890@#«»”’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
@@ -35,9 +35,18 @@ def get_object_from_file(filename,default={}):
         mydict=default
     return mydict
 
+def downsize_counts(already_seen):
+    """Keeps word counts reasonable using geometric decay, so that new trends don't go unnoticed"""
+    total=sum(count for now,count in already_seen.values())
+    if total>MAXIMUM_TOTAL_WEIGHT:
+        print "Total count too big (%d), downsizing counts..." % total
+        for k,(now,old_count) in already_seen.items():
+            already_seen[k]=now,old_count/(total/MAXIMUM_TOTAL_WEIGHT)
+
 def show_original_stuff():
     now=time.time()
     already_seen=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
+    downsize_counts(already_seen)
     already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
     try:
         f=open(os.path.expanduser("~/.popurls.pck"))
@@ -70,12 +79,11 @@ def show_original_stuff():
             if k in already_seen.keys():
                 already_seen[k]=now,already_seen[k][1]+count #this word is still being seen
             else:
-                if count>=SIGNIFICANCE_CONSTANT: #Discard low occurences, they don't represent a trend
-                    cur.append((k,count))
+                cur.append((k,count))
         cur.sort(key=lambda e:e[1])
         #compute rated stories
         story_ratings=[ (story,int(100*sum(current[w] for w in story_words \
-                        if w not in already_seen and current[w]>=SIGNIFICANCE_CONSTANT)/len(story_words)),feed)\
+                        if w not in already_seen)/len(story_words)),feed)\
                 for story,story_words,feed in ((s,tokenize(s),feed) for s,feed in stories)]
         story_ratings.sort(key=lambda e:e[1])
 
@@ -110,7 +118,7 @@ def show_popular_words():
     a=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck"))).items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
-        if k[0] not in common and len(k[0])>1 and k[1][1]>1: print "%s (%d)"%(k[0],k[1][1])
+        if k[0] not in common and len(k[0])>1 and k[1][1]>1: print "%s (%.1f)"%(k[0],k[1][1])
 
 if __name__=='__main__':
     from sys import argv,exit
