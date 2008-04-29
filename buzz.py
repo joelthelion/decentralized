@@ -38,7 +38,7 @@ def get_object_from_file(filename,default={}):
 def downsize_counts(already_seen):
     """Keeps word counts reasonable using geometric decay, so that new trends don't go unnoticed"""
     total=sum(count for now,count in already_seen.values())
-    if total>MAXIMUM_TOTAL_WEIGHT:
+    if total>MAXIMUM_TOTAL_WEIGHT*1.01: #*1.01 so we don't do it every time
         print "Total count too big (%d), downsizing counts..." % total
         for k,(now,old_count) in already_seen.items():
             already_seen[k]=now,old_count/(total/MAXIMUM_TOTAL_WEIGHT)
@@ -73,7 +73,7 @@ def show_original_stuff():
         for m in tokenize(raw_text):
             add(current,m)
         for word in current:
-            if word in common: current[word]=0 #Common words don't interest us
+            if word in common or len(word)<2: current[word]=0 #Common words don't interest us
         cur=[]
         for k,count in current.items():
             if k in already_seen.keys():
@@ -118,7 +118,7 @@ def show_popular_words():
     a=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck"))).items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
-        if k[0] not in common and len(k[0])>1 and k[1][1]>1: print "%s (%.1f)"%(k[0],k[1][1])
+        if k[0] not in common and k[1][1]>1: print "%s (%.1f)"%(k[0],k[1][1])
 
 if __name__=='__main__':
     from sys import argv,exit
