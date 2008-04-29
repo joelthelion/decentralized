@@ -38,7 +38,7 @@ def get_object_from_file(filename,default={}):
 def downsize_counts(already_seen):
     """Keeps word counts reasonable using geometric decay, so that new trends don't go unnoticed"""
     total=sum(count for now,count in already_seen.values())
-    if total>MAXIMUM_TOTAL_WEIGHT:
+    if total>MAXIMUM_TOTAL_WEIGHT*1.01: #*1.01 so we don't do it every time
         print "Total count too big (%d), downsizing counts..." % total
         for k,(now,old_count) in already_seen.items():
             already_seen[k]=now,old_count/(total/MAXIMUM_TOTAL_WEIGHT)
