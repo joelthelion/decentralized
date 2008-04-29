@@ -11,7 +11,7 @@ import sys
 MAXIMUM_TOTAL_WEIGHT=10000 #Maximum number of word counts. After, apply geometric decay
 
 def tokenize(text):
-    text=re.sub(u"""[/1234567890@#«»”’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
+    text=re.sub(u"""[/1234567890@#«»”“’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
     
 def add(dict,key):
