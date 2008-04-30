@@ -119,7 +119,7 @@ def show_popular_words():
     a=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck"))).items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
-        if k[0] not in common and k[1][1]>1: print "%s (%.1f)"%(k[0],k[1][1])
+        if k[0] not in common and k[1][1]>1: print ("%s (%.1f)"%(k[0],k[1][1])).encode('utf-8')
 
 if __name__=='__main__':
     from sys import argv,exit
