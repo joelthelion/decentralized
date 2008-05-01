@@ -11,13 +11,13 @@ import sys
 MAXIMUM_TOTAL_WEIGHT=10000 #Maximum number of word counts. After, apply geometric decay
 
 def tokenize(text):
-    text=re.sub(u"""[/1234567890@#«»”“’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
+    text=re.sub(u"""[/1234567890@#…«»”“’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
     
 def add(dict,key):
     dict[key]=dict.get(key,0)+1
 
-def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://www.liberation.fr/interactif/rss/actualites/"]):
+def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://www.liberation.fr/interactif/rss/actualites/","http://www.lepost.fr/rss.xml","http://www.rue89.com/homepage/feed"]):
     import feedparser
     stories=[]
     for f in feeds:
