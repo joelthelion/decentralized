@@ -9,6 +9,7 @@ import time
 import sys
 
 MAXIMUM_TOTAL_WEIGHT=10000 #Maximum number of word counts. After, apply geometric decay
+REPEAT_INTERVAL_DAYS=15 #Minimum number of days without seing a word required to count it as original again
 
 def tokenize(text):
     text=re.sub(u"""[/1234567890@#…«»”“’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
@@ -88,7 +89,7 @@ def show_original_stuff():
         story_ratings.sort(key=lambda e:e[1])
 
     for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
-        if now-t>86400*30:
+        if now-t>86400*REPEAT_INTERVAL_DAYS:
             print "Cleanup: removed %s from seen dictionnary" % k
             del already_seen[k]
     if cur:
