@@ -18,7 +18,7 @@ def tokenize(text):
 def add(dict,key):
     dict[key]=dict.get(key,0)+1
 
-def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://www.liberation.fr/interactif/rss/actualites/","http://www.lepost.fr/rss.xml","http://www.rue89.com/homepage/feed"]):
+def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://www.liberation.fr/interactif/rss/actualites/","http://news.ycombinator.com/rss"]):
     import feedparser
     stories=[]
     for f in feeds:
