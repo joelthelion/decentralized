@@ -10,6 +10,7 @@ import sys
 
 MAXIMUM_TOTAL_WEIGHT=10000 #Maximum number of word counts. After, apply geometric decay
 REPEAT_INTERVAL_DAYS=15 #Minimum number of days without seing a word required to count it as original again
+my_reddits="programming,technology,linux,xkcd,productivity,Health,newreddits,Physics,c_language,science,business,worldnews,math,Python,startups,bioinformatics,meta,smart,shell".split(",")
 
 def tokenize(text):
     text=re.sub(u"""[/1234567890@#…«»”“’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
@@ -21,6 +22,8 @@ def add(dict,key):
 def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://www.liberation.fr/interactif/rss/actualites/","http://news.ycombinator.com/rss"]):
     import feedparser
     stories=[]
+    for r in my_reddits:
+        feeds.append("http://reddit.com/r/%s/.rss"%r)
     for f in feeds:
         print "Fetching %s..." % f
         stories.extend((entry.title,f) for entry in feedparser.parse(f).entries)
