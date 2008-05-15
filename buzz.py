@@ -49,7 +49,10 @@ def downsize_counts(already_seen):
 
 def show_original_stuff():
     now=time.time()
-    already_seen=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
+    import datetime
+    today=datetime.date.fromtimestamp(now).toordinal()
+    #already_seen is a dict : already_seen[word]=distinct_use_days last seen, number times seen (decaying float), last_use_day is the ordinal of the last day the program was used
+    already_seen,distinct_use_days,last_use_day=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
     downsize_counts(already_seen)
     already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
     try:
@@ -72,6 +75,8 @@ def show_original_stuff():
             print "No new stories found"
             import sys
             sys.exit()
+        if today > last_use_day:
+            distinct_use_days+=1
         time_fetched=now
         current={}
         for m in tokenize(raw_text):
@@ -81,7 +86,7 @@ def show_original_stuff():
         cur=[]
         for k,count in current.items():
             if k in already_seen.keys():
-                already_seen[k]=now,already_seen[k][1]+count #this word is still being seen
+                already_seen[k]=distinct_use_days,already_seen[k][1]+count #this word is still being seen
             else:
                 cur.append((k,count))
         cur.sort(key=lambda e:e[1])
@@ -92,7 +97,7 @@ def show_original_stuff():
         story_ratings.sort(key=lambda e:e[1])
 
     for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
-        if now-t>86400*REPEAT_INTERVAL_DAYS:
+        if distinct_use_days-t>REPEAT_INTERVAL_DAYS:
             print "Cleanup: removed %s from seen dictionnary" % k
             del already_seen[k]
     if cur:
@@ -100,14 +105,14 @@ def show_original_stuff():
         for word in cur:
             if word[1]>0:
                 print "%s (%d)" % word
-                already_seen[word[0]]=now,word[1] #Only update already_seen at the end
+                already_seen[word[0]]=distinct_use_days,word[1] #Only update already_seen at the end
     print "Eliminated %d unoriginal stories" % sum(1 for s,rating,feed in story_ratings if rating==0)
     print "The most original stories are:"
     for s,rating,feed in story_ratings:
         if rating>0:
             print "(%d) %s (%s)"%(rating,s,feed)
     f=open(os.path.expanduser("~/.popurls_alreadyseen.pck"),"wb")
-    cPickle.dump((already_seen),f,-1)
+    cPickle.dump((already_seen,distinct_use_days,today),f,-1)
     f.close()
     f=open(os.path.expanduser("~/.popurls.pck"),"wb")
     cPickle.dump((time_fetched,story_ratings,cur),f,-1)
@@ -120,7 +125,8 @@ def show_popular_words():
     import cPickle
     import os
     common=set(unicode(open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"common.txt")).read()[:-1],"utf8").split(","))
-    a=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck"))).items()
+    a,dummy1,dummy2=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck")))
+    a=a.items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
         if k[0] not in common and k[1][1]>1: print ("%s (%.1f)"%(k[0],k[1][1])).encode('utf-8')
