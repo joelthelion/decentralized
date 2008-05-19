@@ -130,6 +130,7 @@ def show_popular_words():
     a.sort(key=lambda e:e[1][1])
     for k in a:
         if k[0] not in common and k[1][1]>1: print ("%s (%.1f)"%(k[0],k[1][1])).encode('utf-8')
+    print "There are %d words in the popular database" % len(a)
 
 if __name__=='__main__':
     from sys import argv,exit
