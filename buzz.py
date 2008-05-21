@@ -100,19 +100,19 @@ def show_original_stuff():
 
     for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
         if distinct_use_days-t>REPEAT_INTERVAL_DAYS:
-            print "Cleanup: removed %s from seen dictionnary" % k
+            print ("Cleanup: removed %s from seen dictionnary" % k).encode('utf-8')
             del already_seen[k]
     if cur:
         print "The latest popular words are:"
         for word in cur:
             if word[1]>0:
-                print "%s (%d)" % word
+                print ("%s (%d)" % word).encode('utf-8')
                 already_seen[word[0]]=distinct_use_days,word[1] #Only update already_seen at the end
     print "Eliminated %d unoriginal stories" % sum(1 for s,rating,feed in story_ratings if rating==0)
     print "The most original stories are:"
     for s,rating,feed in story_ratings:
         if rating>0:
-            print "(%d) %s (%s)"%(rating,s,feed)
+            print ("(%d) %s (%s)"%(rating,s,feed)).encode('utf-8')
     f=open(os.path.expanduser("~/.popurls_alreadyseen.pck"),"wb")
     cPickle.dump((already_seen,distinct_use_days,today),f,-1)
     f.close()
