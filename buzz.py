@@ -74,7 +74,7 @@ def show_original_stuff():
             distinct_use_days+=1
         time_fetched=now
         for word in tokenize(raw_text):
-            if word not in common or len(word)<2:#Common words don't interest us
+            if word not in common and len(word)>=2:#Common words don't interest us
                 if word in already_seen:
                     if word in todays_words:
                         add(todays_words,word)
