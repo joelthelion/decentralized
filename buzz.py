@@ -31,11 +31,11 @@ def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r
 
 def get_object_from_file(filename,default={}):
     try:
-        f=open(filename) #we separate this from the rest of the stuff because this is the only critical piece of data
+        f=open(filename)
         mydict=cPickle.load(f)
         f.close()
     except IOError,e:
-        print "already_seen file not found, creating a new one..."
+        print "%s file not found, creating a new one..." %filename
         mydict=default
     return mydict
 
@@ -51,19 +51,11 @@ def show_original_stuff():
     now=time.time()
     import datetime
     today=datetime.date.fromtimestamp(now).toordinal()
-    try:
-        f=open(os.path.expanduser("~/.popurls.pck"))
-        time_fetched,story_ratings,cur=cPickle.load(f)
-        f.close()
-        #already_seen is a dict : already_seen[word]=distinct_use_days last seen, number times seen (decaying float), last_use_day is the ordinal of the last day the program was used
-        already_seen,distinct_use_days,last_use_day=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
-        downsize_counts(already_seen)
-        already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
-    except IOError,e:
-        already_seen,distinct_use_days,last_use_day={},0,0
-        already_seen_links=set()
-        print "popurls file not found, creating a new one..."
-        time_fetched,story_ratings,cur=0,None,[]
+    already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"),({},0,0,{}))
+    downsize_counts(already_seen)
+    already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
+    time_fetched,story_ratings,cur=get_object_from_file(os.path.expanduser("~/.popurls.pck"),(0,None,[]))
+
     if story_ratings is None or now-time_fetched>10 * 60: #if file is older than ten minutes
         common=set(unicode(open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"common.txt")).read()[:-1],"utf8").split(","))
         all_stories=get_feed_stories()
@@ -78,23 +70,23 @@ def show_original_stuff():
             import sys
             sys.exit()
         if today > last_use_day:
+            todays_words={} #reset the set of today's words
             distinct_use_days+=1
         time_fetched=now
-        current={}
-        for m in tokenize(raw_text):
-            add(current,m)
-        for word in current:
-            if word in common or len(word)<2: current[word]=0 #Common words don't interest us
-        cur=[]
-        for k,count in current.items():
-            if k in already_seen.keys():
-                already_seen[k]=distinct_use_days,already_seen[k][1]+count #this word is still being seen
-            else:
-                cur.append((k,count))
+        for word in tokenize(raw_text):
+            if word not in common or len(word)<2:#Common words don't interest us
+                if word in already_seen:
+                    if word in todays_words:
+                        add(todays_words,word)
+                    already_seen[word]=distinct_use_days,already_seen[word][1]+1 #this word is still being seen
+                else:
+                    already_seen[word]=distinct_use_days,1
+                    add(todays_words,word)
+        cur=todays_words.items()
         cur.sort(key=lambda e:e[1])
         #compute rated stories
-        story_ratings=[ (story,int(100*sum(current[w] for w in story_words \
-                        if w not in already_seen)/len(story_words)),feed)\
+        story_ratings=[ (story,int(100*sum(todays_words[w] for w in story_words \
+                        if w in todays_words)/len(story_words)),feed)\
                 for story,story_words,feed in ((s,tokenize(s),feed) for s,feed in stories)]
         story_ratings.sort(key=lambda e:e[1])
 
@@ -107,14 +99,13 @@ def show_original_stuff():
         for word in cur:
             if word[1]>0:
                 print ("%s (%d)" % word).encode('utf-8')
-                already_seen[word[0]]=distinct_use_days,word[1] #Only update already_seen at the end
     print "Eliminated %d unoriginal stories" % sum(1 for s,rating,feed in story_ratings if rating==0)
     print "The most original stories are:"
     for s,rating,feed in story_ratings:
         if rating>0:
             print ("(%d) %s (%s)"%(rating,s,feed)).encode('utf-8')
     f=open(os.path.expanduser("~/.popurls_alreadyseen.pck"),"wb")
-    cPickle.dump((already_seen,distinct_use_days,today),f,-1)
+    cPickle.dump((already_seen,distinct_use_days,today,todays_words),f,-1)
     f.close()
     f=open(os.path.expanduser("~/.popurls.pck"),"wb")
     cPickle.dump((time_fetched,story_ratings,cur),f,-1)
@@ -127,22 +118,34 @@ def show_popular_words():
     import cPickle
     import os
     common=set(unicode(open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"common.txt")).read()[:-1],"utf8").split(","))
-    a,dummy1,dummy2=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck")))
+    a,dummy1,dummy2,dummy3=cPickle.load(open(os.path.expanduser("~/.popurls_alreadyseen.pck")))
     a=a.items()
     a.sort(key=lambda e:e[1][1])
     for k in a:
         if k[0] not in common and k[1][1]>1: print ("%s (%.1f)"%(k[0],k[1][1])).encode('utf-8')
     print "There are %d words in the popular database" % len(a)
 
+def show_todays_words():
+    already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
+    cur=todays_words.items()
+    if cur:
+        print "Today's popular words are:"
+        for word in cur:
+            if word[1]>0:
+                print ("%s (%d)" % word).encode('utf-8')
+
 if __name__=='__main__':
     from sys import argv,exit
     import getopt
-    optlist, args = getopt.getopt(argv[1:], '',['popular']) 
+    optlist, args = getopt.getopt(argv[1:], '',['popular','today']) 
 
     #user values                                                            
     for o, a in optlist:
         if o == "--popular":
             show_popular_words()
+            sys.exit()
+        if o == "--today":
+            show_todays_words()
             sys.exit()
     
     show_original_stuff()
