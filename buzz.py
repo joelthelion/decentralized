@@ -94,11 +94,6 @@ def show_original_stuff():
         if distinct_use_days-t>REPEAT_INTERVAL_DAYS:
             print ("Cleanup: removed %s from seen dictionnary" % k).encode('utf-8')
             del already_seen[k]
-    if cur:
-        print "The latest popular words are:"
-        for word in cur:
-            if word[1]>0:
-                print ("%s (%d)" % word).encode('utf-8')
     print "Eliminated %d unoriginal stories" % sum(1 for s,rating,feed in story_ratings if rating==0)
     print "The most original stories are:"
     for s,rating,feed in story_ratings:
@@ -129,10 +124,12 @@ def show_todays_words():
     already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
     cur=todays_words.items()
     if cur:
-        print "Today's popular words are:"
+        print "Words of the day:"
         for word in cur:
             if word[1]>0:
                 print ("%s (%d)" % word).encode('utf-8')
+    else:
+        print "No new words today :-("
 
 if __name__=='__main__':
     from sys import argv,exit
