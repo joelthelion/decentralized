@@ -51,15 +51,17 @@ def show_original_stuff():
     now=time.time()
     import datetime
     today=datetime.date.fromtimestamp(now).toordinal()
-    #already_seen is a dict : already_seen[word]=distinct_use_days last seen, number times seen (decaying float), last_use_day is the ordinal of the last day the program was used
-    already_seen,distinct_use_days,last_use_day=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
-    downsize_counts(already_seen)
-    already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
     try:
         f=open(os.path.expanduser("~/.popurls.pck"))
         time_fetched,story_ratings,cur=cPickle.load(f)
         f.close()
+        #already_seen is a dict : already_seen[word]=distinct_use_days last seen, number times seen (decaying float), last_use_day is the ordinal of the last day the program was used
+        already_seen,distinct_use_days,last_use_day=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
+        downsize_counts(already_seen)
+        already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
     except IOError,e:
+        already_seen,distinct_use_days,last_use_day={},0,0
+        already_seen_links=set()
         print "popurls file not found, creating a new one..."
         time_fetched,story_ratings,cur=0,None,[]
     if story_ratings is None or now-time_fetched>10 * 60: #if file is older than ten minutes
