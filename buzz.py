@@ -54,7 +54,7 @@ def show_original_stuff():
     already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"),({},0,0,{}))
     downsize_counts(already_seen)
     already_seen_links=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),set())
-    time_fetched,story_ratings,cur=get_object_from_file(os.path.expanduser("~/.popurls.pck"),(0,None,[]))
+    time_fetched,story_ratings=get_object_from_file(os.path.expanduser("~/.popurls.pck"),(0,None))
 
     if story_ratings is None or now-time_fetched>10 * 60: #if file is older than ten minutes
         common=set(unicode(open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"common.txt")).read()[:-1],"utf8").split(","))
@@ -82,8 +82,6 @@ def show_original_stuff():
                 else:
                     already_seen[word]=distinct_use_days,1
                     add(todays_words,word)
-        cur=todays_words.items()
-        cur.sort(key=lambda e:e[1])
         #compute rated stories
         story_ratings=[ (story,int(100*sum(todays_words[w] for w in story_words \
                         if w in todays_words)/len(story_words)),feed)\
@@ -103,7 +101,7 @@ def show_original_stuff():
     cPickle.dump((already_seen,distinct_use_days,today,todays_words),f,-1)
     f.close()
     f=open(os.path.expanduser("~/.popurls.pck"),"wb")
-    cPickle.dump((time_fetched,story_ratings,cur),f,-1)
+    cPickle.dump((time_fetched,story_ratings),f,-1)
     f.close()
     f=open(os.path.expanduser("~/.popurls_alreadyseen_links.pck"),"wb")
     cPickle.dump(already_seen_links,f,-1)
@@ -123,6 +121,7 @@ def show_popular_words():
 def show_todays_words():
     already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
     cur=todays_words.items()
+    cur.sort(key=lambda e:e[1])
     if cur:
         print "Words of the day:"
         for word in cur:
