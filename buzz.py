@@ -23,6 +23,7 @@ def add(dict,key):
 def add_tuple(dict,key,default_value,index=0):
     values=list(dict.get(key,default_value))
     values[index]+=1
+    print "add_tuple test: ",key,values
     dict[key]=tuple(values)
 
 def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://www.liberation.fr/interactif/rss/actualites/","http://news.ycombinator.com/rss","http://linuxfr.org/backend/journaux/rss20.rss","http://feeds.feedburner.com/SteveOnImageProcessing"]):
@@ -85,11 +86,11 @@ def show_original_stuff():
             if word not in common and len(word)>=2:#Common words don't interest us
                 if word in already_seen:
                     if word in todays_words:
-                        add_tuple(todays_words,word,default_value=(0,now),index=1)
+                        add_tuple(todays_words,word,default_value=(0,now),index=0)
                     already_seen[word]=distinct_use_days,already_seen[word][1]+1 #this word is still being seen
                 else:
                     already_seen[word]=distinct_use_days,1
-                    add_tuple(todays_words,word,default_value=(0,now),index=1)
+                    add_tuple(todays_words,word,default_value=(0,now),index=0)
         #compute rated stories
         story_ratings=[ (story,int(100*sum(todays_words[w][0] for w in story_words \
                         if w in todays_words)/len(story_words)),feed)\
