@@ -1,3 +1,3 @@
 #!/bin/bash
 buzz.py > ${HOME}/tmp/buzz.txt
-grep -i --color=always -F "$(buzz.py --t | cut -f1 -d\ )" ${HOME}/tmp/buzz.txt
+cat ${HOME}/tmp/buzz.txt | grep --color=always -Ei -e "("$(buzz.py --t | cut -f1 -d\ | sed 's/$/[^A-Za-z]/;s/^/[^A-Za-z]/' | tr '\n' '|' | sed "s/.$//")\)
