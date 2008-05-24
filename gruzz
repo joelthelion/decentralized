@@ -1,0 +1,3 @@
+#!/bin/bash
+buzz.py > ${HOME}/tmp/buzz.txt
+grep -i --color=always -F "$(buzz.py --t | cut -f1 -d\ )" ${HOME}/tmp/buzz.txt
