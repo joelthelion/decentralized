@@ -9,7 +9,7 @@ import time
 import sys
 
 MAXIMUM_TOTAL_WEIGHT=10000 #Maximum number of word counts. After, apply geometric decay
-REPEAT_INTERVAL_DAYS=15 #Minimum number of days without seing a word required to count it as original again
+REPEAT_INTERVAL_DAYS=30 #Minimum number of days without seing a word required to count it as original again
 FOCUS_DAYS=1 #Number of days a word stays interesting
 my_reddits="programming,technology,linux,xkcd,productivity,Health,newreddits,Physics,c_language,science,business,worldnews,math,Python,startups,bioinformatics,meta,smart,shell".split(",")
 
