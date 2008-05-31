@@ -94,7 +94,8 @@ def show_original_stuff():
         #compute rated stories
         story_ratings=[ (story,int(100*sum(todays_words[w][0] for w in story_words \
                         if w in todays_words)/len(story_words)),feed)\
-                for story,story_words,feed in ((s,tokenize(s),feed) for s,feed in stories)]
+                for story,story_words,feed in ((s,tokenize(s),feed) for s,feed in stories)\
+                if len(story_words)>0]
         story_ratings.sort(key=lambda e:e[1])
 
     for k,(t,dummy) in already_seen.items(): #If a keyword hasn't been seen in a month, it's interesting again
