@@ -33,7 +33,10 @@ def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r
         feeds.append("http://reddit.com/r/%s/.rss"%r)
     for f in feeds:
         print "Fetching %s..." % f
-        stories.extend((entry.title,f) for entry in feedparser.parse(f).entries)
+        try:
+            stories.extend((entry.title,f) for entry in feedparser.parse(f).entries)
+        except:
+            print "Error parsing %s..." % f
     return stories
 
 def get_object_from_file(filename,default={}):
