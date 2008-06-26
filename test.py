@@ -8,8 +8,9 @@ print len(already_seen)
 #print todays_words
 print distinct_use_days
 a=already_seen.items()
-a.sort(key=lambda e:distinct_use_days-e[1][0],reverse=True)
-print a[:10]
+a.sort(key=lambda e:distinct_use_days-e[1][0],reverse=False)
+for key,value in  a[-20:]:
+    print "%-20s:%d" % (key,distinct_use_days-value[0])
 #for k,count in todays_words.items():
 #    todays_words[k]=count,time.time()
 #print todays_words
