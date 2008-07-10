@@ -3,6 +3,7 @@ import cPickle
 import buzz
 import os
 import time
+import sys
 already_seen,distinct_use_days,last_use_day,todays_words=buzz.get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
 print len(already_seen)
 #print todays_words
@@ -11,6 +12,13 @@ a=already_seen.items()
 a.sort(key=lambda e:distinct_use_days-e[1][0],reverse=False)
 for key,value in  a[-20:]:
     print "%-20s:%d" % (key,distinct_use_days-value[0])
+
+print
+try:
+    if len(sys.argv) > 1:
+        print sys.argv[1],already_seen[sys.argv[1]]
+except KeyError:
+    print "Word not seen yet"
 #for k,count in todays_words.items():
 #    todays_words[k]=count,time.time()
 #print todays_words
