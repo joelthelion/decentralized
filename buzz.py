@@ -132,6 +132,14 @@ def show_popular_words():
         if k[0] not in common and k[1][1]>1: print ("%s (%.1f)"%(k[0],k[1][1])).encode('utf-8')
     print "There are %d words in the popular database" % len(a)
 
+def show_oldest_words():
+    import time
+    already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
+    a=already_seen.items()
+    a.sort(key=lambda e:-e[1][0])
+    for k,(t,dummy) in a:
+        print "%s (%d days)" % (k,distinct_use_days-t)
+
 def show_todays_words():
     import time
     already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
@@ -148,12 +156,15 @@ def show_todays_words():
 if __name__=='__main__':
     from sys import argv,exit
     import getopt
-    optlist, args = getopt.getopt(argv[1:], '',['popular','today']) 
+    optlist, args = getopt.getopt(argv[1:], '',['popular','today','old']) 
 
     #user values                                                            
     for o, a in optlist:
         if o == "--popular":
             show_popular_words()
+            sys.exit()
+        if o == "--old":
+            show_oldest_words()
             sys.exit()
         if o == "--today":
             show_todays_words()
