@@ -137,8 +137,12 @@ def show_oldest_words():
     already_seen,distinct_use_days,last_use_day,todays_words=get_object_from_file(os.path.expanduser("~/.popurls_alreadyseen.pck"))
     a=already_seen.items()
     a.sort(key=lambda e:-e[1][0])
-    for k,(t,dummy) in a:
-        print "%s (%d days)" % (k,distinct_use_days-t)
+    n=0
+    for k,(t,times_seen) in a:
+        if times_seen>=0.02: #filter old typos
+            print "%s (%d days)" % (k,distinct_use_days-t)
+            n+=1
+    print "Showed %d words with some importance sorted by time since last seen in the news" % n
 
 def show_todays_words():
     import time
