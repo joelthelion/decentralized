@@ -43,9 +43,14 @@ def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r
 
 def read_from_file(filename):
     stories=[]
-    for l in open(filename).readlines():
-        a=l.split(" ")
+    try:
+        for l in open(filename).readlines():
+            a=l.split(" ")
         stories.append((a[1]," ".join(a[2:])[:-1]))
+    except IOError:
+        import sys
+        print >>sys.stderr,"Warning: Error while reading old stories file"
+        return []
     return stories
 
 
