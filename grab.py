@@ -33,7 +33,7 @@ def get_feed_stories(feeds=["http://digg.com/rss/index.xml","http://reddit.com/r
     for r in my_reddits:
         feeds.append("http://reddit.com/r/%s/.rss"%r)
     #for f in random.sample(feeds,2):
-    for f in feeds[:2]:
+    for f in feeds:
         print >>sys.stderr, "Fetching %s..." % f
         try:
             stories.extend((time.asctime().replace(" ",""),f,entry.title.encode('utf8')) for entry in feedparser.parse(f).entries)
@@ -46,7 +46,7 @@ def read_from_file(filename):
     try:
         for l in open(filename).readlines():
             a=l.split(" ")
-        stories.append((a[1]," ".join(a[2:])[:-1]))
+            stories.append((a[1]," ".join(a[2:])[:-1]))
     except IOError:
         import sys
         print >>sys.stderr,"Warning: Error while reading old stories file"
