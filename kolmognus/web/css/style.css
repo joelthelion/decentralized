@@ -1,0 +1,132 @@
+body {
+font-family: sans serif;
+margin: 30px;
+}
+a:link {
+color: #3091f7;
+}
+a:visited, a:active {
+color: #acd6f4;
+}
+a:hover {
+/*font-weight: bold;*/
+}
+input {
+background-color: #acd6f4;
+border: 1px solid #3091f1;
+margin: 1px;
+}
+input.button_input {
+cursor: pointer;
+font-size: 14px;
+}
+a.button_input {
+font-size: 14px;
+padding: 1px 6px;
+color: #white;
+text-decoration: none;
+background-color: #acd6f4;
+border: 1px solid #3091f1;
+margin: 1px;
+}
+
+/*main header*/
+div.header {
+}
+/*menu*/
+div.menu p {
+margin: 0px;
+font-family: monospace;
+font-weight: bold;
+font-size: 14pt;
+}
+div.menu img {
+border: 0px;
+}
+div.menu p a {
+text-decoration: none;
+color: #3091f1;
+}
+/*session frame*/
+div.session {
+/*font-size: 10pt;*/
+float: right;
+text-align: right;
+}
+div.session p {
+margin: 3px;
+}
+div.session form {
+margin: 3px;
+}
+div.session form input {
+margin: 0px 0px 0px 6px;
+}
+div.session form a {
+margin: 0px 0px 0px 6px;
+}
+
+/*main frame*/
+div.main {
+margin: 5px 0px 0px 0px;
+/*font-size: 10pt;*/
+}
+div.main h1 {
+font-size: 14pt;
+margin: 8px 0px 0px 0px;
+}
+div.main p {
+margin: 0px 0px 0px 20px;
+}
+/*welcome message*/
+div.main div.welcome {
+text-align: center;
+margin: 30px;
+font-size: 20px;
+}
+/*recommended stories*/
+div.main div.recommended_stories {
+margin: 30px 0px 0px 0px;
+}
+div.main div.recommended_stories form input.good {
+background-color: white;
+border: 0px;
+cursor: pointer;
+}
+div.main div.recommended_stories form input.bad {
+background-color: white;
+border: 0px;
+cursor: pointer;
+}
+div.main div.recommended_stories form a.details {
+color: black;
+font-size: 8pt;
+text-decoration: none;
+}
+/*symbols*/
+/*div.main div.liked_symbols form input.text_input {
+background-color: #FFFFFF;
+border: 1px solid #FFFFFF;
+margin: 1px;
+}*/
+/*rated stories*/
+div.main div.rated_stories {
+margin: 0px 0px 30px 0px;
+}
+
+/*footer*/
+div.footer {
+font-size: 8pt;
+margin: 20px 0px;
+}
+/*debug footer*/
+div.debug span.key {
+font-weight: bold;
+}
+div.validation {
+float: right;
+}
+div.validation a img {
+border: 0px;
+margin: 0px 0px 0px 6px;
+}
