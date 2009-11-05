@@ -83,7 +83,7 @@ def readdeliciousfeed(feedurl,storydict={}):
             if not storydict.has_key(i.id):
                 storydict[i.id]=item_description.DeliciousStory(i.id)
             tagchain=""
-            if len(i.tags) != 0:
+            if i.has_key("tags") and len(i.tags) != 0:
                 tagchain=i.tags[0].term.split()
             i.summary=i.get("summary","")
             storydict[i.id].add_user(i.author,i.title,tagchain,i.summary)

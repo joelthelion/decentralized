@@ -62,7 +62,7 @@ class DeliciousStory(Story):
                     self.publication_date=min([time.mktime(i.updated_parsed) for i in feed['entries']])
                 except ValueError : pass #if no dates are found, do nothing
                 summaries=[i.summary if i.has_key("summary") else "" for i in feed['entries']]
-                tags=[i.tags[0].term.split() for i in feed['entries'] if len(i.tags) != 0]
+                tags=[i.tags[0].term.split() for i in feed['entries'] if i.has_key('tags') and len(i.tags) != 0]
                 for u,s,t in zip(users,summaries,tags):
                     self.add_user(u,"",t,s) # all users usually use the same title, no need to repeat it
                 time.sleep(1) # throttling by respect for delicious servers
