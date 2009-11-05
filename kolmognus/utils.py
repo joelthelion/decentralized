@@ -10,7 +10,10 @@ class Counter(dict):
         else:
             self[key]=1
 
+import os
 datadir="data/"
+if not os.path.exists(datadir):
+    os.mkdir(datadir)
 
 # A list of common words that should not be considered significative, even if they are well represented in the database
 common_words = set(['with', 'is', 'and', 'the', 'of', 'to', 'in', \
