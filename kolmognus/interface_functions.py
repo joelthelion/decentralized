@@ -27,7 +27,7 @@ def add_old(story):
 def is_old(url):
     """returns True if url is in the db of old stories"""
     import md5
-    if md5.md5(url).digest() in old_stories:
+    if md5.md5(url.encode('utf-8')).digest() in old_stories:
         return True
     else: return False
 
