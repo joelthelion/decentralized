@@ -20,14 +20,14 @@ def save_old_stories():
     cPickle.dump(old_stories,f,-1)
 
 def add_old(story):
-    import md5
-    old_stories.add(md5.md5(story.url).digest())
+    import hashlib
+    old_stories.add(hashlib.md5(story.url.encode('utf-8')).digest())
     save_old_stories()
 
 def is_old(url):
     """returns True if url is in the db of old stories"""
-    import md5
-    if md5.md5(url.encode('utf-8')).digest() in old_stories:
+    import hashlib
+    if hashlib.md5(url.encode('utf-8')).digest() in old_stories:
         return True
     else: return False
 
@@ -78,7 +78,7 @@ def readdeliciousfeed(feedurl,storydict={}):
     print len(f.entries)
     output=[] #optional debug output
     for i in f.entries:
-        if not is_old(i.id): #i.id is simply the story URL
+        if i.has_key('id') and not is_old(i.id): #i.id is simply the story URL
             output.append("+")
             if not storydict.has_key(i.id):
                 storydict[i.id]=item_description.DeliciousStory(i.id)
