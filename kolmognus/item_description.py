@@ -48,8 +48,8 @@ class DeliciousStory(Story):
     def get_additional_info(self):
         if not self.gotadditionalinfo:
             self.gotadditionalinfo = True
-            import md5
-            page_url="http://del.icio.us/rss/url/" + md5.md5(self.url).hexdigest()
+            import hashlib
+            page_url="http://del.icio.us/rss/url/" + hashlib.md5(self.url.encode('utf-8')).hexdigest()
             print "Fetched additional info for %s..." % self.url
             from feedparser import parse
             import timeout
