@@ -45,14 +45,24 @@ def get_links(rssfeed):
     f=parse(rssfeed)
     s=db.Session()
     for i in f.entries:
-        newlink=Link(unicode(i.link),unicode(i.title),datetime.fromtimestamp(time.mktime(i.date_parsed)))
+        if i.has_key("date_parsed"):
+            newlink=Link(unicode(i.link),unicode(i.title),datetime.fromtimestamp(time.mktime(i.date_parsed)))
+        else:
+            #use the scrape date if the information isn't there
+            newlink=Link(unicode(i.link),unicode(i.title),datetime.now()) 
         newlink.sources=[LinkSource(newlink.url,unicode(f.url))]
         s.merge(newlink)
     s.commit()
 
 if __name__ == '__main__':
     db.Base.metadata.create_all(db.engine)
-    get_links("http://www.lemonde.fr/rss/une.xml")
+    from utils import feeds
+    import sys
+    for f in feeds:
+        get_links(f)
+        print ".",
+        sys.stdout.flush()
+    print
     #get_links("file://une.xml")
     #import time
     #t=time.time()
