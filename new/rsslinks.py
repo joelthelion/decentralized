@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import database as db
-from sqlalchemy import Table, Column, Integer, Unicode,DateTime,ForeignKey
+from sqlalchemy import Table, Column, Boolean, Integer, Unicode,DateTime,ForeignKey
 from sqlalchemy.orm import relation,backref
 
 class Link(db.Base):
@@ -12,6 +12,9 @@ class Link(db.Base):
     title = Column(Unicode)
     sources = relation("LinkSource",backref=backref('link'))
     date = Column(DateTime)
+    """The two next columns are filled when the user evaluated the link"""
+    evaluation = Column(Boolean)
+    evaluation_date = Column(DateTime)
 
     def __init__(self,u,t,d):
         self.url=u
@@ -50,6 +53,7 @@ def get_links(rssfeed):
 if __name__ == '__main__':
     db.Base.metadata.create_all(db.engine)
     get_links("http://www.lemonde.fr/rss/une.xml")
+    #get_links("file://une.xml")
     #import time
     #t=time.time()
     #for i in range(10000):
