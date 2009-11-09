@@ -1,67 +1,38 @@
 #!/usr/bin/env python
 
-import database as db
-from sqlalchemy import Table, Column, Boolean, Integer, Unicode,DateTime,ForeignKey
-from sqlalchemy.orm import relation,backref
+from datamodel import Link,LinkSource
 
-class Link(db.Base):
-    """A link is a potentially interesting URL, together with all the relevant metadata
-    to help evaluate it"""
-    __tablename__ = "links"
-    url = Column(Unicode,primary_key=True)
-    title = Column(Unicode)
-    sources = relation("LinkSource",backref=backref('link'))
-    date = Column(DateTime)
-    """The two next columns are filled when the user evaluated the link"""
-    evaluation = Column(Boolean)
-    evaluation_date = Column(DateTime)
-
-    def __init__(self,u,t,d):
-        self.url=u
-        self.title=t
-        self.date=d
-    def __repr__(self):
-        return self.title.encode('utf-8')+\
-            " ("+self.url.encode('utf-8')+")"
-
-class LinkSource(db.Base):
-    """The sources of a link. Can contain additional pieces of info
-    only relevant to a certain source, such as points for a reddit link"""
-    __tablename__ = "linksources"
-    link_url = Column(Unicode,ForeignKey('links.url'),primary_key=True)
-    """source is a source identifier, such as the URL of an RSS feed, or
-    the jabber id of a friend"""
-    source = Column(Unicode,primary_key=True)
-    def __init__(self,l,s):
-        self.link_url=l
-        self.source=s
-    def __repr__(self):
-        return "link \"" + self.link_url.encode('utf-8')+"\" linked to by "+self.source.encode('utf-8')
-
-def get_links(rssfeed):
+def get_links(rssfeed,session):
     from feedparser import parse
     import time
     from datetime import datetime
     f=parse(rssfeed)
-    s=db.Session()
     for i in f.entries:
-        if i.has_key("date_parsed"):
-            newlink=Link(unicode(i.link),unicode(i.title),datetime.fromtimestamp(time.mktime(i.date_parsed)))
-        else:
-            #use the scrape date if the information isn't there
-            newlink=Link(unicode(i.link),unicode(i.title),datetime.now()) 
-        newlink.sources=[LinkSource(newlink.url,unicode(f.url))]
-        s.merge(newlink)
-    s.commit()
+        current_link=s.query(Link).filter_by(url=unicode(i.link)).first()
+        if not current_link:
+            if i.has_key("date_parsed"):
+                current_link=Link(unicode(i.link),unicode(i.title),datetime.fromtimestamp(time.mktime(i.date_parsed)))
+            else:
+                #use the scrape date if the information isn't there
+                current_link=Link(unicode(i.link),unicode(i.title),datetime.now()) 
+        elif s.query(LinkSource).filter_by(link=current_link).filter_by(source=unicode(f.url)).first():
+            continue # entry is already there
+        current_link.sources.append(LinkSource(current_link.url,unicode(f.url)))
+        session.merge(current_link)
 
 if __name__ == '__main__':
-    db.Base.metadata.create_all(db.engine)
+    import database as db
     from utils import feeds
+
+    db.Base.metadata.create_all(db.engine)
+
+    s=db.Session()
     import sys
     for f in feeds:
-        get_links(f)
+        get_links(f,s)
         print ".",
         sys.stdout.flush()
+    s.commit()
     print
     #get_links("file://une.xml")
     #import time
