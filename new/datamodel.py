@@ -21,7 +21,7 @@ class Link(db.Base):
         self.date=d
     def __repr__(self):
         return self.title.encode('utf-8')+\
-            " ("+self.url.encode('utf-8')+")"
+            " ("+self.url.encode('utf-8')+" )"
 
 class LinkSource(db.Base):
     """The sources of a link. Can contain additional pieces of info
