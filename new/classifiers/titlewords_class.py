@@ -15,7 +15,7 @@ def predict(link):
     return good>=bad
 
 def train(links):
-    dic=get_dict()
+    dic={}#get_dict()
     for l in links:
         words=l.title.split(" ")
         for w in words:
