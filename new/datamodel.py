@@ -10,6 +10,8 @@ class Link(db.Base):
     url = Column(Unicode,primary_key=True)
     title = Column(Unicode)
     sources = relation("LinkSource",backref=backref('link'))
+    predictions = relation("Prediction",backref=backref('link'))
+    combined_prediction = Column(Boolean)
     date = Column(DateTime)
     """The two next columns are filled when the user evaluated the link"""
     evaluation = Column(Boolean) #True: good
@@ -22,7 +24,7 @@ class Link(db.Base):
         self.date=d
     def __repr__(self):
         return self.title.encode('utf-8')+\
-            " ("+self.url.encode('utf-8')+" )"
+            " ( "+self.url.encode('utf-8')+" )"
 
 class LinkSource(db.Base):
     """The sources of a link. Can contain additional pieces of info
@@ -37,3 +39,18 @@ class LinkSource(db.Base):
         self.source=s
     def __repr__(self):
         return "link \"" + self.link_url.encode('utf-8')+"\" linked to by "+self.source.encode('utf-8')
+
+class Prediction(db.Base):
+    """For each classifier and for each link, the relevant prediction"""
+    __tablename__ = "predictions"
+    link_url = Column(Unicode,ForeignKey('links.url'),primary_key=True)
+    classifier = Column( Unicode, primary_key=True )
+    #Good or bad, as predicted by the classifier
+    value = Column(Boolean)
+    def __init__(self,url,cl,v):
+        self.link_url,self.classifier,self.value = url, cl, v
+    def __repr__(self):
+        if value:
+            return "%s thinks ( %s ) is good" % (self.classifier,self.link_url)
+        else:
+            return "%s thinks ( %s ) is bad" % (self.classifier,self.link_url)

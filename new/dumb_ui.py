@@ -24,6 +24,7 @@ if __name__ == "__main__":
     from datamodel import *
     s=db.Session()
     fresh = s.query(Link).filter(Link.evaluation_date == None).\
+        filter_by(combined_prediction=True).\
         order_by(Link.date.desc()).limit(10).all()
     for r in fresh:
         evaluate(r,s)
