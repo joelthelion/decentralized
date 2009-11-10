@@ -12,7 +12,7 @@ def get_links(rssfeed,session):
         if not current_link:
             #can't trust the link date, it is dependent on RSS time fuse
             current_link=Link(unicode(i.link),unicode(i.title),datetime.now()) 
-        elif s.query(LinkSource).filter_by(link=current_link).filter_by(source=unicode(f.url)).first():
+        elif unicode(f.url) in (s.source for s in current_link.sources):
             continue # entry is already there
         current_link.sources.append(LinkSource(current_link.url,unicode(f.url)))
         session.merge(current_link)
