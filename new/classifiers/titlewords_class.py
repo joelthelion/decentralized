@@ -8,14 +8,22 @@ def predict(link):
     good,bad=1.,1.
     for w in words:
         if dic.has_key(w):
-            ng,nb = dic[w]
+            ngood,nbad = dic[w]
             cond=conditional_prob(ngood,nbad)
             good*=cond
             bad*=1-cond
     return good>=bad
 
 def train(links):
-    pass
+    dic=get_dict()
+    for l in links:
+        words=l.title.split(" ")
+        for w in words:
+            good,bad=dic.get(w,(0,0))
+            if l.evaluation: good+=1
+            else: bad+=1
+            dic[w]=(good,bad)
+    save_dict(dic)
 
 datafile='titlewords.pck'
 
