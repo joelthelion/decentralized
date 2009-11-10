@@ -10,4 +10,4 @@ if __name__ == "__main__":
         order_by(Link.date.desc()).limit(10).all()
     recent.reverse()
     for r in recent:
-        print r
+        print "-",r
