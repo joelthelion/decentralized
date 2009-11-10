@@ -12,8 +12,9 @@ class Link(db.Base):
     sources = relation("LinkSource",backref=backref('link'))
     date = Column(DateTime)
     """The two next columns are filled when the user evaluated the link"""
-    evaluation = Column(Integer) #-1 bad, 1 good, 0 neutral
+    evaluation = Column(Boolean) #True: good
     evaluation_date = Column(DateTime)
+    hidden = Column(Boolean)
 
     def __init__(self,u,t,d):
         self.url=u
