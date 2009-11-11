@@ -22,3 +22,7 @@ if __name__ == '__main__':
     results=test_classifiers()
     for method in results.keys():
         print method,":",results[method]
+    s=db.Session()
+    links=s.query(Link).filter(Link.evaluation != None).all()
+    print "Global accuracy:",float(sum(1-abs(l.combined_prediction - l.evaluation)\
+        for l in links)) / len(links)
