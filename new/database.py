@@ -13,3 +13,6 @@ Base=declarative_base()
 from sqlalchemy import create_engine
 engine=create_engine("sqlite:///test.db")
 Session.configure(bind=engine)
+
+Base.metadata.create_all(engine)    #this is needed for debug only,
+                                    #otherwise it should be in a setup script
