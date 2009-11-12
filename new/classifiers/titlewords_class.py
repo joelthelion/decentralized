@@ -35,10 +35,19 @@ datafile='titlewords.pck'
 dic=get_dict()
 
 def conditional_prob(ngood,nbad):
-    uncertainty=5
-    return (ngood + uncertainty) / (ngood + nbad + uncertainty)
+    uncertainty=5 #this is the central parameter of the classifier. 5 shouldn't be too aggressive
+    return float(ngood + uncertainty) / (ngood + nbad + 2*uncertainty)
 
 
 def save_dict(dic):
     import cPickle
     cPickle.dump(dic,open(datafile,'wb'),-1)
+
+def print_self():
+    print "A naive Bayesian classifier on title words. Selection of words:"
+    words=dic.items()
+    words.sort(key=lambda w:conditional_prob(w[1][0],w[1][1]),reverse=True)
+    for ws in words[:5],words[-5:]:
+        for w,(g,b) in ws:
+            print "%s (%2.f%%), " %(w.encode('utf-8'),conditional_prob(g,b)*100.),
+        print

@@ -5,3 +5,6 @@ def predict(link):
 
 def train(links):
     pass
+
+def print_self():
+    print "I am an idiot classifier, I like all links!"

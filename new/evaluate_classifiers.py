@@ -10,6 +10,7 @@ def test_classifiers():
     results={}
     for cl_name in utils.get_classifiers():
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
+        print "- "+cl_name+":";current.print_self()
         results[cl_name]=0
         for l in links:
             if current.predict(l) == l.evaluation:
