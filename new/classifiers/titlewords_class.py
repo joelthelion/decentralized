@@ -1,10 +1,8 @@
 import datamodel
 
 #See http://en.wikipedia.org/wiki/Naive_Bayes_classifier
-
 def predict(link):
     words=link.title.split(" ")
-    dic=get_dict()
     good,bad=1.,1.
     for w in words:
         if dic.has_key(w):
@@ -25,18 +23,21 @@ def train(links):
             dic[w]=(good,bad)
     save_dict(dic)
 
-datafile='titlewords.pck'
-
-def conditional_prob(ngood,nbad):
-    uncertainty=5
-    return (ngood + uncertainty) / (ngood + nbad + uncertainty)
-
 def get_dict():
     import cPickle
     try:
         return cPickle.load(open(datafile))
     except IOError:
         return {}
+
+datafile='titlewords.pck'
+#load the dic only once, on import
+dic=get_dict()
+
+def conditional_prob(ngood,nbad):
+    uncertainty=5
+    return (ngood + uncertainty) / (ngood + nbad + uncertainty)
+
 
 def save_dict(dic):
     import cPickle
