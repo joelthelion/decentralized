@@ -8,7 +8,7 @@ def evaluate(link,session):
         link.evaluation=True
     elif answer == 'b':
         link.evaluation=False
-    elif answer == 'h':
+    elif answer == 'h' or answer =='':
         link.hidden=True
     else:
         print "I didn't understand..."
