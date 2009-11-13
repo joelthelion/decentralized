@@ -1,7 +1,7 @@
 import datamodel
 from bayesian import Bayesian
 from utils import tokenize
-filter=Bayesian('titlewords.pck',3)
+filter=Bayesian('titlewords.pck',2)
 
 #See http://en.wikipedia.org/wiki/Naive_Bayes_classifier
 def predict(link):
