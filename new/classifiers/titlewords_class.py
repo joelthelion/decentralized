@@ -49,5 +49,5 @@ def print_self():
     words.sort(key=lambda w:conditional_prob(w[1][0],w[1][1]),reverse=True)
     for ws in words[:5],words[-5:]:
         for w,(g,b) in ws:
-            print "%s (%2.f%%), " %(w.encode('utf-8'),conditional_prob(g,b)*100.),
+            print "%s (%dg,%db,%2.f%%), " %(w.encode('utf-8'),g,b,conditional_prob(g,b)*100.),
         print
