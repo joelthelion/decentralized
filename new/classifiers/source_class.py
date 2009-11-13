@@ -12,5 +12,5 @@ def train(links):
     filter.train([([s.source for s in l.sources],l.evaluation) for l in links])
 
 def print_self():
-    print "A naive Bayesian classifier on link source. Selection of words:"
+    print "A naive Bayesian classifier on link source. Selection of sources:"
     print filter

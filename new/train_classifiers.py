@@ -6,7 +6,7 @@ if __name__ == '__main__':
     from datamodel import *
     import database as db
     s=db.Session()
-    links=s.query(Link).filter(Link.evaluation != None).limit(100)
+    links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date).limit(100)
     for cl_name in utils.get_classifiers():
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
         print "Training",cl_name
