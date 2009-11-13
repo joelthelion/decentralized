@@ -54,3 +54,6 @@ class Prediction(db.Base):
             return "%s thinks ( %s ) is good" % (self.classifier,self.link_url)
         else:
             return "%s thinks ( %s ) is bad" % (self.classifier,self.link_url)
+
+db.Base.metadata.create_all(db.engine)    #this is needed for debug only,
+                                    #otherwise it should be in a setup script
