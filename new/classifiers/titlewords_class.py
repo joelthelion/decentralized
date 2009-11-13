@@ -1,6 +1,6 @@
 import datamodel
 from bayesian import Bayesian
-filter=Bayesian('titlewords.pck')
+filter=Bayesian('titlewords.pck',3)
 
 #See http://en.wikipedia.org/wiki/Naive_Bayes_classifier
 def predict(link):

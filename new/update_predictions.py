@@ -20,8 +20,7 @@ if __name__ == '__main__':
     accuracy=evaluate_classifiers.test_classifiers()
     for l in links:
         l.combined_prediction = \
-                (sum( float(p.value) * accuracy[p.classifier]  \
-                    for p in l.predictions)/
+                (sum( p.value * accuracy[p.classifier] for p in l.predictions)/
                 sum(accuracy[p.classifier] for p in l.predictions)) >= 0.
     s.commit()
     print "Done!"

@@ -1,5 +1,6 @@
 class Bayesian:
-    def __init__(self,filename):
+    def __init__(self,filename,uncertainty):
+        self.uncertainty=uncertainty #this is the central parameter of the classifier. 5 shouldn't be too aggressive
         self.filename=filename
         import cPickle
         try:
@@ -28,13 +29,12 @@ class Bayesian:
                 if evaluation: good+=1
                 else: bad+=1
                 self.dic[w]=(good,bad)
-        save_dict()
-    def save_dict(self,):
+        self.save_dict()
+    def save_dict(self):
         import cPickle
         cPickle.dump(self.dic,open(self.filename,'wb'),-1)
     def conditional_prob(self,ngood,nbad):
-        uncertainty=1 #this is the central parameter of the classifier. 5 shouldn't be too aggressive
-        return float(ngood + uncertainty) / (ngood + nbad + 2*uncertainty)
+        return float(ngood + self.uncertainty) / (ngood + nbad + 2*self.uncertainty)
     def __repr__(self):
         result=""
         words=self.dic.items()
