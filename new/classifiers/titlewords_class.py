@@ -10,7 +10,12 @@ def predict(link):
             cond=conditional_prob(ngood,nbad)
             good*=cond
             bad*=1-cond
-    return good>=bad
+    total=good+bad
+    good /= total ; bad /= total
+    if good>=bad:
+        return good
+    else:
+        return -bad
 
 def train(links):
     dic={}#get_dict()
@@ -35,7 +40,7 @@ datafile='titlewords.pck'
 dic=get_dict()
 
 def conditional_prob(ngood,nbad):
-    uncertainty=5 #this is the central parameter of the classifier. 5 shouldn't be too aggressive
+    uncertainty=1 #this is the central parameter of the classifier. 5 shouldn't be too aggressive
     return float(ngood + uncertainty) / (ngood + nbad + 2*uncertainty)
 
 

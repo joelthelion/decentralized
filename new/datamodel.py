@@ -1,6 +1,6 @@
 
 import database as db
-from sqlalchemy import Table, Column, Boolean, Integer, Unicode,DateTime,ForeignKey
+from sqlalchemy import Table, Column, Boolean,Float, Integer, Unicode,DateTime,ForeignKey
 from sqlalchemy.orm import relation,backref
 
 class Link(db.Base):
@@ -46,7 +46,7 @@ class Prediction(db.Base):
     link_url = Column(Unicode,ForeignKey('links.url'),primary_key=True)
     classifier = Column( Unicode, primary_key=True )
     #Good or bad, as predicted by the classifier
-    value = Column(Boolean)
+    value = Column(Float())
     def __init__(self,url,cl,v):
         self.link_url,self.classifier,self.value = url, cl, v
     def __repr__(self):

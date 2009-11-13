@@ -1,7 +1,7 @@
 import datamodel
 
 def predict(link):
-    return True
+    return 1.0
 
 def train(links):
     pass

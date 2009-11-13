@@ -12,7 +12,7 @@ if __name__ == '__main__':
         print cl_name
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
         for l in links:
-            s.merge(Prediction(l.url,unicode(cl_name),current.predict(l)))
+            s.merge(Prediction(l.url,unicode(cl_name),round(current.predict(l),2)))
     s.commit()
 
     print "Combining the classifications..."
@@ -20,8 +20,8 @@ if __name__ == '__main__':
     accuracy=evaluate_classifiers.test_classifiers()
     for l in links:
         l.combined_prediction = \
-                (sum( float(p.value) * (accuracy[p.classifier] - 0.5) \
+                (sum( float(p.value) * accuracy[p.classifier]  \
                     for p in l.predictions)/
-                sum(accuracy[p.classifier]-0.5 for p in l.predictions)) >= 0.5
+                sum(accuracy[p.classifier] for p in l.predictions)) >= 0.
     s.commit()
     print "Done!"
