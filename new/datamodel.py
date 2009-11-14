@@ -9,8 +9,8 @@ class Link(db.Base):
     __tablename__ = "links"
     url = Column(Unicode,primary_key=True)
     title = Column(Unicode)
-    sources = relation("LinkSource",backref=backref('link'))
-    predictions = relation("Prediction",backref=backref('link'))
+    sources = relation("LinkSource",cascade="all,delete,delete-orphan")
+    predictions = relation("Prediction",cascade="all,delete,delete-orphan")
     combined_prediction = Column(Boolean)
     date = Column(DateTime)
     """The two next columns are filled when the user evaluated the link"""

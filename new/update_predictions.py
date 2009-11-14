@@ -12,8 +12,15 @@ if __name__ == '__main__':
         print cl_name
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
         for l in links:
-            s.merge(Prediction(l.url,unicode(cl_name),round(current.predict(l),2)))
-    s.commit()
+            found=False
+            for p in l.predictions:
+                if p.link_url == l.url and p.classifier == unicode(cl_name):
+                    p.value=round(current.predict(l),2)
+                    found=True
+                    break
+            if not found:
+                l.predictions.append(Prediction(l.url,unicode(cl_name),round(current.predict(l),2)))
+        s.commit()
 
     print "Combining the classifications..."
     import evaluate_classifiers
