@@ -24,10 +24,10 @@ if __name__ == '__main__':
 
     print "Combining the classifications..."
     import evaluate_classifiers
-    accuracy=evaluate_classifiers.test_classifiers()
+    accuracy,conf_weighted=evaluate_classifiers.test_classifiers()
     for l in links:
         l.combined_prediction = \
-                (sum( p.value * accuracy[p.classifier] for p in l.predictions)/
-                sum(accuracy[p.classifier] for p in l.predictions)) >= 0.
+                (sum( p.value * (accuracy[p.classifier]-0.5) for p in l.predictions if p.classifier!="idiot_class")/
+                sum(accuracy[p.classifier]-0.5 for p in l.predictions if p.classifier!="idiot_class")) >= 0.
     s.commit()
     print "Done!"
