@@ -2,6 +2,13 @@
 import utils
 from sqlalchemy import or_
 
+def naive_weight(accuracy):
+    return accuracy-0.5
+
+def adaboost_weight(accuracy):
+    from math import log
+    return 0.5*log(accuracy/(1-accuracy))
+
 if __name__ == '__main__':
     import classifiers
     from datamodel import *
@@ -34,7 +41,7 @@ if __name__ == '__main__':
     accuracy,conf_weighted=evaluate_classifiers.test_classifiers()
     for l in links:
         l.combined_prediction = \
-                (sum( p.value * (accuracy[p.classifier]-0.5) for p in l.predictions if p.classifier!="idiot_class")/
-                sum(accuracy[p.classifier]-0.5 for p in l.predictions if p.classifier!="idiot_class")) >= 0.
+                (sum( p.value * adaboost_weight(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class")/
+                sum(adaboost_weight(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class")) >= 0.
     s.commit()
     print "Done!"
