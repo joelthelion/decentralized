@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 import utils
+from sqlalchemy import or_
 
 if __name__ == '__main__':
     import classifiers
     from datamodel import *
     import database as db
+    from datetime import datetime
+    from time import time
     s=db.Session()
     print "Computing individual predictions..."
-    links=s.query(Link).order_by(Link.date.desc())
+    #evaluate rated stories and recent ones
+    links=s.query(Link).\
+        filter(or_(\
+            Link.evaluation != None,\
+            Link.date > datetime.fromtimestamp(time()-86400)))
     for cl_name in utils.get_classifiers():
         print cl_name
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
