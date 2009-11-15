@@ -4,8 +4,8 @@ class Bayesian:
         self.filename=filename
         import cPickle
         try:
-            self.dic = cPickle.load(open(self.filename))
-        except IOError:
+            self.dic,self.total_ngood,self.total_links = cPickle.load(open(self.filename))
+        except (IOError,ValueError):
             self.dic = {}
     def predict(self,words):
         good,bad=1.,1.
@@ -15,6 +15,8 @@ class Bayesian:
                 cond=self.conditional_prob(ngood,nbad)
                 good*=cond
                 bad*=1-cond
+        good*=float(self.total_ngood)/self.total_links
+        bad*=float(self.total_links-self.total_ngood)/self.total_links
         total=good+bad
         good /= total ; bad /= total
         if good>=bad:
@@ -23,16 +25,19 @@ class Bayesian:
             return -bad
     def train(self,training_set):
         self.dic={}#get_dict()
+        self.total_ngood,self.total_links=0,len(training_set)
         for words,evaluation in training_set:
+            if evaluation: self.total_ngood+=1
             for w in words:
                 good,bad=self.dic.get(w,(0,0))
-                if evaluation: good+=1
+                if evaluation: 
+                    good+=1
                 else: bad+=1
                 self.dic[w]=(good,bad)
-        self.save_dict()
-    def save_dict(self):
+        self.save()
+    def save(self):
         import cPickle
-        cPickle.dump(self.dic,open(self.filename,'wb'),-1)
+        cPickle.dump((self.dic,self.total_ngood,self.total_links),open(self.filename,'wb'),-1)
     def conditional_prob(self,ngood,nbad):
         return float(ngood + self.uncertainty) / (ngood + nbad + 2*self.uncertainty)
     def __repr__(self):
