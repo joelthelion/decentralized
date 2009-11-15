@@ -11,9 +11,11 @@ def get_links(rssfeed):
     t=time()
     f=parse(rssfeed)
     session=db.Session()
+    added=0
     for i in f.entries:
         current_link=session.query(Link).filter_by(url=unicode(i.link)).first()
         if not current_link:
+            added+=1
             #can't trust the link date, it is dependent on RSS time fuse
             current_link=Link(unicode(i.link),unicode(i.title),\
                 datetime.fromtimestamp(time()+random()*30))
@@ -23,9 +25,12 @@ def get_links(rssfeed):
         current_link.sources.append(LinkSource(current_link.url,unicode(f.url)))
     session.commit()
     print rssfeed,"(%.2fs)"%(time()-t)
+    return added
 
 if __name__ == '__main__':
     from utils import feeds
     import multiprocessing
     pool=multiprocessing.Pool(10)
-    pool.map(get_links,feeds) #do 10 feeds at a time
+    added=pool.map(get_links,feeds) #do 10 feeds at a time
+    if sum(added) > 0:
+        print "Added %d link(s) to the database!" % sum(added)
