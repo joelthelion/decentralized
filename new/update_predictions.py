@@ -39,6 +39,8 @@ if __name__ == '__main__':
     print "Combining the classifications..."
     import evaluate_classifiers
     accuracy,conf_weighted=evaluate_classifiers.test_classifiers()
+    for c,a in accuracy.items():
+        print c,adaboost_weight(a)
     for l in links:
         l.combined_prediction = \
                 (sum( p.value * adaboost_weight(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class")/
