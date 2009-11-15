@@ -30,6 +30,7 @@ def get_links(rssfeed):
     except Exception as e:
         print "Exception when parsing %s" % rssfeed
         print e
+        return 0
 
 if __name__ == '__main__':
     from utils import feeds
