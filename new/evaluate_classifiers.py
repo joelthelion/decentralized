@@ -13,7 +13,7 @@ def test_classifiers():
     import database as db
     from math import fabs
     s=db.Session()
-    links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date.desc()).all()[1::2]
+    links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date).all()[1::2]
     accuracy,confidence_weighted_ac={},{}
     for cl_name in utils.get_classifiers():
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         print method,": %.4f (accuracy), %.4f (confidence_weighted) "% (acc[method],conf[method])
     s=db.Session()
     evaluated=s.query(Link).filter(Link.evaluation != None).count()
-    links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date.desc()).all()[1::2]
+    links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date).all()[1::2]
     print "Evaluating on %d of %d evaluated links (every other element)" % (len(links),evaluated)
     print "Global accuracy: %.4f" % (float(sum(1-abs(l.combined_prediction - l.evaluation)\
         for l in links)) / len(links))

@@ -7,7 +7,7 @@ if __name__ == '__main__':
     import database as db
     s=db.Session()
     evaluated=s.query(Link).filter(Link.evaluation != None).count()
-    links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date.desc()).all()[::2]
+    links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date).all()[::2]
     print "Training on %d of %d evaluated links (every second element)" % (len(links),evaluated)
     for cl_name in utils.get_classifiers():
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
