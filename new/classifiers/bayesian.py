@@ -9,7 +9,7 @@ class Bayesian:
             self.dic = {}
     def predict(self,words):
         if self.total_links == 0:
-            return True
+            return 1.0
         good,bad=1.,1.
         for w in words:
             if self.dic.has_key(w):
