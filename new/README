@@ -1,0 +1,9 @@
+1) get some links with rsslinks.py
+2) run update_prediction.py 
+
+update_prediction.py
+
+database: 3 tables
+- links: liens parsés avec la prédiction combinée binaire.
+- predictions: one-to-many p/r links
+- link_sources: lien rss de provenance.
