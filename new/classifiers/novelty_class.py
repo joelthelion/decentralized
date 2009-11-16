@@ -38,4 +38,4 @@ def isnovel(word,word_date):
     return True
 
 def print_self():
-    print "I am an idiot classifier, I like all links!"
+    print "I rate links based on the novelty of the title terms"
