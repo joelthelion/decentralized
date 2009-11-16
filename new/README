@@ -1,13 +1,21 @@
-1) get some links with rsslinks.py
-2) run update_prediction.py 
+Decentralized links recomandation
+=================================
 
-rsslinks.py : parse rss links to database et vérifie les doublons
-update_prediction.py : appelle les classifieurs pour mettre à jour les prédictions combinées.
-train_classifiers.py : entraine les classifieurs sur la moitié des liens (1 sur deux classés par date du lien)
-evaluate_classifier.py : evaluate classifieurs
+Usage
+-----
 
+1.   Run `rsslinks.py`. This will parse several rss feeds and put those links in a database.
+2.   Run `update_prediction.py`. Update good/bad prediction on new links. This script trains classifiers on half the training set.
+3.   Run `dumb_ui.py` or use another backend to rate new links.
+4.   Repeat to 1 to get new links.
 
-database: 3 tables
-- links: liens parsés avec la prédiction combinée binaire.
-- predictions: one-to-many p/r links
-- link_sources: lien rss de provenance.
+Database
+--------
+
+Data is stored into a sqlite database called `test.db`.
+There is 3 main tables on the database.
+
+-    links: store records of parsed links.
+-    predictions: contains the prediction of a classifier about a link.
+-    link_sources: where does that link comes from?
+
