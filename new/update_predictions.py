@@ -43,8 +43,8 @@ if __name__ == '__main__':
     for c,a in accuracy.items():
         print c,combination_func(a)
     for l in links:
+        assert( sum(combination_func(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class") >= 0.)
         l.combined_prediction = \
-                (sum( p.value * combination_func(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class")/
-                sum(combination_func(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class")) >= 0.
+                (sum( p.value * combination_func(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class") >= 0)
     s.commit()
     print "Done!"
