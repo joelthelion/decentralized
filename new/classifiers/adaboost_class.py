@@ -20,7 +20,7 @@ f.close()
 
 def predict(link):
     words=tokenize(link.title)
-    return sum(alpha * c.predict(words) for c,alpha in trained) >= 0
+    return sum(alpha * c.predict(words) for c,alpha in trained)
 
 def train(links):
     from math import exp,fabs,log
