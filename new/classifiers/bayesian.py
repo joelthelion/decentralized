@@ -8,6 +8,8 @@ class Bayesian:
         except (IOError,ValueError):
             self.dic = {}
     def predict(self,words):
+        if self.total_links == 0:
+            return True
         good,bad=1.,1.
         for w in words:
             if self.dic.has_key(w):
