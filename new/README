@@ -1,7 +1,11 @@
 1) get some links with rsslinks.py
 2) run update_prediction.py 
 
-update_prediction.py
+rsslinks.py : parse rss links to database et vérifie les doublons
+update_prediction.py : appelle les classifieurs pour mettre à jour les prédictions combinées.
+train_classifiers.py : entraine les classifieurs sur la moitié des liens (1 sur deux classés par date du lien)
+evaluate_classifier.py : evaluate classifieurs
+
 
 database: 3 tables
 - links: liens parsés avec la prédiction combinée binaire.
