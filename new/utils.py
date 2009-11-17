@@ -9,6 +9,9 @@ def open_pickle(filename,default):
     except (IOError,ValueError):
         return default
 
+def dic_add(dic,key):
+    dic[key]=dic.get(key,0)+1
+
 def get_classifiers():
     import re
     import os
