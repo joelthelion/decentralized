@@ -39,7 +39,7 @@ if __name__ == '__main__':
     print "Combining the classifications..."
     import evaluate_classifiers
     accuracy,conf_weighted=evaluate_classifiers.test_classifiers()
-    combination_func=naive_weight
+    combination_func=adaboost_weight
     for c,a in accuracy.items():
         print c,combination_func(a)
     for l in links:

@@ -20,3 +20,19 @@ def tokenize(text):
     import re
     text=re.sub(u"""[/1234567890=@\-#…«»”“’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
+
+def most_frequent_words():
+    """Return all 'interesting' words"""
+    from datamodel import Link
+    from database import Session
+    s=Session()
+    links=s.query(Link)
+    frequent={}
+    for l in links:
+        words=tokenize(l.title)
+        for w in words:
+            if frequent.has_key(w):
+                frequent[w]+=1
+            else:
+                frequent[w]=1
+    return [w for w,f in frequent.items() if f>=4 and f<=15]

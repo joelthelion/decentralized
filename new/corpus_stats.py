@@ -17,16 +17,8 @@ if __name__ == '__main__':
             hidden+=1
     print "%d links, %d good, %d bad, %d hidden" %(total,good,bad,hidden)
     frequent={}
-    titles=[]
-    for l in links:
-        words=utils.tokenize(l.title)
-        titles.append(words)
-        for w in words:
-            if frequent.has_key(w):
-                frequent[w]+=1
-            else:
-                frequent[w]=1
-    fwords=[w for w,f in frequent.items() if f>=4 and f<15]
+    titles=[utils.tokenize(l.title) for l in links]
+    fwords=utils.most_frequent_words()
     print fwords
     not_null=0
     for t in titles:

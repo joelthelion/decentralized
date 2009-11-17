@@ -1,15 +1,23 @@
 import datamodel
-from utils import tokenize,open_pickle
+from utils import tokenize,open_pickle,most_frequent_words
 
-class WordClassifier:
+class HasWordPredicate:
     def __init__(self,word):
         self.word=word
+    def __call__(self,words):
+        return self.word in words
+    def __repr__(self):
+        return self.word.encode('utf-8')
+
+class PredicateClassifier:
+    def __init__(self,predicate):
+        self.predicate=predicate
     def train(self,titles,weights,evaluations):
         """titles is [[words]]"""
-        total=sum(weights[n]*evaluations[n] for n,words in enumerate(titles) if self.word in words)
+        total=sum(weights[n]*evaluations[n] for n,words in enumerate(titles) if self.predicate(words))
         self.wordgood=1. if total >= 0 else -1.
     def predict(self,title):
-        if self.word in title:
+        if self.predicate(title):
             return self.wordgood
         else: return 0.
 
@@ -17,11 +25,14 @@ trained=open_pickle("adaboost.pck",[])
 
 def predict(link):
     words=tokenize(link.title)
-    return sum(alpha * c.predict(words) for c,alpha in trained)
+    if sum(alpha * c.predict(words) for c,alpha in trained) >= 0:
+        return 1.
+    else:
+        return -1.
 
 def train(links):
     from math import exp,fabs,log
-    classifiers=[WordClassifier(w) for w in most_frequent_words(links)]
+    classifiers=[PredicateClassifier(HasWordPredicate(w)) for w in most_frequent_words()]
     titles=[tokenize(l.title) for l in links]
     evaluations=[1. if l.evaluation else -1. for l in links]
     weights=[1./len(links) for l in links]
@@ -43,7 +54,7 @@ def train(links):
         trained.append((best,alphat))
         classifiers.remove(best)
     for c,alpha in trained:
-        print c.word,c.wordgood,alpha
+        print c.predicate,c.wordgood,alpha
     import cPickle
     cPickle.dump(trained,open("adaboost.pck","wb"),-1)
 
@@ -51,14 +62,3 @@ def print_self():
     print "A simple adaboost classifier on title words with really dumb features"
 
 
-def most_frequent_words(links):
-    """Return all words that are present at least 5 times in the corpus"""
-    frequent={}
-    for l in links:
-        words=tokenize(l.title)
-        for w in words:
-            if frequent.has_key(w):
-                frequent[w]+=1
-            else:
-                frequent[w]=1
-    return [w for w,f in frequent.items() if f>=3]
