@@ -1,13 +1,13 @@
 import datamodel
-from utils import tokenize,open_pickle,most_frequent_words
+from utils import tokenize,open_pickle,most_frequent_words,most_frequent_duos
 
-class HasWordPredicate:
-    def __init__(self,word):
-        self.word=word
-    def __call__(self,words):
-        return self.word in words
+class HasWordsPredicate:
+    def __init__(self,words):
+        self.words=words
+    def __call__(self,title):
+        return all(w in title for w in self.words)
     def __repr__(self):
-        return self.word.encode('utf-8')
+        return ",".join(self.words).encode('utf-8')
 
 class PredicateClassifier:
     def __init__(self,predicate):
@@ -32,7 +32,9 @@ def predict(link):
 
 def train(links):
     from math import exp,fabs,log
-    classifiers=[PredicateClassifier(HasWordPredicate(w)) for w in most_frequent_words()]
+    fwords=most_frequent_words()
+    classifiers=[PredicateClassifier(HasWordsPredicate([w])) for w in fwords]
+    classifiers.extend(PredicateClassifier(HasWordsPredicate(duo)) for duo in most_frequent_duos(fwords))
     titles=[tokenize(l.title) for l in links]
     evaluations=[1. if l.evaluation else -1. for l in links]
     weights=[1./len(links) for l in links]

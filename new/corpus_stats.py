@@ -27,16 +27,7 @@ if __name__ == '__main__':
                 not_null+=1
                 break
 
-    duos={}
-    for t in titles:
-        for w in t:
-            if w in fwords:
-                for w2 in t:
-                    if w!=w2 and w2 in fwords:
-                        utils.dic_add(duos,frozenset((w,w2)))
-    duos=duos.items()
-    duos.sort(key=lambda (w,f):f,reverse=True)
-    for d in duos[:60]:
+    for d in utils.most_frequent_duos(fwords):
         print d
                     
     print float(not_null)/len(titles)*100.,len(fwords)

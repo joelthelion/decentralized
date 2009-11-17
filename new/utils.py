@@ -39,3 +39,18 @@ def most_frequent_words():
             else:
                 frequent[w]=1
     return [w for w,f in frequent.items() if f>=4 and f<=15]
+
+def most_frequent_duos(frequent_words):
+    from datamodel import Link
+    from database import Session
+    s=Session()
+    links=s.query(Link)
+    duos={}
+    for l in links:
+        t=tokenize(l.title)
+        for w in t:
+            if w in frequent_words:
+                for w2 in t:
+                    if w!=w2 and w2 in frequent_words:
+                        dic_add(duos,frozenset((w,w2)))
+    return [list(s) for s,f in duos.items() if f>10]
