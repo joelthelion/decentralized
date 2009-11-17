@@ -11,6 +11,8 @@ except IOError:
 
 def predict(link):
     words=title_words(link.title)
+    if not words:
+        return 0.
     novelty=sum(1. for w in words if isnovel(w,link.date))/len(words)
     return 2*novelty -0.8
 
