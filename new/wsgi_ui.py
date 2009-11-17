@@ -4,38 +4,87 @@ from datamodel import *
 from cgi import parse_qs, escape
 from datetime import datetime
 import time
+import re
 
 def format_link(link):
-    return '''<li><a href='?rating=good&key=%s'>good</a> <a href='?rating=bad&key=%s'>bad</a> <a href='%s'>%s</a></li>''' % tuple(map(escape,(link.url,link.url,link.url,link.title)))
+    return '''<li class='%(eval)s'><a href='?action=good&key=%(url)s'>good</a> <a href='?action=bad&key=%(url)s'>bad</a> <a href='%(url)s'>%(title)s</a> <a href='?action=%(hideact)s&key=%(url)s'>%(hideact)s</a> </li>''' % {'url':escape(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden]}
 
 def map_links_to_lu(links):
-    return '<lu>' + ''.join(format_link(link) for link in links) + '</lu>'
+    return '''<lu class='links'>''' + ''.join(format_link(link) for link in links) + '''</lu>'''
 
-cursor = None
-def hello_world(environ, start_response):
+import database as db
+cursor = db.Session()
+
+def get_csslink(environ):
     parameters = parse_qs(environ.get('QUERY_STRING', ''))
-    if 'subject' in parameters:
-        subject = escape(parameters['subject'][0])
-    else:
-        subject = u'World'
-    start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+    cssfilename = 'default.css'
+    if 'css' in parameters: cssfilename = escape(parameters['css'][0])
+    return '''<link rel='stylesheet' type='text/css' href='/css/%s' />''' % cssfilename
 
-    fresh = cursor.query(Link).filter(Link.evaluation_date == None).\
-        filter_by(combined_prediction=True).\
-        order_by(Link.date.desc()).limit(10).all()
-    resp = '''<html><head><title>title</title></head><body><p>Hello %(subject)s!</p> %(fresh)s </body></html>''' % {'subject': subject, 'fresh': map_links_to_lu(fresh)}
+def get_menu(environ):
+    return '''<p class='menu'><a href='/'>home</a> <a href='/liked/'>liked</a> <a href='/disliked/'>disliked</a> <a href='/hidden/'>hidden</a></p>'''
+
+def display_links(environ, start_response,links):
+    '''display link helper'''
+    resp = '''<html><head><title>title</title>%(csslink)s</head><body>%(menu)s%(links)s</body></html>''' % {'menu':get_menu(environ),'links':map_links_to_lu(links),'csslink':get_csslink(environ)}
+    start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
     resp = resp.encode('utf8')
     return [resp]
 
+def index(environ,start_response):
+    links = cursor.query(Link).filter(Link.evaluation_date == None).filter(Link.combined_prediction == True).order_by(Link.date.desc()).limit(10).all()
+    return display_links(environ,start_response,links)
+
+def liked(environ,start_response):
+    links = cursor.query(Link).filter(Link.evaluation_date != None).filter(Link.evaluation == True).order_by(Link.evaluation_date.desc()).all()
+    return display_links(environ,start_response,links)
+
+def disliked(environ,start_response):
+    links = cursor.query(Link).filter(Link.evaluation_date != None).filter(Link.evaluation == False).order_by(Link.evaluation_date.desc()).all()
+    return display_links(environ,start_response,links)
+
+def hidden(environ,start_response):
+    links = cursor.query(Link).filter(Link.hidden == True).order_by(Link.evaluation_date.desc()).all()
+    return display_links(environ,start_response,links)
+
+def css(environ, start_response):
+    '''serve css files'''
+    try:
+        cssfile = open(environ.get('URL_ARGS','')[0],'r')
+        resp = cssfile.read()
+        start_response('200 OK', [('Content-Type', 'text/css;charset=UTF-8')])
+        resp = resp.encode('utf8')
+        return [resp]
+    except IOError:
+        return not_found(environ,start_response)
+
+def not_found(environ, start_response):
+    '''404 error handler'''
+    start_response('404 NOT FOUND', [('Content-Type', 'text/plain;charset=UTF-8')])
+    return ['Not Found']
+
+urls = [
+    (re.compile(r'^$'),index),
+    (re.compile(r'^liked/$'),liked),
+    (re.compile(r'^disliked/$'),disliked),
+    (re.compile(r'^hidden/$'),hidden),
+    (re.compile(r'^css/(\w+\.css)$'),css)
+    ]
+
+def dispatcher(environ,start_response):
+    path = environ.get('PATH_INFO', '').lstrip('/')
+    for regex,callback in urls:
+        match = regex.search(path)
+        if match is not None:
+            environ['URL_ARGS'] = match.groups()
+            return callback(environ, start_response)
+    return not_found(environ, start_response)
+
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
-    import database as db
-
-    cursor = db.Session()
-
     hostname = 'localhost'
     port     = 8080
-    srv = make_server(hostname, port, hello_world)
-    print "server started on http://%s:%d/" % (hostname,port)
+    srv = make_server(hostname, port, dispatcher)
+    print 'server started on http://%s:%d/' % (hostname,port)
     srv.serve_forever()
 
