@@ -11,7 +11,8 @@ except IOError:
 
 def predict(link):
     words=title_words(link.title)
-    novelty=sum(1. for w in words if isnovel(w,link.date))/len(words)
+    if words: novelty=sum(1. for w in words if isnovel(w,link.date))/len(words)
+    else: novelty=0
     return 2*novelty -0.8
 
 def train(links):
