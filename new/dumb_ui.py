@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 def evaluate(link,session):
-    print "-",r
+    print "-",link
     print "Good, Bad, Hide? (g/b/h)"
     answer=raw_input().lower()
     if answer == 'g':
