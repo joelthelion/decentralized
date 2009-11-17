@@ -16,7 +16,6 @@ if __name__ == '__main__':
         if l.hidden==True:
             hidden+=1
     print "%d links, %d good, %d bad, %d hidden" %(total,good,bad,hidden)
-    frequent={}
     titles=[utils.tokenize(l.title) for l in links]
     fwords=utils.most_frequent_words()
     print fwords
@@ -26,8 +25,7 @@ if __name__ == '__main__':
             if w in t:
                 not_null+=1
                 break
+    print float(not_null)/len(titles)*100.,len(fwords)
 
     for d in utils.most_frequent_duos(fwords):
         print d
-                    
-    print float(not_null)/len(titles)*100.,len(fwords)

@@ -1,5 +1,5 @@
 import datamodel
-from utils import tokenize,open_pickle,most_frequent_words,most_frequent_duos
+from utils import tokenize,open_pickle,most_frequent_words,most_frequent_duos,mash_post
 
 class HasWordsPredicate:
     def __init__(self,words):
@@ -24,7 +24,8 @@ class PredicateClassifier:
 trained=open_pickle("adaboost.pck",[])
 
 def predict(link):
-    words=tokenize(link.title)
+    #words=tokenize(link.title)
+    words=mash_post(link)
     if sum(alpha * c.predict(words) for c,alpha in trained) >= 0:
         return 1.
     else:
@@ -34,11 +35,12 @@ def train(links):
     from math import exp,fabs,log
     fwords=most_frequent_words()
     classifiers=[PredicateClassifier(HasWordsPredicate([w])) for w in fwords]
-    classifiers.extend(PredicateClassifier(HasWordsPredicate(duo)) for duo in most_frequent_duos(fwords))
-    titles=[tokenize(l.title) for l in links]
+    #classifiers.extend(PredicateClassifier(HasWordsPredicate(duo)) for duo in most_frequent_duos(fwords))
+    titles=[mash_post(l) for l in links]
     evaluations=[1. if l.evaluation else -1. for l in links]
     weights=[1./len(links) for l in links]
     trained=[]
+    print "Training on %d features..." % len(classifiers)
     while True:
         print ".",
         min_error=1e6 ; best=None
