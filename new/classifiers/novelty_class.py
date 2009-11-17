@@ -12,7 +12,7 @@ except IOError:
 def predict(link):
     words=title_words(link.title)
     novelty=sum(1. for w in words if isnovel(w,link.date))/len(words)
-    return 2*novelty -1.
+    return 2*novelty -0.8
 
 def train(links):
     chronology={}
@@ -26,7 +26,9 @@ def train(links):
     cPickle.dump(chronology,open("novelty.pck","wb",-1))
 
 def title_words(title):
-    return [w.lower() for w in title.split()]
+    import utils
+    return utils.tokenize(title)
+    #return [w.lower() for w in title.split()]
 
 def isnovel(word,word_date):
     if not chronology.has_key(word):
@@ -38,4 +40,4 @@ def isnovel(word,word_date):
     return True
 
 def print_self():
-    print "I am an idiot classifier, I like all links!"
+    print "I rate links based on the novelty of the title terms"
