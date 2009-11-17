@@ -1,5 +1,5 @@
 import datamodel
-from utils import tokenize
+from utils import tokenize,open_pickle
 
 class WordClassifier:
     def __init__(self,word):
@@ -13,10 +13,7 @@ class WordClassifier:
             return self.wordgood
         else: return 0.
 
-import cPickle
-f=open("adaboost.pck")
-trained=cPickle.load(f)
-f.close()
+trained=open_pickle("adaboost.pck",[])
 
 def predict(link):
     words=tokenize(link.title)

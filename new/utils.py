@@ -2,6 +2,13 @@
 #A module for various stuff that doesn't fit elsewhere
 #should be mostly test or temporary things
 
+def open_pickle(filename,default):
+    import cPickle
+    try:
+        return cPickle.load(open(filename))
+    except (IOError,ValueError):
+        return default
+
 def get_classifiers():
     import re
     import os

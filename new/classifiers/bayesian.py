@@ -2,11 +2,8 @@ class Bayesian:
     def __init__(self,filename,uncertainty):
         self.uncertainty=uncertainty #this is the central parameter of the classifier. 5 shouldn't be too aggressive
         self.filename=filename
-        import cPickle
-        try:
-            self.dic,self.total_ngood,self.total_links = cPickle.load(open(self.filename))
-        except (IOError,ValueError):
-            self.dic = {}
+        from utils import open_pickle
+        self.dic,self.total_ngood,self.total_links=open_pickle(filename,({},0,0))
     def predict(self,words):
         if self.total_links == 0:
             return 1.0
