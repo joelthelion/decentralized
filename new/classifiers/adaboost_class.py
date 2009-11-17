@@ -43,7 +43,7 @@ def train(links):
         trained.append((best,alphat))
         classifiers.remove(best)
     for c,alpha in trained:
-        print c.word,alpha
+        print c.word,c.wordgood,alpha
     import cPickle
     cPickle.dump(trained,open("adaboost.pck","wb"),-1)
 
