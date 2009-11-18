@@ -28,8 +28,8 @@ def tokenize(text,url=False):
 
 def mash_post(link):
     mash=tokenize(link.title)+tokenize(link.url,True)
-    for source_mash in [tokenize(s.source,True) for s in link.sources]:
-        mash+=source_mash
+    #for source_mash in [tokenize(s.source,True) for s in link.sources]:
+    #    mash+=source_mash
     return mash
 
 def most_frequent_words():
