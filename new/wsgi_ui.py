@@ -12,7 +12,7 @@ cursor = db.Session()
 
 
 def format_link(link):
-    return '''<li class='%(eval)s'><a href='?action=good&key=%(url)s'>good</a> <a href='?action=bad&key=%(url)s'>bad</a> <a href=%(urlext)s>%(title)s</a> <a href='?action=%(hideact)s&key=%(url)s'>%(hideact)s</a> </li>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden]}
+    return '''<li class='%(eval)s'><a href='?action=good&key=%(url)s'>good</a> <a href='?action=bad&key=%(url)s'>bad</a> <a href=%(urlext)s>%(title)s</a> <a href='?action=%(hideact)s&key=%(url)s'>%(hideact)s</a> </li>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url.encode('utf-8')),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden]}
 
 def map_links_to_lu(links):
     return '''<lu class='links'>''' + ''.join(format_link(link) for link in links) + '''</lu>'''
