@@ -46,7 +46,7 @@ def handle_rating(environ):
     
 def display_links(environ, start_response,links):
     '''display link helper'''
-    resp = '''<html><head><title>title</title>%(csslink)s</head><body>%(menu)s%(links)s</body></html>''' % {'menu':get_menu(environ),'links':map_links_to_lu(links),'csslink':get_csslink(environ)}
+    resp = '''<html><head><title>Hermie the brave news helper</title>%(csslink)s</head><body>%(menu)s%(links)s</body></html>''' % {'menu':get_menu(environ),'links':map_links_to_lu(links),'csslink':get_csslink(environ)}
     start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
     resp = resp.encode('utf8')
     return [resp]
@@ -58,12 +58,12 @@ def index(environ,start_response):
 
 def liked(environ,start_response):
     handle_rating(environ)
-    links = cursor.query(Link).filter(db.and_(Link.evaluation == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
+    links = cursor.query(Link).filter(db.and_(Link.evaluation == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.evaluation_date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def disliked(environ,start_response):
     handle_rating(environ)
-    links = cursor.query(Link).filter(db.and_(Link.evaluation == False,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
+    links = cursor.query(Link).filter(db.and_(Link.evaluation == False,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.evaluation_date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def hidden(environ,start_response):
