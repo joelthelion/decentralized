@@ -58,12 +58,12 @@ def index(environ,start_response):
 
 def liked(environ,start_response):
     handle_rating(environ)
-    links = cursor.query(Link).filter(db.and_(Link.evaluation == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
+    links = cursor.query(Link).filter(db.and_(Link.evaluation == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.evaluation_date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def disliked(environ,start_response):
     handle_rating(environ)
-    links = cursor.query(Link).filter(db.and_(Link.evaluation == False,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
+    links = cursor.query(Link).filter(db.and_(Link.evaluation == False,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.evaluation_date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def hidden(environ,start_response):
