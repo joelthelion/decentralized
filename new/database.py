@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base=declarative_base()
 
 #Specify which database we're going to use
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine,or_,and_,not_
 engine=create_engine("sqlite:///test.db")
 Session.configure(bind=engine)
 

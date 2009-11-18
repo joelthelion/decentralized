@@ -27,7 +27,8 @@ def test_classifiers():
                 confidence_weighted_ac[cl_name]-=fabs(prediction)
     for dic in accuracy,confidence_weighted_ac:
         for k in dic.keys():
-            dic[k]=float(dic[k])/len(links)
+            if len(links): dic[k]=float(dic[k])/len(links)
+            else: dic[k]=0.6
     return (accuracy,confidence_weighted_ac)
 
 if __name__ == '__main__':
