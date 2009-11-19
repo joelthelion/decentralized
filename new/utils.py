@@ -28,8 +28,8 @@ def tokenize(text,url=False):
 
 def mash_post(link):
     mash=tokenize(link.title)+tokenize(link.url,True)
-    #for source_mash in [tokenize(s.source,True) for s in link.sources]:
-    #    mash+=source_mash
+    for source_mash in [s.source for s in link.sources]:
+        mash.append(source_mash)
     return mash
 
 def most_frequent_words():
@@ -47,7 +47,7 @@ def most_frequent_words():
                 frequent[w]+=1
             else:
                 frequent[w]=1
-    fwords= [(f,w) for w,f in frequent.items() if f>=4 and f<=20 and len(w)>1]
+    fwords= [(f,w) for w,f in frequent.items() if f>=4 and (f<=20 or w[:4]=="http") and len(w)>1]
     fwords.sort(reverse=True)
     maxlength=800
     if len(fwords)>maxlength:
