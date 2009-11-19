@@ -2,6 +2,22 @@
 import utils
 from datamodel import *
 
+class ClassifierEvaluation:
+    def __init__(self,accuracy,confidence,false_positives,false_negatives,test_size):
+        if test_size:
+            self.accuracy=float(accuracy)/test_size
+            self.confidence=float(confidence)/test_size
+            self.false_positive_rate=float(false_positives)/test_size
+            self.false_negative_rate=float(false_negatives)/test_size
+        else:
+            self.accuracy=0.6
+            self.confidence=0
+            self.false_positive_rate=0
+            self.false_negative_rate=0
+    def __repr__(self):
+        return "accuracy: %.4f\tconfidence: %.4f\tfp: %.4f\tfn:%.4f" %\
+            (self.accuracy,self.confidence,self.false_positive_rate,self.false_negative_rate)
+
 def show_classifiers():
     import classifiers
     for cl_name in utils.get_classifiers():
@@ -14,30 +30,31 @@ def test_classifiers():
     from math import fabs
     s=db.Session()
     links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date).all()[1::2]
-    accuracy,confidence_weighted_ac={},{}
+    cl_evaluations={}
     for cl_name in utils.get_classifiers():
         current=__import__('classifiers.'+cl_name,fromlist=[classifiers])
-        accuracy[cl_name]=0;confidence_weighted_ac[cl_name]=0
+        accuracy=0;confidence_weighted_ac=0
+        fp,fn=0,0
         for l in links:
             prediction=current.predict(l)
             if ( prediction >= 0. ) == l.evaluation:
-                confidence_weighted_ac[cl_name]+=fabs(prediction)
-                accuracy[cl_name]+=1
+                confidence_weighted_ac+=fabs(prediction)
+                accuracy+=1
             else:
-                confidence_weighted_ac[cl_name]-=fabs(prediction)
-    for dic in accuracy,confidence_weighted_ac:
-        for k in dic.keys():
-            if len(links): dic[k]=float(dic[k])/len(links)
-            else: dic[k]=0.6
-    return (accuracy,confidence_weighted_ac)
+                confidence_weighted_ac-=fabs(prediction)
+                if (prediction >= 0): fp+=1
+                else: fn+=1
+        cl_evaluations[cl_name]=ClassifierEvaluation(accuracy,\
+            confidence_weighted_ac,fp,fn,len(links))
+    return cl_evaluations
 
 if __name__ == '__main__':
     show_classifiers()
-    acc,conf=test_classifiers()
+    evals=test_classifiers()
     print "Global results:"
     print
-    for method in acc.keys():
-        print method,": %.4f (accuracy), %.4f (confidence_weighted) "% (acc[method],conf[method])
+    for method,eval in evals.items():
+        print method,eval
     s=db.Session()
     evaluated=s.query(Link).filter(Link.evaluation != None).count()
     links=s.query(Link).filter(Link.evaluation != None).order_by(Link.date).all()[1::2]
