@@ -38,14 +38,16 @@ if __name__ == '__main__':
 
     print "Combining the classifications..."
     import evaluate_classifiers
-    accuracy,conf_weighted=evaluate_classifiers.test_classifiers()
+    c_evals=evaluate_classifiers.test_classifiers()
     combination_func=adaboost_weight
-    for c,a in accuracy.items():
-        print c,combination_func(a)
+    for method,eval in c_evals.items():
+        print method,combination_func(eval.accuracy)
     for l in links:
-        normal = sum(combination_func(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class")
+        normal = sum(combination_func(c_evals[p.classifier].accuracy)\
+                    for p in l.predictions if p.classifier!="idiot_class")
         assert( normal != 0)
         l.combined_prediction = \
-                (sum( p.value * combination_func(accuracy[p.classifier]) for p in l.predictions if p.classifier!="idiot_class")/normal >= 0)
+                (sum( p.value * combination_func(c_evals[p.classifier].accuracy)\
+                    for p in l.predictions if p.classifier!="idiot_class")/normal >= 0)
     s.commit()
     print "Done!"

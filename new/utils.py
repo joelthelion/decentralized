@@ -17,7 +17,7 @@ def get_classifiers():
     import os
     return [module[:-3] for module in os.listdir('classifiers') if re.search('_class\.py$',module)]
 
-feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://news.ycombinator.com/rss","http://linuxfr.org/backend/journaux/rss20.rss","http://www.lepoint.fr/content/system/rss/a_la_une/a_la_une_doc.xml","http://rss.feedsportal.com/c/568/f/7295/index.rss","http://www.marianne2.fr/xml/syndication.rss","http://syndication.lesechos.fr/rss/rss_une.xml","http://blogs.lexpress.fr/attali/index.xml","http://feeds.feedburner.com/consommateur-si-tu-savais","http://www.reddit.com/r/AskReddit/","http://tempsreel.nouvelobs.com/file/rss_perm/rss_permanent.xml","http://top25.sciencedirect.com/rss.php?subject_area_id=17&journal_id=13618415","http://feedproxy.google.com/Phoronix","http://rss.feedsportal.com/c/499/f/413823/index.rss","http://www.slate.fr/rss.xml","http://www.mlyon.fr/rss/actu.php"]
+feeds=["http://digg.com/rss/index.xml","http://reddit.com/r/all/.rss","http://www.lemonde.fr/rss/sequence/0,2-3208,1-0,0.xml","http://linuxfr.org/backend/news-homepage/rss20.rss","http://del.icio.us/rss/","http://www.lefigaro.fr/rss/figaro_actualites.xml","http://news.ycombinator.com/rss","http://linuxfr.org/backend/journaux/rss20.rss","http://www.lepoint.fr/content/system/rss/a_la_une/a_la_une_doc.xml","http://rss.feedsportal.com/c/568/f/7295/index.rss","http://www.marianne2.fr/xml/syndication.rss","http://syndication.lesechos.fr/rss/rss_une.xml","http://blogs.lexpress.fr/attali/index.xml","http://feeds.feedburner.com/consommateur-si-tu-savais","http://www.reddit.com/r/AskReddit/","http://tempsreel.nouvelobs.com/file/rss_perm/rss_permanent.xml","http://top25.sciencedirect.com/rss.php?subject_area_id=17&journal_id=13618415","http://feedproxy.google.com/Phoronix","http://rss.feedsportal.com/c/499/f/413823/index.rss","http://www.slate.fr/rss.xml","http://www.mlyon.fr/rss/actu.php","http://www2.cnrs.fr/rss.php?id=all"]
 
 def tokenize(text,url=False):
     import re
@@ -28,8 +28,8 @@ def tokenize(text,url=False):
 
 def mash_post(link):
     mash=tokenize(link.title)+tokenize(link.url,True)
-    #for source_mash in [tokenize(s.source,True) for s in link.sources]:
-    #    mash+=source_mash
+    for source_mash in [s.source for s in link.sources]:
+        mash.append(source_mash)
     return mash
 
 def most_frequent_words():
@@ -47,7 +47,7 @@ def most_frequent_words():
                 frequent[w]+=1
             else:
                 frequent[w]=1
-    fwords= [(f,w) for w,f in frequent.items() if f>=4 and f<=20 and len(w)>1]
+    fwords= [(f,w) for w,f in frequent.items() if f>=4 and (f<=20 or w[:4]=="http") and len(w)>1]
     fwords.sort(reverse=True)
     maxlength=800
     if len(fwords)>maxlength:
