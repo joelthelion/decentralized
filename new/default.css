@@ -1,11 +1,52 @@
 body {
-background-color: grey;
+background-color: white;
 font-family: sans-serif;
 }
-li.good {
-background-color: green;
+
+p.menu {
+font-size: 14pt;
+border-bottom: 2px solid red;
+margin-bottom: 10pt;
 }
-li.bad {
-background-color: red;
+p.menu a {
+text-decoration: none;
+margin-right: 2pt;
+color: black;
 }
+
+ul.links {
+list-style-type: none;
+padding-left: 10pt;
+}
+ul.links div {
+width: 16px;
+height: 16px;
+display: inline-block;
+}
+ul.links div.hidebut {
+background-image: url(/img/hide.png);
+}
+ul.links div.unhidebut {
+background-image: url(/img/show.png);
+}
+ul.links div.goodbut {
+background-image: url(/img/plus.png);
+}
+ul.links li.good div.goodbut {
+background-image: url(/img/plus_voted.png);
+}
+ul.links div.badbut {
+background-image: url(/img/minus.png);
+}
+ul.links li.bad div.badbut {
+background-image: url(/img/minus_voted.png);
+}
+ul.links a.extlink {
+text-decoration: none;
+color: black;
+}
+ul.links a.extlink:visited {
+color: grey;
+}
+
 

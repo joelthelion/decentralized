@@ -12,10 +12,10 @@ cursor = db.Session()
 
 
 def format_link(link):
-    return '''<li class='%(eval)s'><a href='?action=good&key=%(url)s'>good</a> <a href='?action=bad&key=%(url)s'>bad</a> <a href=%(urlext)s>%(title)s</a> <a href='?action=%(hideact)s&key=%(url)s'>%(hideact)s</a> </li>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden]}
+    return '''<li class='%(eval)s'><a href='?action=good&key=%(url)s'><div class='goodbut'></div></a> <a href='?action=bad&key=%(url)s'><div class='badbut'></div></a> <a href='?action=%(hideact)s&key=%(url)s'><div class='%(hideact)sbut'></div></a> <a class='extlink' target='_blank' href=%(urlext)s>%(title)s</a> </li>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden]}
 
-def map_links_to_lu(links):
-    return '''<lu class='links'>''' + ''.join(format_link(link) for link in links) + '''</lu>'''
+def format_links(links):
+    return '''<ul class='links'>''' + ''.join(format_link(link) for link in links) + '''</ul>'''
 
 def get_csslink(environ):
     parameters = parse_qs(environ.get('QUERY_STRING', ''))
@@ -46,24 +46,25 @@ def handle_rating(environ):
     
 def display_links(environ, start_response,links):
     '''display link helper'''
-    resp = '''<html><head><title>title</title>%(csslink)s</head><body>%(menu)s%(links)s</body></html>''' % {'menu':get_menu(environ),'links':map_links_to_lu(links),'csslink':get_csslink(environ)}
+    resp = '''<html><head><title>title</title>%(csslink)s</head><body>%(menu)s%(links)s</body></html>''' % {'menu':get_menu(environ),'links':format_links(links),'csslink':get_csslink(environ)}
     start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
     resp = resp.encode('utf8')
     return [resp]
 
 def index(environ,start_response):
     handle_rating(environ)
+    print self.__name__
     links = cursor.query(Link).filter(db.and_(Link.evaluation_date == None,Link.combined_prediction == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def liked(environ,start_response):
     handle_rating(environ)
-    links = cursor.query(Link).filter(db.and_(Link.evaluation == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
+    links = cursor.query(Link).filter(db.and_(Link.evaluation == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.asc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def disliked(environ,start_response):
     handle_rating(environ)
-    links = cursor.query(Link).filter(db.and_(Link.evaluation == False,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
+    links = cursor.query(Link).filter(db.and_(Link.evaluation == False,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.asc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def hidden(environ,start_response):
@@ -71,13 +72,25 @@ def hidden(environ,start_response):
     links = cursor.query(Link).filter(Link.hidden == True).order_by(Link.date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
-def css(environ, start_response):
+def serve_css(environ, start_response):
     '''serve css files'''
     try:
         cssfile = open(environ.get('URL_ARGS','')[0],'r')
         resp = cssfile.read()
+        cssfile.close()
         start_response('200 OK', [('Content-Type', 'text/css;charset=UTF-8')])
         resp = resp.encode('utf8')
+        return [resp]
+    except IOError:
+        return not_found(environ,start_response)
+
+def serve_image(environ, start_response):
+    '''serve images files'''
+    try:
+        imgfile = open(environ.get('URL_ARGS','')[0],'rb')
+        resp = imgfile.read()
+        imgfile.close()
+        start_response('200 OK', [('Content-Type', 'image/png')])
         return [resp]
     except IOError:
         return not_found(environ,start_response)
@@ -88,7 +101,7 @@ def not_found(environ, start_response):
     return ['Not Found']
 
 def dispatcher(environ,start_response):
-    urls = [ (re.compile(r'^$'),index), (re.compile(r'^liked/$'),liked), (re.compile(r'^disliked/$'),disliked), (re.compile(r'^hidden/$'),hidden), (re.compile(r'^css/(\w+\.css)$'),css) ]
+    urls = [ (re.compile(r'^$'),index), (re.compile(r'^liked/$'),liked), (re.compile(r'^disliked/$'),disliked), (re.compile(r'^hidden/$'),hidden), (re.compile(r'^img/(\w+\.png)$'),serve_image), (re.compile(r'^css/(\w+\.css)$'),serve_css) ]
     path = environ.get('PATH_INFO', '').lstrip('/')
     for regex,callback in urls:
         match = regex.search(path)
