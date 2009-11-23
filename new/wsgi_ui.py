@@ -78,7 +78,7 @@ def handle_rating(environ):
     
 def display_links(environ, start_response,links):
     '''display link helper'''
-    resp = '''<html><head><title>title</title>%(csslink)s</head><body>%(menu)s%(links)s</body></html>''' % {'menu':get_menu(environ),'links':format_links(links),'csslink':get_csslink(environ)}
+    resp = '''<html><head><title>Hermie the brave news helper</title>%(csslink)s</head><body>%(menu)s%(links)s</body></html>''' % {'menu':get_menu(environ),'links':format_links(links),'csslink':get_csslink(environ)}
     start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
     resp = resp.encode('utf8')
     return [resp]
