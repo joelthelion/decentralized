@@ -3,7 +3,7 @@ import utils
 from sqlalchemy import or_
 
 def naive_weight(accuracy):
-    return accuracy-0.5
+    return accuracy
 
 def adaboost_weight(accuracy):
     from math import log
@@ -39,14 +39,14 @@ if __name__ == '__main__':
     print "Combining the classifications..."
     import evaluate_classifiers
     c_evals=evaluate_classifiers.test_classifiers()
-    combination_func=adaboost_weight
+    combination_func=naive_weight
     for method,eval in c_evals.items():
-        print method,combination_func(eval.accuracy)
+        print method,combination_func(eval.weighted_acc)
     del c_evals["idiot_class"]
     for l in links:
-        normal = sum(combination_func(c_evals[p.classifier].accuracy) for p in l.predictions if p.classifier in c_evals)
+        normal = sum(combination_func(c_evals[p.classifier].weighted_acc) for p in l.predictions if p.classifier in c_evals)
         if normal != 0:
-            l.combined_prediction = ( sum(p.value * combination_func(c_evals[p.classifier].accuracy) for p in l.predictions if p.classifier in c_evals)/normal >= 0 )
+            l.combined_prediction = ( sum(p.value * combination_func(c_evals[p.classifier].weighted_acc) for p in l.predictions if p.classifier in c_evals)/normal >= 0 )
         else:
             l.combined_prediction = True
     s.commit()
