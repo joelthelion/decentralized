@@ -1,9 +1,5 @@
 body {
-<<<<<<< HEAD
 background-color: white;
-=======
-background-color: silver;
->>>>>>> remotes/joel/master
 font-family: sans-serif;
 }
 
@@ -18,38 +14,68 @@ margin-right: 2pt;
 color: black;
 }
 
-ul.links {
-list-style-type: none;
-padding-left: 10pt;
+div.links div.even {
+background-color: #f7f7f7;
+padding-bottom: 5px;
+padding-top: 5px;
 }
-ul.links div {
+div.links div.odd {
+background-color: #fefefe;
+padding-bottom: 5px;
+padding-top: 5px;
+}
+div.links div div.buttons {
+float: left;
+display: block;
+width: 20px;
+}
+div.links div div.buttons div {
 width: 16px;
 height: 16px;
-display: inline-block;
+display: block;
 }
-ul.links div.hidebut {
+div.links div div.buttons div.hidebut {
 background-image: url(/img/hide.png);
 }
-ul.links div.unhidebut {
+div.links div div.buttons div.unhidebut {
 background-image: url(/img/show.png);
 }
-ul.links div.goodbut {
+div.links div div.buttons div.goodbut {
 background-image: url(/img/plus.png);
 }
-ul.links li.good div.goodbut {
+div.links div.good div.buttons div.goodbut {
 background-image: url(/img/plus_voted.png);
 }
-ul.links div.badbut {
+div.links div div.buttons div.badbut {
 background-image: url(/img/minus.png);
 }
-ul.links li.bad div.badbut {
+div.links div.bad div.buttons div.badbut {
 background-image: url(/img/minus_voted.png);
 }
-ul.links a.extlink {
+
+div.links div div.contents {
+vertical-align: top;
+overflow: hidden;
+}
+div.links div div.contents p {
+margin: 0px;
+}
+
+div.links div div.clear {
+height: 0px;
+clear: left;
+}
+
+div.contents h1 {
+font-size: 12pt;
+margin: 0px;
+}
+
+a.extlink {
 text-decoration: none;
 color: black;
 }
-ul.links a.extlink:visited {
+a.extlink:visited {
 color: grey;
 }
 

@@ -10,12 +10,33 @@ import re
 import database as db
 cursor = db.Session()
 
+source_formats = [
+(re.compile(r'''^http://www.reddit.com/r/(\w+)/'''),lambda x: x.groups()[0] + "@reddit.com"),
+(re.compile(r'''^http://(\w+\.|)(\w+\.\w+)/'''),lambda x: x.groups()[1])]
+def format_source(source):
+    for source_re,source_format in source_formats:
+        match = source_re.search(source.source)
+        if match is not None:
+            return source_format(match)
+    return source.source
 
-def format_link(link):
-    return '''<li class='%(eval)s'><a href='?action=good&key=%(url)s'><div class='goodbut'></div></a> <a href='?action=bad&key=%(url)s'><div class='badbut'></div></a> <a href='?action=%(hideact)s&key=%(url)s'><div class='%(hideact)sbut'></div></a> <a class='extlink' target='_blank' href=%(urlext)s>%(title)s</a> </li>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden]}
+def format_sources(sources):
+    return "<em>" + ", ".join(escape(format_source(source)) for source in sources) + "</em>"
+
+def format_link(k,link):
+    return '''<div class='%(eval)s %(evenodd)s'>
+    <div class='buttons'>
+        <a href='?action=good&key=%(url)s'><div class='goodbut'></div></a>
+        <a href='?action=bad&key=%(url)s'><div class='badbut'></div></a>
+        <a href='?action=%(hideact)s&key=%(url)s'><div class='%(hideact)sbut'></div></a></div>
+    <div class='contents'>
+        <h1><a class='extlink' target='_blank' href=%(urlext)s>%(title)s</a></h1>
+        <p>from %(sources)s</p></div>
+    <div class='clear'></div>
+        </div>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden],'evenodd':['even','odd'][k%2],'sources':format_sources(link.sources)}
 
 def format_links(links):
-    return '''<ul class='links'>''' + ''.join(format_link(link) for link in links) + '''</ul>'''
+    return '''<div class='links'>''' + ''.join(format_link(k,link) for k,link in enumerate(links)) + '''</div>'''
 
 def get_csslink(environ):
     parameters = parse_qs(environ.get('QUERY_STRING', ''))
@@ -53,7 +74,6 @@ def display_links(environ, start_response,links):
 
 def index(environ,start_response):
     handle_rating(environ)
-    print self.__name__
     links = cursor.query(Link).filter(db.and_(Link.evaluation_date == None,Link.combined_prediction == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
