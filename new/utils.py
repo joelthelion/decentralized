@@ -26,6 +26,13 @@ def tokenize(text,url=False):
     text=re.sub(u"""[_/1234567890=@\-#…«»”“’‘.!"'()*,:;<>?\[\]`{|}~&]"""," ",text).lower()
     return text.split()
 
+def word_frequencies(links):
+    freqz={}
+    for l in links:
+        for w in tokenize(l.title):
+            freqz[w]=freqz.get(w,0)+1
+    return freqz
+
 def mash_post(link):
     mash=tokenize(link.title)+tokenize(link.url,True)
     for source_mash in [s.source for s in link.sources]:
