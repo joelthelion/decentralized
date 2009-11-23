@@ -21,6 +21,7 @@ color: black;
 ul.links {
 list-style-type: none;
 padding-left: 10pt;
+font-weight: bold;
 }
 ul.links div {
 width: 16px;
@@ -45,12 +46,23 @@ background-image: url(/img/minus.png);
 ul.links li.bad div.badbut {
 background-image: url(/img/minus_voted.png);
 }
+ul.links a.extlink:good {
+text-decoration: none;
+color: green;
+}
 ul.links a.extlink {
 text-decoration: none;
 color: black;
 }
+ul.links li.bad a.extlink {
+color: silver;
+font-weight: normal;
+}
 ul.links a.extlink:visited {
 color: grey;
+font-weight: normal;
 }
-
-
+ul.links li.good a.extlink {
+color: #88AA88;
+font-weight: normal;
+}
