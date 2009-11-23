@@ -11,8 +11,8 @@ import database as db
 cursor = db.Session()
 
 source_formats = [
-(re.compile(r'''^http://www.reddit.com/r/(\w+)/'''),lambda x: x.groups()[0] + "@reddit.com"),
-(re.compile(r'''^http://(\w+\.|)(\w+\.\w+)/'''),lambda x: x.groups()[1])]
+(re.compile(r'''^http://www.reddit.com/r/(\w+)/'''),lambda x: x.groups()[0] + "@reddit.com"), #reddit links display subreddit
+(re.compile(r'''^http://(\w+\.|)(\w+\.\w+)/'''),lambda x: x.groups()[1])] #rss links with server name display server name
 def format_source(source):
     for source_re,source_format in source_formats:
         match = source_re.search(source.source)
@@ -23,7 +23,18 @@ def format_source(source):
 def format_sources(sources):
     return "<em>" + ", ".join(escape(format_source(source)) for source in sources) + "</em>"
 
+def format_date(delta):
+    if delta.days > 0:
+        return "%d days ago" % delta.days
+    elif delta.seconds > 3600:
+        return "%d hours ago" % (delta.seconds/3600)
+    elif delta.seconds > 60:
+        return "%d minutes ago" % (delta.seconds/60)
+    else:
+        return "%d seconds ago" % (delta.seconds)
+
 def format_link(k,link):
+    now = datetime.now()
     return '''<div class='%(eval)s %(evenodd)s'>
     <div class='buttons'>
         <a href='?action=good&key=%(url)s'><div class='goodbut'></div></a>
@@ -31,9 +42,9 @@ def format_link(k,link):
         <a href='?action=%(hideact)s&key=%(url)s'><div class='%(hideact)sbut'></div></a></div>
     <div class='contents'>
         <h1><a class='extlink' target='_blank' href=%(urlext)s>%(title)s</a></h1>
-        <p>from %(sources)s</p></div>
+        <p>from %(sources)s %(datefromnow)s</p></div>
     <div class='clear'></div>
-        </div>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden],'evenodd':['even','odd'][k%2],'sources':format_sources(link.sources)}
+        </div>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden],'evenodd':['even','odd'][k%2],'sources':format_sources(link.sources),'datefromnow':format_date(now-link.date)}
 
 def format_links(links):
     return '''<div class='links'>''' + ''.join(format_link(k,link) for k,link in enumerate(links)) + '''</div>'''

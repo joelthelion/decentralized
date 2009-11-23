@@ -50,7 +50,7 @@ class Prediction(db.Base):
     def __init__(self,url,cl,v):
         self.link_url,self.classifier,self.value = url, cl, v
     def __repr__(self):
-        if value:
+        if self.value:
             return "%s thinks ( %s ) is good" % (self.classifier,self.link_url)
         else:
             return "%s thinks ( %s ) is bad" % (self.classifier,self.link_url)

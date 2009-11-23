@@ -42,12 +42,12 @@ if __name__ == '__main__':
     combination_func=adaboost_weight
     for method,eval in c_evals.items():
         print method,combination_func(eval.accuracy)
+    del c_evals["idiot_class"]
     for l in links:
-        normal = sum(combination_func(c_evals[p.classifier].accuracy)\
-                    for p in l.predictions if p.classifier!="idiot_class")
-        assert( normal != 0)
-        l.combined_prediction = \
-                (sum( p.value * combination_func(c_evals[p.classifier].accuracy)\
-                    for p in l.predictions if p.classifier!="idiot_class")/normal >= 0)
+        normal = sum(combination_func(c_evals[p.classifier].accuracy) for p in l.predictions if p.classifier in c_evals)
+        if normal != 0:
+            l.combined_prediction = ( sum(p.value * combination_func(c_evals[p.classifier].accuracy) for p in l.predictions if p.classifier in c_evals)/normal >= 0 )
+        else:
+            l.combined_prediction = True
     s.commit()
     print "Done!"
