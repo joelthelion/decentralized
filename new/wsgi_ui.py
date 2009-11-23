@@ -85,7 +85,7 @@ def display_links(environ, start_response,links):
 
 def index(environ,start_response):
     handle_rating(environ)
-    links = cursor.query(Link).filter(db.and_(Link.evaluation_date == None,Link.combined_prediction == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
+    links = cursor.query(Link).filter(db.and_(Link.combined_prediction == True,db.or_(Link.hidden == None,Link.hidden == False))).order_by(Link.date.desc()).limit(50).all()
     return display_links(environ,start_response,links)
 
 def liked(environ,start_response):

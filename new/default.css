@@ -77,6 +77,9 @@ color: black;
 }
 a.extlink:visited {
 color: grey;
+font-weight: normal;
 }
-
-
+ul.links li.good a.extlink {
+color: #88AA88;
+font-weight: normal;
+}
