@@ -37,12 +37,12 @@ def format_link(k,link):
     now = datetime.now()
     return '''<div class='%(eval)s %(evenodd)s'>
     <div class='buttons'>
-        <a href='?action=good&key=%(url)s'><div class='goodbut'></div></a>
-        <a href='?action=bad&key=%(url)s'><div class='badbut'></div></a>
-        <a href='?action=%(hideact)s&key=%(url)s'><div class='%(hideact)sbut'></div></a></div>
+        <a href='?action=good&key=%(url)s'><div class='goodbut'>G</div></a>
+        <a href='?action=bad&key=%(url)s'><div class='badbut'>B</div></a>
+        <a href='?action=%(hideact)s&key=%(url)s'><div class='%(hideact)sbut'>H</div></a></div>
     <div class='contents'>
         <h1><a class='extlink' target='_blank' href=%(urlext)s>%(title)s</a></h1>
-        <p>from %(sources)s %(datefromnow)s</p></div>
+        <h2>from %(sources)s %(datefromnow)s</h2></div>
     <div class='clear'></div>
         </div>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden],'evenodd':['even','odd'][k%2],'sources':format_sources(link.sources),'datefromnow':format_date(now-link.date)}
 

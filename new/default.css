@@ -16,41 +16,31 @@ color: black;
 
 div.links div.even {
 background-color: #f7f7f7;
-padding-bottom: 5px;
-padding-top: 5px;
+padding-bottom: 2px;
+padding-top: 2px;
 }
 div.links div.odd {
 background-color: #fefefe;
-padding-bottom: 5px;
-padding-top: 5px;
+padding-bottom: 2px;
+padding-top: 2px;
 }
 div.links div div.buttons {
 float: left;
 display: block;
+font-size: 8pt;
 width: 20px;
 }
-div.links div div.buttons div {
-width: 16px;
-height: 16px;
+div.links div div.buttons a {
+color: grey;
 display: block;
+text-decoration: none;
+font-weight: bold;
 }
-div.links div div.buttons div.hidebut {
-background-image: url(/img/hide.png);
+div.links div.bad div.buttons a{
+color: #FFBBBB;
 }
-div.links div div.buttons div.unhidebut {
-background-image: url(/img/show.png);
-}
-div.links div div.buttons div.goodbut {
-background-image: url(/img/plus.png);
-}
-div.links div.good div.buttons div.goodbut {
-background-image: url(/img/plus_voted.png);
-}
-div.links div div.buttons div.badbut {
-background-image: url(/img/minus.png);
-}
-div.links div.bad div.buttons div.badbut {
-background-image: url(/img/minus_voted.png);
+div.links div.good div.buttons a{
+color: #AAFFAA;
 }
 
 div.links div div.contents {
@@ -67,8 +57,13 @@ clear: left;
 }
 
 div.contents h1 {
-font-size: 12pt;
+font-size: 10pt;
 margin: 0px;
+}
+div.contents h2 {
+font-size: 8pt;
+margin: 0px;
+font-weight: normal;
 }
 
 a.extlink {
@@ -79,7 +74,7 @@ a.extlink:visited {
 color: grey;
 font-weight: normal;
 }
-ul.links li.good a.extlink {
+ul.links li.good div a.extlink {
 color: #88AA88;
 font-weight: normal;
 }
