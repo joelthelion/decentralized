@@ -13,7 +13,7 @@ def predict(link):
     if not words:
         return 0.
     novelty=sum(1. for w in words if isnovel(w,link.date))/len(words)
-    return filter.predict(["novelty_%d"%int(novelty*hist_bins)])
+    return filter.predict(["novelty_%d"%int(novelty*hist_bins)]) > 0.
 
 def train(links):
     chronology={}
