@@ -3,7 +3,7 @@
 import re
 from database import and_,or_
 from datamodel import Link
-from wsgi_helper import handle_rating,return_links,cursor
+from wsgi_helper import handle_rating,return_links,cursor,prefs
 
 @handle_rating
 @return_links

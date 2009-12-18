@@ -7,12 +7,24 @@ p.menu {
 font-size: 14pt;
 border-bottom: 2px solid red;
 margin-bottom: 10pt;
+margin-top: 1pt;
 }
 p.menu a {
 text-decoration: none;
 margin-right: 2pt;
 color: black;
 }
+
+p.menuright {
+float: right;
+font-size: 10pt;
+}
+p.menuright a {
+text-decoration: none;
+margin-left: 2pt;
+color: grey;
+}
+
 
 div.links div.even {
 background-color: #f7f7f7;

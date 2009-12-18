@@ -7,6 +7,7 @@ from datetime import datetime
 from xml.sax.saxutils import escape,quoteattr
 from urllib import quote_plus
 from database import Session
+from wsgi_prefs import prefs
 cursor = Session()
 
 def parse_rating(environ,indent="++ "):
@@ -77,12 +78,11 @@ def format_links(links):
 
 def get_csslink(environ):
     parameters = parse_qs(environ.get('QUERY_STRING', ''))
-    cssfilename = 'default.css'
-    if 'css' in parameters: cssfilename = escape(parameters['css'][0])
-    return '''<link rel='stylesheet' type='text/css' href='/css/%s' />''' % cssfilename
+    if 'css' in parameters: prefs.set("cssfilename",parameters['css'][0])
+    return '''<link rel='stylesheet' type='text/css' href='/css/%s' />''' % escape(prefs.get("cssfilename"))
 
 def get_menu(environ):
-    return '''<p class='menu'><a href='/'>home</a> <a href='/liked/'>liked</a> <a href='/disliked/'>disliked</a> <a href='/hidden/'>hidden</a></p>'''
+    return '''<p class='menuright'><a href='?css=pierre.css'>pierre.css</a> <a href='?css=joel.css'>joel.css</a></p><p class='menu'><a href='/'>home</a> <a href='/liked/'>liked</a> <a href='/disliked/'>disliked</a> <a href='/hidden/'>hidden</a></p>'''
 
 def display_links(environ, start_response,links):
     '''display link helper'''
