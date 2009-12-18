@@ -26,19 +26,28 @@ def disliked():
 def hidden():
     return cursor.query(Link).filter(Link.hidden == True).order_by(Link.date.desc()).limit(50).all()
 
-def serve_file(ctype,fail):
-    def server(environ, start_response):
-        '''serve css files'''
-        try:
-            cssfile = open(environ.get('URL_ARGS','')[0],'r')
-            resp = cssfile.read()
-            cssfile.close()
-            start_response('200 OK', [('Content-Type', ctype)])
-            resp = resp.encode('utf8')
-            return [resp]
-        except IOError:
-            return fail(environ,start_response)
-    return server
+def serve_css(environ, start_response):
+    '''serve css files'''
+    try:
+        cssfile = open(environ.get('URL_ARGS','')[0],'r')
+        resp = cssfile.read()
+        cssfile.close()
+        start_response('200 OK', [('Content-Type', 'text/css;charset=UTF-8')])
+        resp = resp.encode('utf8')
+        return [resp]
+    except IOError:
+        return not_found(environ,start_response)
+
+def serve_image(environ, start_response):
+    '''serve images files'''
+    try:
+        imgfile = open(environ.get('URL_ARGS','')[0],'rb')
+        resp = imgfile.read()
+        imgfile.close()
+        start_response('200 OK', [('Content-Type', 'image/png')])
+        return [resp]
+    except IOError:
+        return not_found(environ,start_response)
 
 def not_found(environ, start_response):
     '''404 error handler'''
@@ -50,8 +59,8 @@ urls = [
 (re.compile(r'^liked/$'),liked),
 (re.compile(r'^disliked/$'),disliked),
 (re.compile(r'^hidden/$'),hidden),
-(re.compile(r'^img/(\w+\.png)$'),serve_file('image/png',not_found)),
-(re.compile(r'^css/(\w+\.css)$'),serve_file('text/css;charset=UTF-8',not_found))
+(re.compile(r'^img/(\w+\.png)$'),serve_image),
+(re.compile(r'^css/(\w+\.css)$'),serve_css)
 ]
 def dispatcher(environ,start_response):
     path = environ.get('PATH_INFO', '').lstrip('/')
