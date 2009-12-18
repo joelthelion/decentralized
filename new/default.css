@@ -48,7 +48,9 @@ vertical-align: top;
 overflow: hidden;
 }
 div.links div div.contents p {
+font-size: 8pt;
 margin: 0px;
+font-weight: normal;
 }
 
 div.links div div.clear {
@@ -59,11 +61,6 @@ clear: left;
 div.contents h1 {
 font-size: 10pt;
 margin: 0px;
-}
-div.contents h2 {
-font-size: 8pt;
-margin: 0px;
-font-weight: normal;
 }
 
 a.extlink {

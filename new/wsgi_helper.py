@@ -68,7 +68,7 @@ def format_link(k,link):
         <a href='?action=%(hideact)s&key=%(url)s'><div class='%(hideact)sbut'>H</div></a></div>
     <div class='contents'>
         <h1><a class='extlink' target='_blank' href=%(urlext)s>%(title)s</a></h1>
-        <h2>from %(sources)s %(datefromnow)s</h2></div>
+        <p>from %(sources)s %(datefromnow)s</p></div>
     <div class='clear'></div>
         </div>''' % {'urlext':quoteattr(link.url),'url':quote_plus(link.url),'title':escape(link.title),'eval':{True:'good',False:'bad',None:'uneval'}[link.evaluation],'hideact':{True:'unhide',False:'hide',None:'hide'}[link.hidden],'evenodd':['even','odd'][k%2],'sources':format_sources(link.sources),'datefromnow':format_date(now-link.date)}
 
