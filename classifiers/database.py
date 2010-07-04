@@ -12,6 +12,7 @@ Base=declarative_base()
 #Specify which database we're going to use
 from sqlalchemy import create_engine,or_,and_,not_
 from os.path import expanduser
-engine=create_engine("sqlite:////" + expanduser('~')+"/.decentralized.db")
+engine=create_engine("sqlite:///" +"test.db")
+#engine=create_engine("sqlite:////" + expanduser('~')+"/.decentralized.db")
 Session.configure(bind=engine)
 
