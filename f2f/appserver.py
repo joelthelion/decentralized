@@ -102,7 +102,7 @@ def submit(environ,start_response):
    response_body = submit_html % (title,url or 'http://')
    status = '200 OK'
 
-   response_headers = [('Content-Type', 'text/html'),
+   response_headers = [('Content-Type', 'text/html;charset=utf-8'),
                   ('Content-Length', str(len(response_body)))]
    start_response(status, response_headers)
 
