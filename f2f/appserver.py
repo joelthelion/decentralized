@@ -3,72 +3,11 @@
 from wsgiref.simple_server import make_server
 from cgi import parse_qs, escape
 
-html = """
-<html>
-<body>
-   <form method="post" action="parsing_get.wsgi">
-      <p>
-         Age: <input type="text" name="age">
-         </p>
-      <p>
-         Hobbies:
-         <input name="hobbies" type="checkbox" value="software"> Software
-         <input name="hobbies" type="checkbox" value="tunning"> Auto Tunning
-         </p>
-      <p>
-         <input type="submit" value="Submit">
-         </p>
-      </form>
-   <p>
-      Age: %s<br>
-      Hobbies: %s
-      </p>
-   </body>
-</html>"""
-
 def not_found(environ, start_response):
 
    response_body="Error 404: Not found"
    status = '404 Not Found'
    start_response(status, [])
-   return [response_body]
-
-def test_post_page(environ, start_response):
-
-   # the environment variable CONTENT_LENGTH may be empty or missing
-   try:
-      request_body_size = int(environ.get('CONTENT_LENGTH', 0))
-   except (ValueError):
-      request_body_size = 0
-
-   # When the method is POST the query string will be sent
-   # in the HTTP request body which is passed by the WSGI server
-   # in the file like wsgi.input environment variable.
-   request_body = environ['wsgi.input'].read(request_body_size)
-
-   response_body=""
-   # Sorting and stringifying the environment key, value pairs
-   #response_body = ['%s: %s' % (key, value)
-   #                 for key, value in sorted(environ.items())]
-   #response_body = '<br>'.join(response_body) + '<br>'
-
-   d = parse_qs(request_body)
-   age = d.get('age', [''])[0] # Returns the first age value.
-   hobbies = d.get('hobbies', []) # Returns a list of hobbies.
-
-   # Always escape user input to avoid script injection
-   age = escape(age)
-   hobbies = [escape(hobby) for hobby in hobbies]
-
-   response_body = response_body + html % (age or 'Empty',
-               ', '.join(hobbies or ['No Hobbies']))
-
-   status = '200 OK'
-
-   response_headers = [('Content-Type', 'text/html'),
-                  ('Content-Length', str(len(response_body)))]
-   start_response(status, response_headers)
-
    return [response_body]
 
 submit_html= """
@@ -94,8 +33,6 @@ submit_html= """
 def submit(environ,start_response):
    # Get method: Returns a dictionary containing lists as values.
    d = parse_qs(environ['QUERY_STRING'])
-
-
    url = escape(d.get('url', [''])[0])
    title = escape(d.get('title', [''])[0])
 
@@ -108,15 +45,35 @@ def submit(environ,start_response):
 
    return [response_body]
 
+post_link_html= """
+<html>
+<meta HTTP-EQUIV="Refresh" content="1;URL=%s"> 
+<title>Submission posted!</title>
+<body>
+Your submission has been succesfully posted!
+</body>
+</html>"""
+
+def post_link(environ,start_response):
+   try:
+      request_body_size = int(environ.get('CONTENT_LENGTH', 0))
+   except (ValueError):
+      request_body_size = 0
+   request_body = environ['wsgi.input'].read(request_body_size)
+   d = parse_qs(request_body)
+   url = escape(d.get('url', ['http://www.google.com'])[0]) # Returns the first age value.
+   response_body=post_link_html % url
+   response_headers = [('Content-Type', 'text/html;charset=utf-8'),
+                  ('Content-Length', str(len(response_body)))]
+   start_response('200 OK', response_headers)
+   return [response_body]
+
 import re
 
 urls = [
 (re.compile(r'^$'),test_post_page),
 (re.compile(r'^submit$'),submit),
-#(re.compile(r'^disliked/$'),disliked),
-#(re.compile(r'^hidden/$'),hidden),
-#(re.compile(r'^img/(\w+\.png)$'),serve_image),
-#(re.compile(r'^css/(\w+\.css)$'),serve_css)
+(re.compile(r'^post_link$'),post_link),
 ]
 
 def dispatcher(environ,start_response):
