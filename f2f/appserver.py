@@ -71,9 +71,8 @@ def post_link(environ,start_response):
 import re
 
 urls = [
-(re.compile(r'^$'),test_post_page),
 (re.compile(r'^submit$'),submit),
-(re.compile(r'^post_link$'),post_link),
+(re.compile(r'^post_link$'),post_link)
 ]
 
 def dispatcher(environ,start_response):
