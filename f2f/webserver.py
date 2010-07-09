@@ -128,7 +128,7 @@ def dispatcher(environ,start_response):
             return callback(environ, start_response)
     return not_found(environ, start_response)
 
-if __name__ == '__main__':
+def start_server():
     from wsgiref.simple_server import make_server
     hostname = 'localhost'
     port     = 8085
@@ -136,3 +136,5 @@ if __name__ == '__main__':
     print 'server started on http://%s:%d/' % (hostname,port)
     srv.serve_forever()
 
+if __name__ == '__main__':
+    start_server()
