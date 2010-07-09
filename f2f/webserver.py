@@ -61,7 +61,16 @@ def post_link(environ,start_response):
       request_body_size = 0
    request_body = environ['wsgi.input'].read(request_body_size)
    d = parse_qs(request_body)
-   url = escape(d.get('url', ['http://www.google.com'])[0]) # Returns the first age value.
+   url = escape(d.get('url', ['http://www.google.com'])[0])
+   title = escape(d.get('title', ['No title.'])[0])
+
+   from daemon import post_queue
+   from post import Post
+   mypost=Post()
+   mypost.url=url
+   mypost.title=title
+   post_queue.put(mypost)
+
    response_body=post_link_html % url
    response_headers = [('Content-Type', 'text/html;charset=utf-8'),
                   ('Content-Length', str(len(response_body)))]
