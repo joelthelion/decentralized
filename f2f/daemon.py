@@ -3,6 +3,11 @@ from Queue import Queue
 from sys import stderr
 
 post_queue=Queue()
+my_posts=[]
+
+def add_post():
+    new_post=post_queue.get()
+    my_posts.append(new_post)
 
 def start_daemon():
     import time
@@ -10,5 +15,5 @@ def start_daemon():
         if not post_queue.empty():
             print >>stderr, post_queue.get()
         else:
-            print >>stderr, "empty!"
+            pass#print >>stderr, "empty!"
         time.sleep(1)
