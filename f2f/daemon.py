@@ -13,7 +13,8 @@ def start_daemon():
     import time
     while True:
         if not post_queue.empty():
-            print >>stderr, post_queue.get()
+	    add_post()
+            #print >>stderr, post_queue.get()
         else:
             pass#print >>stderr, "empty!"
         time.sleep(1)
