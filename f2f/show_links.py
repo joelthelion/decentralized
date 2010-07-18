@@ -1,4 +1,4 @@
-from daemon import my_posts
+from daemon import storage
 
 show_links_html= """
 <html>
@@ -15,7 +15,7 @@ def show_link(url,title):
 def show_links(environ,start_response):
  
     html="""<div class=html>"""
-    for p in my_posts:
+    for p in storage.my_posts:
     	html+=show_link(p.url,p.title)
     html+="</div>"
     response_body=show_links_html % html
