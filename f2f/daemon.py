@@ -1,11 +1,12 @@
 # the main daemon, handling the data store and rating posts
 from Queue import Queue
 from sys import stderr
-from persistence import PersistentObject
+from persistence import PersistentObject,basedir
 
 post_queue=Queue()
 
 class StorageObject(PersistentObject):
+     storage_file=basedir+"daemon.pck"
      def __init__(self):
         PersistentObject.__init__(self)
         if not self.could_restore:
