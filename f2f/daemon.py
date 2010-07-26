@@ -18,6 +18,7 @@ def add_post():
     print >>stderr, "New post taken into account."
     new_post=post_queue.get()
     storage.my_posts.append(new_post)
+    storage.store() #we don't want to lose posts
 
 def start_daemon():
     import time
