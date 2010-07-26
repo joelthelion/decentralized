@@ -9,8 +9,10 @@ class StorageObject(PersistentObject):
      storage_file=basedir+"daemon.pck"
      def __init__(self):
         PersistentObject.__init__(self)
-        if not self.could_restore:
+        if not self.__dict__.has_key("my_posts"):
             self.my_posts=[]
+        if not self.__dict__.has_key("config"):
+            self.config={}
 
 storage=StorageObject()
 
