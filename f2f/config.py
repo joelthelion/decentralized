@@ -10,13 +10,13 @@ config_html= """
     <h3>Configuration</h3>
    <form method="post" action="post_config">
       <p>
-         Jabber id: <input type="text" id="jabber_id" value="%s">
+         Jabber id: <input type="text" name="jid" value="%s">
          </p>
       <p>
          Password:
-            <input type="password" id="jabber_password" value="%s">
+            <input type="password" name="password" value="%s">
          </p>
-         <input type="hidden" id="old_url" value="%s">
+         <input type="hidden" name="oldurl" value="%s">
       <p>
          <input type="submit" value="Save configuration">
          </p>
@@ -37,7 +37,7 @@ def config_page(environ,start_response):
 
 post_config_html= """
 <html>
-<!-- <meta HTTP-EQUIV="Refresh" content="1;URL=%s">  -->
+<meta HTTP-EQUIV="Refresh" content="1;URL=%s">
 <title>Configuration updated!</title>
 <body>
 Your configuration has been succesfully updated!
@@ -53,9 +53,9 @@ def post_config(environ,start_response):
    request_body = environ['wsgi.input'].read(request_body_size)
    d = parse_qs(request_body)
    print d,request_body_size
-   previous_url = escape(d.get('previous_url', ['http://www.google.com'])[0])
-   jabber_id = escape(d.get('jabber_id', ['example@example.com'])[0])
-   jabber_password = escape(d.get('jabber_password', ['xxx'])[0])
+   previous_url = escape(d.get('oldurl', ['http://www.google.com'])[0])
+   jabber_id = escape(d.get('jid', ['example@example.com'])[0])
+   jabber_password = escape(d.get('password', ['xxx'])[0])
 
    storage.config["jabber_id"]=jabber_id
    storage.config["jabber_password"]=jabber_password
