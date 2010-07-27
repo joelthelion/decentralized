@@ -10,13 +10,13 @@ def not_found(environ, start_response):
    return [response_body]
 
 import re
-import submit
-import show_links
+import submit, show_links, config
 
 urls = [
 (re.compile(r'^submit$'),submit.submit),
 (re.compile(r'^post_link$'),submit.post_link),
 (re.compile(r'^show_links$'),show_links.show_links),
+(re.compile(r'^config$'),config.config_page),
 ]
 
 def dispatcher(environ,start_response):

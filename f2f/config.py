@@ -1,48 +1,46 @@
 from cgi import parse_qs, escape
+from daemon import storage
 
 #TODO: replace stuff to make a configuration page
 
-submit_html= """
+config_html= """
 <html>
-<title>Submit a link</title>
+<title>Configuration</title>
 <body>
-    <h3>Submit a link</h3>
+    <h3>Configuration</h3>
    <form method="post" action="post_link">
       <p>
          Jabber id: <input type="text" name="jid" value="%s">
          </p>
       <p>
-         URL:
-            <input type="text" name="url" value="%s">
+         Password:
+            <input type="password" name="password" value="%s">
          </p>
+         <input type="hidden" name="old_url" value="%s">
       <p>
-         <input type="submit" value="Submit">
+         <input type="submit" value="Save configuration">
          </p>
       </form>
    </body>
 </html>"""
 
-def submit(environ,start_response):
-   # Get method: Returns a dictionary containing lists as values.
-   d = parse_qs(environ['QUERY_STRING'])
-   url = escape(d.get('url', [''])[0])
-   title = escape(d.get('title', [''])[0])
-
-   response_body = submit_html % (title,url or 'http://')
+def config_page(environ,start_response):
+   previous_url = environ.get('HTTP_REFERER','http://www.google.com')
+   response_body = config_html % (storage.config.get("jabber_id","example@example.com"),\
+                                  storage.config.get("jabber_password","xxx"),\
+                                  previous_url)
    status = '200 OK'
-
    response_headers = [('Content-Type', 'text/html;charset=utf-8'),
                   ('Content-Length', str(len(response_body)))]
    start_response(status, response_headers)
-
    return [response_body]
 
-post_link_html= """
+post_config_html= """
 <html>
 <meta HTTP-EQUIV="Refresh" content="1;URL=%s"> 
-<title>Submission posted!</title>
+<title>Configuration updated!</title>
 <body>
-Your submission has been succesfully posted!
+Your configuration has been succesfully updated!
 </body>
 </html>"""
 
@@ -53,17 +51,15 @@ def post_link(environ,start_response):
       request_body_size = 0
    request_body = environ['wsgi.input'].read(request_body_size)
    d = parse_qs(request_body)
-   url = escape(d.get('url', ['http://www.google.com'])[0])
-   title = escape(d.get('title', ['No title.'])[0])
+   previous_url = escape(d.get('previous_url', ['http://www.google.com'])[0])
+   jabber_id = escape(d.get('jabber_id', ['example@example.com'])[0])
+   jabber_password = escape(d.get('password', ['xxx'])[0])
 
-   from daemon import post_queue
-   from post import Post
-   mypost=Post()
-   mypost.url=url
-   mypost.title=title
-   post_queue.put(mypost)
+   storage["jabber_id"]=jabber_id
+   storage["jabber_password"]=jabber_password
+   storage.store()
 
-   response_body=post_link_html % url
+   response_body=post_config_html % previous_url
    response_headers = [('Content-Type', 'text/html;charset=utf-8'),
                   ('Content-Length', str(len(response_body)))]
    start_response('200 OK', response_headers)
