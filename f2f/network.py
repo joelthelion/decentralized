@@ -5,7 +5,7 @@ from daemon import storage
 
 def start_network():
     print >>stderr, "Network started!"
-    jid=storage.config.get("jabber_id","test@example.com")
     while True:
+        jid=storage.config.get("jabber_id","test@example.com")
         print jid
-        time.sleep(1)
+        time.sleep(4)

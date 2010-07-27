@@ -17,6 +17,7 @@ urls = [
 (re.compile(r'^post_link$'),submit.post_link),
 (re.compile(r'^show_links$'),show_links.show_links),
 (re.compile(r'^config$'),config.config_page),
+(re.compile(r'^post_config$'),config.post_config),
 ]
 
 def dispatcher(environ,start_response):

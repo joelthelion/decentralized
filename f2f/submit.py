@@ -51,6 +51,7 @@ def post_link(environ,start_response):
       request_body_size = 0
    request_body = environ['wsgi.input'].read(request_body_size)
    d = parse_qs(request_body)
+   print d,request_body_size
    url = escape(d.get('url', ['http://www.google.com'])[0])
    title = escape(d.get('title', ['No title.'])[0])
 
