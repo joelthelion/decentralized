@@ -22,7 +22,7 @@ def message_handler(client,message):
 def start_network():
     jid=storage.config.get("jabber_id","test@example.com")
     password=storage.config.get("jabber_password","xxx")
-    print >>stderr, jid,password
+    #print >>stderr, jid,password
     client=connect(jid,password)
     client.sendInitPresence()
     client.RegisterHandler('message',message_handler)
