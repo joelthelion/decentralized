@@ -10,7 +10,7 @@ def not_found(environ, start_response):
    return [response_body]
 
 import re
-import submit, show_links, config
+from web_ui import submit, show_links, config
 
 urls = [
 (re.compile(r'^submit$'),submit.submit),
