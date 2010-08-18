@@ -19,12 +19,21 @@ def connect(jid,password):
 def message_handler(client,message):
     print >>stderr, message
 
+def presence_handler(client,message):
+    print str(message)
+    prs_type=message.getType()
+    sender=message.getFrom()
+    if prs_type == "subscribe": #accept all friend requests
+        client.send(xmpp.Presence(to=sender, typ = 'subscribed'))
+        client.send(xmpp.Presence(to=sender, typ = 'subscribe'))
+
 def start_network():
     jid=storage.config.get("jabber_id","test@example.com")
     password=storage.config.get("jabber_password","xxx")
     #print >>stderr, jid,password
     client=connect(jid,password)
     client.sendInitPresence()
+    client.RegisterHandler('presence',basic_presence_handler)
     client.RegisterHandler('message',message_handler)
     print >>stderr, "Network started!"
     while True:

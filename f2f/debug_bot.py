@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from daemon import storage
-print storage.config
-from network import connect,message_handler
+from network import connect,message_handler,presence_handler
 from time import sleep
 
 with open("credentials.txt") as file:
@@ -9,7 +8,8 @@ with open("credentials.txt") as file:
 print jid,password
 client=connect(jid,password)
 client.sendInitPresence()
-client.RegisterHandler('message',message_handler)
+client.RegisterHandler('presence',presence_handler)
+client.RegisterDefaultHandler(message_handler)
 while True:
     client.Process(1)
     sleep(1)
