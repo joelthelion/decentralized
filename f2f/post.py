@@ -5,7 +5,7 @@ class Post:
     def __init__(self):
         #URL the post links to. Unused in the case of a comment
         self.url=u""
-        #Title of the post: ununsed in the case of a comment
+        #Title of the post: ununsed(?) in the case of a comment
         self.title=u""
         #Content of the post
         self.content=u""

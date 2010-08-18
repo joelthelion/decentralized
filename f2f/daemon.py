@@ -17,12 +17,15 @@ class StorageObject(PersistentObject):
 storage=StorageObject()
 
 def add_post():
+    from network import outbox
     print >>stderr, "New post taken into account."
     new_post=post_queue.get()
+    outbox.put(new_post) # send the new post over the network
     storage.my_posts.append(new_post)
     storage.store() #we don't want to lose posts
 
 def start_daemon():
+    from network import outbox
     import time
     while True:
     #print >>stderr, storage.my_posts
