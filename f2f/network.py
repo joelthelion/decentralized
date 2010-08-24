@@ -29,6 +29,15 @@ def presence_handler(client,message):
         client.send(xmpp.Presence(to=sender, typ = 'subscribed'))
         client.send(xmpp.Presence(to=sender, typ = 'subscribe'))
 
+def make_xml_post(post):
+    node=xmpp.protocol.Node(tag="f2f",attrs={"url":post.url,\
+        "title":  post.title,\
+        "content":post.content,\
+        "reception_date":repr(post.reception_date),\
+        "parent": post.parent,\
+        "author": post.author})
+    #TODO: add votes (each in a child node <vote user=xxx/>)
+
 def start_network():
     from daemon import storage
     jid=storage.config.get("jabber_id","test@example.com")
@@ -43,8 +52,9 @@ def start_network():
     while True:
         while not outbox.empty(): #send posts to friends
             new_post=outbox.get()
+            xml_post=make_xml_post(new_post)
             for jid in roster.getItems():
-                m=xmpp.Message(to=jid,body=new_post.url,typ="message",attrs={})
+                m=xmpp.Message(to=jid,body=new_post.pretty_print(),typ="message",subject="f2f",payload=[xml_post])
                 client.send(m)
         #print jid
         client.Process(1)
