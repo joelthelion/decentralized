@@ -5,7 +5,7 @@ from time import sleep
 
 with open("credentials.txt") as file:
     jid,password=file.readlines()[0].split()
-print jid,password
+#print jid,password
 client=connect(jid,password)
 client.sendInitPresence()
 client.RegisterHandler('presence',presence_handler)
